@@ -1,0 +1,8 @@
+{
+  "name": "browser-workflow-2",
+  "description": "Browser Workflow 2: the Claude plugin that works with the Browser Workflow Chrome extension.",
+  "owner": { "name": "chauvoluuhuong" },
+  "plugins": [
+    { "name": "browser-workflow-2", "source": "./", "description": "Build, run and fix browser workflows in your own Chrome." }
+  ]
+}

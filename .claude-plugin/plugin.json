@@ -1,0 +1,11 @@
+{
+  "name": "browser-workflow-2",
+  "displayName": "Browser Workflow",
+  "version": "0.0.0",
+  "description": "Teach Claude a task on a website once; it saves it as a workflow that runs fast in your own Chrome through the Browser Workflow extension.",
+  "author": { "name": "chauvoluuhuong" },
+  "license": "AGPL-3.0-only",
+  "homepage": "https://browser-workflow.web.app",
+  "repository": "https://github.com/chauvoluuhuong/browser-workflow-2",
+  "keywords": ["browser", "automation", "chrome", "workflow"]
+}
