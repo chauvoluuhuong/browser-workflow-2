@@ -79,7 +79,11 @@ or `claude://code/new?q=…`); the user presses Send. From then on:
   `{ bw: "chat.mentions", query }` → `{ workflows, runs, tabs }`; `{ bw: "chat.send", text, mentions }` →
   `{ delivered }`; and the event `{ bw: "event", name: "chat.update", data: { state, entries } }` on every change.
   The log lives in `chrome.storage.session` (cleared when Chrome closes), at most 200 entries:
-  `{ at, from: "you" | "claude" | "event", text, mentions?, card? }`.
+  `{ at, from: "you" | "claude" | "event", text, mentions?, card? }`. A `you` entry's `text` holds `＠<name>`
+  (fullwidth ＠) where the user put each mention, in the order of `mentions`. `card` (an `event` entry):
+  `{ kind: "proposal", pendingId, name, state, runId? }` (from `proposal.update`) or
+  `{ kind: "run", runId, workflowId?, name, status, items? }` (from a finished `run.update`). The panel draws a
+  card from its fields in its own language; `text` is an English fallback for a card kind it does not know.
 
 Chunk frame (host → extension only):
 ```json
