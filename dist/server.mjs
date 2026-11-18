@@ -7,6 +7,7 @@ var __export = (target, all) => {
 };
 
 // src/server.js
+import { createHash } from "node:crypto";
 import { existsSync as existsSync2, readFileSync as readFileSync2 } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -25234,6 +25235,208 @@ function validateAndWarnToolName(name) {
   issueToolNameWarning(name, result.warnings);
   return result.isValid;
 }
+var MAX_TEMPLATE_LENGTH = 1e6;
+var MAX_VARIABLE_LENGTH = 1e6;
+var MAX_TEMPLATE_EXPRESSIONS = 1e4;
+var MAX_REGEX_LENGTH = 1e6;
+var UriTemplate = class UriTemplate2 {
+  /**
+  * Returns true if the given string contains any URI template expressions.
+  * A template expression is a sequence of characters enclosed in curly braces,
+  * like `{foo}` or `{?bar}`.
+  */
+  static isTemplate(str) {
+    return /\{[^}\s]+\}/.test(str);
+  }
+  static validateLength(str, max, context) {
+    if (str.length > max) throw new Error(`${context} exceeds maximum length of ${max} characters (got ${str.length})`);
+  }
+  template;
+  parts;
+  get variableNames() {
+    return this.parts.flatMap((part) => typeof part === "string" ? [] : part.names);
+  }
+  constructor(template) {
+    UriTemplate2.validateLength(template, MAX_TEMPLATE_LENGTH, "Template");
+    this.template = template;
+    this.parts = this.parse(template);
+  }
+  toString() {
+    return this.template;
+  }
+  parse(template) {
+    const parts = [];
+    let currentText = "";
+    let i = 0;
+    let expressionCount = 0;
+    while (i < template.length) if (template[i] === "{") {
+      if (currentText) {
+        parts.push(currentText);
+        currentText = "";
+      }
+      const end = template.indexOf("}", i);
+      if (end === -1) throw new Error("Unclosed template expression");
+      expressionCount++;
+      if (expressionCount > MAX_TEMPLATE_EXPRESSIONS) throw new Error(`Template contains too many expressions (max ${MAX_TEMPLATE_EXPRESSIONS})`);
+      const expr = template.slice(i + 1, end);
+      const operator = this.getOperator(expr);
+      const exploded = expr.includes("*");
+      const names = this.getNames(expr);
+      const name = names[0];
+      for (const name$1 of names) UriTemplate2.validateLength(name$1, MAX_VARIABLE_LENGTH, "Variable name");
+      parts.push({
+        name,
+        operator,
+        names,
+        exploded
+      });
+      i = end + 1;
+    } else {
+      currentText += template[i];
+      i++;
+    }
+    if (currentText) parts.push(currentText);
+    return parts;
+  }
+  getOperator(expr) {
+    return [
+      "+",
+      "#",
+      ".",
+      "/",
+      "?",
+      "&"
+    ].find((op) => expr.startsWith(op)) || "";
+  }
+  getNames(expr) {
+    const operator = this.getOperator(expr);
+    return expr.slice(operator.length).split(",").map((name) => name.replace("*", "").trim()).filter((name) => name.length > 0);
+  }
+  encodeValue(value, operator) {
+    UriTemplate2.validateLength(value, MAX_VARIABLE_LENGTH, "Variable value");
+    if (operator === "+" || operator === "#") return encodeURI(value);
+    return encodeURIComponent(value);
+  }
+  expandPart(part, variables) {
+    if (part.operator === "?" || part.operator === "&") {
+      const pairs = part.names.map((name) => {
+        const value$1 = variables[name];
+        if (value$1 === void 0) return "";
+        return `${name}=${Array.isArray(value$1) ? value$1.map((v) => this.encodeValue(v, part.operator)).join(",") : this.encodeValue(value$1.toString(), part.operator)}`;
+      }).filter((pair) => pair.length > 0);
+      if (pairs.length === 0) return "";
+      return (part.operator === "?" ? "?" : "&") + pairs.join("&");
+    }
+    if (part.names.length > 1) {
+      const values = part.names.map((name) => variables[name]).filter((v) => v !== void 0);
+      if (values.length === 0) return "";
+      return values.map((v) => Array.isArray(v) ? v[0] : v).join(",");
+    }
+    const value = variables[part.name];
+    if (value === void 0) return "";
+    const encoded = (Array.isArray(value) ? value : [value]).map((v) => this.encodeValue(v, part.operator));
+    switch (part.operator) {
+      case "":
+        return encoded.join(",");
+      case "+":
+        return encoded.join(",");
+      case "#":
+        return "#" + encoded.join(",");
+      case ".":
+        return "." + encoded.join(".");
+      case "/":
+        return "/" + encoded.join("/");
+      default:
+        return encoded.join(",");
+    }
+  }
+  expand(variables) {
+    let result = "";
+    let hasQueryParam = false;
+    for (const part of this.parts) {
+      if (typeof part === "string") {
+        result += part;
+        continue;
+      }
+      const expanded = this.expandPart(part, variables);
+      if (!expanded) continue;
+      result += (part.operator === "?" || part.operator === "&") && hasQueryParam ? expanded.replace("?", "&") : expanded;
+      if (part.operator === "?" || part.operator === "&") hasQueryParam = true;
+    }
+    return result;
+  }
+  escapeRegExp(str) {
+    return str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+  }
+  partToRegExp(part) {
+    const patterns = [];
+    for (const name$1 of part.names) UriTemplate2.validateLength(name$1, MAX_VARIABLE_LENGTH, "Variable name");
+    if (part.operator === "?" || part.operator === "&") {
+      for (let i = 0; i < part.names.length; i++) {
+        const name$1 = part.names[i];
+        const prefix = i === 0 ? "\\" + part.operator : "&";
+        patterns.push({
+          pattern: prefix + this.escapeRegExp(name$1) + "=([^&]+)",
+          name: name$1
+        });
+      }
+      return patterns;
+    }
+    let pattern;
+    const name = part.name;
+    switch (part.operator) {
+      case "":
+        pattern = part.exploded ? "([^/,]+(?:,[^/,]+)*)" : "([^/,]+)";
+        break;
+      case "+":
+      case "#":
+        pattern = "(.+)";
+        break;
+      case ".":
+        pattern = String.raw`\.([^/,]+)`;
+        break;
+      case "/":
+        pattern = "/" + (part.exploded ? "([^/,]+(?:,[^/,]+)*)" : "([^/,]+)");
+        break;
+      default:
+        pattern = "([^/]+)";
+    }
+    patterns.push({
+      pattern,
+      name
+    });
+    return patterns;
+  }
+  match(uri) {
+    UriTemplate2.validateLength(uri, MAX_TEMPLATE_LENGTH, "URI");
+    let pattern = "^";
+    const names = [];
+    for (const part of this.parts) if (typeof part === "string") pattern += this.escapeRegExp(part);
+    else {
+      const patterns = this.partToRegExp(part);
+      for (const { pattern: partPattern2, name } of patterns) {
+        pattern += partPattern2;
+        names.push({
+          name,
+          exploded: part.exploded
+        });
+      }
+    }
+    pattern += "$";
+    UriTemplate2.validateLength(pattern, MAX_REGEX_LENGTH, "Generated regex pattern");
+    const regex = new RegExp(pattern);
+    const match = uri.match(regex);
+    if (!match) return null;
+    const result = {};
+    for (const [i, name_] of names.entries()) {
+      const { name, exploded } = name_;
+      const value = match[i + 1];
+      const cleanName = name.replace("*", "");
+      result[cleanName] = exploded && value.includes(",") ? value.split(",") : value;
+    }
+    return result;
+  }
+};
 function isZodV4Schema(v) {
   return typeof v === "object" && v !== null && "_zod" in v;
 }
@@ -33586,6 +33789,31 @@ var McpServer = class {
     if (this.isConnected()) this.server.sendPromptListChanged();
   }
 };
+var ResourceTemplate = class {
+  _uriTemplate;
+  constructor(uriTemplate, _callbacks) {
+    this._callbacks = _callbacks;
+    this._uriTemplate = typeof uriTemplate === "string" ? new UriTemplate(uriTemplate) : uriTemplate;
+  }
+  /**
+  * Gets the URI template pattern.
+  */
+  get uriTemplate() {
+    return this._uriTemplate;
+  }
+  /**
+  * Gets the list callback, if one was provided.
+  */
+  get listCallback() {
+    return this._callbacks.list;
+  }
+  /**
+  * Gets the callback for completing a specific URI template variable, if one was provided.
+  */
+  completeCallback(variable) {
+    return this._callbacks.complete?.[variable];
+  }
+};
 function createToolExecutor(inputSchema, handler) {
   if (inputSchema) {
     const callback$1 = handler;
@@ -33749,9 +33977,6 @@ var StdioServerTransport = class {
   }
 };
 
-// src/link.js
-import { connect } from "node:net";
-
 // src/ids.js
 import { homedir, userInfo } from "node:os";
 import { join } from "node:path";
@@ -33772,6 +33997,7 @@ function socketPath(env = process.env, platform = process.platform) {
 }
 
 // src/link.js
+import { connect } from "node:net";
 var OPEN_CHROME = "Open Chrome to continue.";
 var PROTOCOL = 1;
 var LinkError = class extends Error {
@@ -34076,6 +34302,21 @@ function readText(rel) {
 }
 var VERSION = JSON.parse(readText("../package.json") ?? '{"version":"0.0.0"}').version;
 var guide = () => readText("../skills/browser-workflow/SKILL.md") ?? "";
+var RESOURCE_MIME_TYPE = "text/html;profile=mcp-app";
+var UI_URI = "ui://browser-workflow/app.html";
+function widgetHtml() {
+  const html = readText("../dist/widget.html");
+  if (!html) throw new Error("The widget is not built: run `npm run build`.");
+  return html;
+}
+function uiUri() {
+  try {
+    return `ui://browser-workflow/app-${createHash("sha256").update(widgetHtml()).digest("hex").slice(0, 10)}.html`;
+  } catch {
+    return UI_URI;
+  }
+}
+var UI_META = { ui: { csp: { resourceDomains: ["data:"] } } };
 var INSTRUCTIONS = [
   "browser-workflow creates, runs and fixes browser-automation workflows (JSON step graphs run in the user's own Chrome, in the background, by the Browser Workflow extension).",
   'Always check setup first: before any other tool in a conversation, call `get_account` (it shows the user nothing). Its answer ends with "Setup: finished" or "Setup: not finished". When it is not finished, call `setup`, end your reply with one short line and wait: do nothing else, whatever the user asked for, until they have finished it in the widget (it tells you when), then go on with what they asked. Do the same whenever a tool says setup is not finished. Once you have seen "Setup: finished" in this conversation, you need not check again.',
@@ -34108,7 +34349,7 @@ var WORKFLOW_TOOLS = [
   { name: "setup", title: "Set up browser-workflow", description: "Shows the setup widget, where the user adds a first workflow. Call it for new users or when a tool says setup is not finished, alone: no other widget in the same reply.", readOnly: true },
   { name: "list_workflows", title: "List workflows", description: "Lists the user's workflows for them, in a widget where they can open or run one (all of them, or a search). Use it whenever the user asks for their workflows, and do not write the list out yourself. Only while you are still working and need the list for yourself, use read_workflows, which shows nothing.", input: { query: external_exports.string().optional().describe("Filter by name, host or description") }, readOnly: true },
   { name: "show_workflow", title: "Get workflow", description: "For your final answer, not while you are still working. Shows the user one workflow (steps, variables, version); they can run it or ask for edits there. Use it when the user asks about one workflow, instead of writing its steps out. To read its definition for your own work, use get_workflow, which shows nothing.", input: { id: external_exports.string() }, readOnly: true },
-  { name: "get_step_schema", title: "Get workflow format", description: "How to build workflows, plus the JSON Schema of the format and every step type. Read this before drafting or changing workflows.", readOnly: true },
+  { name: "get_step_schema", title: "Get workflow format", description: "How to build workflows, plus the JSON Schema of the format and every step type. Read this before drafting or changing workflows.", readOnly: true, noUi: true },
   { name: "import_workflow", title: "Import workflow", description: "Validate a workflow JSON file (e.g. one the user attached) and show an import preview. Nothing is saved until the user confirms in the widget.", input: { json: external_exports.string().describe("The workflow file content"), fileName: external_exports.string().optional() } },
   { name: "propose_workflow", title: "Propose new workflow", description: "Show a drafted workflow (format: get_step_schema) to the user for review. The user saves it, or saves and test-runs it, from the widget.", input: { workflow: external_exports.record(external_exports.string(), external_exports.any()).describe("Workflow JSON: id, name, pageUrl?, description, steps[], environmentVariableSchema?") } },
   { name: "run_workflow", title: "Run workflow", description: "Start a run from the first step. If required inputs are missing the user gets a form. Returns a runId; the widget shows live progress.", input: { id: external_exports.string(), variables: external_exports.record(external_exports.string(), external_exports.any()).optional().describe("Inputs (environment variables) for this run"), stopAfterStepId: external_exports.string().optional().describe("Stop after this step (to test a change without running everything)"), form: external_exports.boolean().optional().describe("Widget use: show the input form even if all inputs have defaults") } },
@@ -34135,18 +34376,18 @@ var WORKFLOW_TOOLS = [
   { name: "show_run_data", title: "Get extracted data", description: "For your final answer, not while you are still working. Shows the user the table of items a run extracted, with downloads. Use it when the user asks for the data or results of a run, instead of writing a table. To read the items for your own work, use get_run_data, which shows nothing and gives every item.", input: { runId: external_exports.string() }, readOnly: true },
   { name: "show_history", title: "Workflow versions", description: "For your final answer, not while you are still working. Shows the user the version history of a workflow; they can restore an older version there. Use it when the user asks what changed or wants an older version back. To read it for your own work, use get_history, which shows nothing.", input: { id: external_exports.string() }, readOnly: true },
   { name: "show_account", title: "Account", description: "For your final answer, not while you are still working. Shows the user their account and settings (language). Use it when the user asks about their account, usage or settings, and do not write the numbers out beside it. To read them for your own work, use get_account, which shows nothing.", readOnly: true },
-  { name: "read_workflows", title: "Read workflows", description: `${mine} The saved workflows: id, name, version, number of steps, last run.`, input: { query: external_exports.string().optional().describe("Filter by name, host or description") }, readOnly: true },
-  { name: "get_workflow", title: "Read workflow", description: `${mine} The full definition of a workflow as JSON (steps, variables, version). Read it before proposing a change.`, input: { id: external_exports.string() }, readOnly: true },
-  { name: "get_history", title: "Read workflow versions", description: `${mine} The versions of a workflow: when, by whom, and what changed.`, input: { id: external_exports.string() }, readOnly: true },
-  { name: "read_runs", title: "Read runs", description: `${mine} Past runs of a workflow, newest first: run id, time, version, status, items.`, input: { workflowId: external_exports.string() }, readOnly: true },
-  { name: "get_run", title: "Read run", description: `${mine} A run's status and the state of each step. Use it to check a run you started.`, input: { runId: external_exports.string() }, readOnly: true },
-  { name: "get_step", title: "Read step in a run", description: `${mine} What one step did in one run: state, duration, URL, output or error, a downloaded file, variables before it, and its screenshot.`, input: { runId: external_exports.string(), stepId: external_exports.string() }, readOnly: true },
-  { name: "get_run_data", title: "Read extracted data", description: `${mine} The items a run extracted, one JSON object per line, a part at a time: the answer says how to get the next part.`, input: { runId: external_exports.string(), offset: external_exports.number().int().min(0).optional().describe("Skip this many items (default 0)"), limit: external_exports.number().int().min(1).max(200).optional().describe("At most this many items (default 20)") }, readOnly: true },
-  { name: "get_failure", title: "Read run failure", description: `${mine} Everything captured when a run failed: failing step and its definition, error, URL, console errors, variables, HTML near the target element, and a screenshot.`, input: { runId: external_exports.string() }, readOnly: true },
-  { name: "get_account", title: "Read account", description: `${mine} Where runs are stored, the language, and whether setup is finished. Call it first in a conversation, before any other tool.`, readOnly: true },
-  { name: "set_language", title: "Set language", description: "Sets the language of the widgets (English or Vietnamese) to the one the user writes in, and shows nothing. Only when get_account says no language is chosen yet, and before any tool that shows a widget. It changes nothing once a language is chosen: the user changes it in their account settings.", input: { lang: external_exports.enum(["en", "vi"]).describe("vi when the user writes in Vietnamese, en for anything else") } },
+  { name: "read_workflows", title: "Read workflows", description: `${mine} The saved workflows: id, name, version, number of steps, last run.`, input: { query: external_exports.string().optional().describe("Filter by name, host or description") }, readOnly: true, noUi: true },
+  { name: "get_workflow", title: "Read workflow", description: `${mine} The full definition of a workflow as JSON (steps, variables, version). Read it before proposing a change.`, input: { id: external_exports.string() }, readOnly: true, noUi: true },
+  { name: "get_history", title: "Read workflow versions", description: `${mine} The versions of a workflow: when, by whom, and what changed.`, input: { id: external_exports.string() }, readOnly: true, noUi: true },
+  { name: "read_runs", title: "Read runs", description: `${mine} Past runs of a workflow, newest first: run id, time, version, status, items.`, input: { workflowId: external_exports.string() }, readOnly: true, noUi: true },
+  { name: "get_run", title: "Read run", description: `${mine} A run's status and the state of each step. Use it to check a run you started.`, input: { runId: external_exports.string() }, readOnly: true, noUi: true },
+  { name: "get_step", title: "Read step in a run", description: `${mine} What one step did in one run: state, duration, URL, output or error, a downloaded file, variables before it, and its screenshot.`, input: { runId: external_exports.string(), stepId: external_exports.string() }, readOnly: true, noUi: true },
+  { name: "get_run_data", title: "Read extracted data", description: `${mine} The items a run extracted, one JSON object per line, a part at a time: the answer says how to get the next part.`, input: { runId: external_exports.string(), offset: external_exports.number().int().min(0).optional().describe("Skip this many items (default 0)"), limit: external_exports.number().int().min(1).max(200).optional().describe("At most this many items (default 20)") }, readOnly: true, noUi: true },
+  { name: "get_failure", title: "Read run failure", description: `${mine} Everything captured when a run failed: failing step and its definition, error, URL, console errors, variables, HTML near the target element, and a screenshot.`, input: { runId: external_exports.string() }, readOnly: true, noUi: true },
+  { name: "get_account", title: "Read account", description: `${mine} Where runs are stored, the language, and whether setup is finished. Call it first in a conversation, before any other tool.`, readOnly: true, noUi: true },
+  { name: "set_language", title: "Set language", description: "Sets the language of the widgets (English or Vietnamese) to the one the user writes in, and shows nothing. Only when get_account says no language is chosen yet, and before any tool that shows a widget. It changes nothing once a language is chosen: the user changes it in their account settings.", input: { lang: external_exports.enum(["en", "vi"]).describe("vi when the user writes in Vietnamese, en for anything else") }, noUi: true },
   { name: "delete_workflow", title: "Delete workflow", description: "Delete a workflow, all its versions and runs. Only when the user clearly asks.", input: { id: external_exports.string() }, destructive: true },
-  // The widget's tools (shown with the widgets in F): the user's own decisions.
+  // The widget's tools (visibility "app": only the widget sees them): the user's own decisions.
   { name: "show_workflows", title: "List workflows", description: `The workflow library, for the widget.${WIDGET_ONLY}`, input: { query: external_exports.string().optional() }, appOnly: true, readOnly: true },
   { name: "show_runs", title: "Workflow runs", description: `The past runs of a workflow, for the widget.${WIDGET_ONLY}`, input: { workflowId: external_exports.string() }, appOnly: true, readOnly: true },
   { name: "ui_confirm_import", title: "Confirm import", description: `Save an import preview.${WIDGET_ONLY}`, input: { pendingId: external_exports.string() }, appOnly: true },
@@ -34162,7 +34403,9 @@ var WORKFLOW_TOOLS = [
   { name: "ui_sign_in", title: "Sign in", description: `Sign in.${WIDGET_ONLY}`, appOnly: true },
   { name: "ui_finish_setup", title: "Finish setup", description: `Mark setup as done.${WIDGET_ONLY}`, appOnly: true },
   { name: "ui_account_page", title: "Account page", description: `The account page: plan, usage and settings.${WIDGET_ONLY}`, appOnly: true },
-  { name: "ui_account_link", title: "Create account", description: `A page where the user creates an account.${WIDGET_ONLY}`, appOnly: true }
+  { name: "ui_account_link", title: "Create account", description: `A page where the user creates an account.${WIDGET_ONLY}`, appOnly: true },
+  { name: "ui_proposal", title: "Proposal", description: `A proposal as it is now (it may have been approved in the side panel), or the proposals waiting.${WIDGET_ONLY}`, input: { pendingId: external_exports.string().optional() }, appOnly: true, readOnly: true },
+  { name: "ui_show_file", title: "Show in folder", description: `Shows a file a download step saved in its folder.${WIDGET_ONLY}`, input: { runId: external_exports.string(), stepId: external_exports.string() }, appOnly: true, readOnly: true }
 ];
 var INSPECT = "[Inspector \u2014 the same Chrome as workflow runs, in the extension's own tab group]";
 var PAGE_TOOLS = [
@@ -34181,22 +34424,87 @@ var PAGE_TOOLS = [
   { name: "page_list_network_requests", method: "inspect.network", title: "Inspector: list network requests", description: `${INSPECT} The requests of the selected page since its last navigation.`, input: { resourceTypes: external_exports.array(external_exports.string()).optional() }, readOnly: true },
   { name: "page_get_network_request", method: "inspect.request", title: "Inspector: get network request", description: `${INSPECT} One request in detail: headers and the response body.`, input: { reqid: external_exports.number().int() }, readOnly: true }
 ];
-function refusal(e) {
+function refusal(e, tool) {
   if (e instanceof LinkError) {
-    if (e.code === "not_running") return { content: [{ type: "text", text: OPEN_CHROME }], isError: true };
+    if (e.code === "not_running") {
+      const view = !tool || tool.noUi ? void 0 : tool.name === "setup" ? { view: "setup", step: "extension", workflows: 0, link: WEB_STORE_URL } : { view: "error", code: "not_running", message: OPEN_CHROME, link: WEB_STORE_URL };
+      return { content: [{ type: "text", text: OPEN_CHROME }], ...view ? { structuredContent: { ...view, modelText: OPEN_CHROME } } : {}, isError: true };
+    }
     if (e.code === "unsupported") return { content: [{ type: "text", text: `The Browser Workflow extension in Chrome is older than this plugin and does not know this yet. ${e.message} Ask the user to update the extension (Chrome updates it by itself, usually within a day).` }], isError: true };
     return { content: [{ type: "text", text: e.message }], isError: true };
   }
   return { content: [{ type: "text", text: `Error: ${e?.message ?? e}` }], isError: true };
 }
+var UserActions = class {
+  /** @param {{ open(): Promise<void>, on(name: string, fn: (d: any) => void): () => void }} link */
+  constructor(link, { keep = 20, keepMs = 60 * 6e4 } = {}) {
+    this.link = link;
+    this.keep = keep;
+    this.keepMs = keepMs;
+    this.queue = [];
+    this.context = [];
+    this.waiters = /* @__PURE__ */ new Set();
+    link.on("user.action", (d) => this.push(d));
+  }
+  open() {
+    return this.link.open();
+  }
+  push(d) {
+    if (!d || typeof d !== "object") return;
+    if (d.silent) {
+      this.context.push(String(d.text ?? ""));
+      if (this.context.length > 5) this.context.shift();
+      return;
+    }
+    const data = this.withContext(d);
+    if (this.waiters.size) {
+      for (const w of [...this.waiters]) w(data);
+      return;
+    }
+    this.queue.push({ at: Date.now(), data });
+    if (this.queue.length > this.keep) this.queue.shift();
+  }
+  /** Context the panel gave (with the action, or silently before it), after the action's own words. */
+  withContext(d) {
+    const ctx = [...this.context.splice(0), ...d.context ? [String(d.context)] : []].filter(Boolean);
+    return ctx.length ? { ...d, text: `${d.text ?? ""} (Details: ${ctx.join(" ")})` } : d;
+  }
+  /** Listens to the next action: one kept from before answers at once. */
+  on(name, fn) {
+    if (name !== "user.action") return this.link.on(name, fn);
+    this.queue = this.queue.filter((q) => Date.now() - q.at < this.keepMs);
+    const kept = this.queue.shift();
+    if (kept) {
+      let off = false;
+      queueMicrotask(() => {
+        if (!off) fn(kept.data);
+      });
+      return () => {
+        off = true;
+      };
+    }
+    this.waiters.add(fn);
+    return () => this.waiters.delete(fn);
+  }
+};
 function createServer(link) {
   const server = new McpServer({ name: "browser-workflow", version: VERSION }, { instructions: INSTRUCTIONS });
+  const actions = new UserActions(link);
+  const UI = uiUri();
+  server.registerResource("Browser Workflow views", UI, { description: "Inline views for Browser Workflow", mimeType: RESOURCE_MIME_TYPE }, async () => ({
+    contents: [{ uri: UI, mimeType: RESOURCE_MIME_TYPE, text: widgetHtml(), _meta: UI_META }]
+  }));
+  server.registerResource("Browser Workflow views (an earlier address)", new ResourceTemplate("ui://browser-workflow/{file}", { list: void 0 }), { mimeType: RESOURCE_MIME_TYPE }, async (uri) => ({
+    contents: [{ uri: uri.href, mimeType: RESOURCE_MIME_TYPE, text: widgetHtml(), _meta: UI_META }]
+  }));
   for (const t of WORKFLOW_TOOLS) {
     server.registerTool(t.name, {
       title: t.title,
       description: t.description,
       inputSchema: external_exports.object(t.input ?? {}),
-      annotations: { title: t.title, readOnlyHint: t.readOnly ?? false, destructiveHint: t.destructive ?? false }
+      annotations: { title: t.title, readOnlyHint: t.readOnly ?? false, destructiveHint: t.destructive ?? false },
+      // As ext-apps' registerAppTool: `ui.resourceUri` and the older `ui/resourceUri` key.
+      ...t.noUi ? {} : { _meta: { ui: { resourceUri: UI, visibility: t.appOnly ? ["app"] : ["model", "app"] }, "ui/resourceUri": UI } }
     }, async (args) => {
       try {
         const a = t.name === "get_step_schema" ? { ...args ?? {}, guide: guide() } : args ?? {};
@@ -34208,7 +34516,7 @@ function createServer(link) {
           isError: r.isError
         };
       } catch (e) {
-        return refusal(e);
+        return refusal(e, t);
       }
     });
   }
@@ -34242,7 +34550,7 @@ function createServer(link) {
     inputSchema: external_exports.object({ minutes: external_exports.number().min(0).max(30).optional().describe("How long to wait at most (default 10)") }),
     annotations: { title: "Wait for the user", readOnlyHint: true, destructiveHint: false }
   }, async (args, ctx) => {
-    const r = await waitForUser(link, args ?? {}, ctx);
+    const r = await waitForUser(actions, args ?? {}, ctx);
     return { content: [{ type: "text", text: r.text }], isError: r.isError };
   });
   server.registerPrompt("start", {
@@ -34275,11 +34583,16 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await
 export {
   INSTRUCTIONS,
   PAGE_TOOLS,
+  RESOURCE_MIME_TYPE,
+  UI_URI,
+  UserActions,
   VERSION,
   WORKFLOW_TOOLS,
   createServer,
   main,
-  startPrompt
+  startPrompt,
+  uiUri,
+  widgetHtml
 };
 /*! Bundled license information:
 

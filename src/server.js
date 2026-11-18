@@ -5,11 +5,13 @@
 // `wait_for_user` are answered here. The engine and the data live in the extension, never in this public repo.
 // At start it registers its native host (register.js), so Chrome can connect the extension to it.
 // Logs go to stderr: stdout is the MCP channel.
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { McpServer } from '@modelcontextprotocol/server';
+import { McpServer, ResourceTemplate } from '@modelcontextprotocol/server';
 import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
+import { WEB_STORE_URL } from './ids.js';
 import { Link, LinkError, OPEN_CHROME } from './link.js';
 import { registerHost } from './register.js';
 import { extensionStatus } from './tools/status.js';
@@ -23,6 +25,35 @@ function readText(rel) {
 export const VERSION = JSON.parse(readText('../package.json') ?? '{"version":"0.0.0"}').version;
 /** The authoring guide: the plugin's skill, passed to the extension's get_step_schema. */
 const guide = () => readText('../skills/browser-workflow/SKILL.md') ?? '';
+
+// ---------- the widget (MCP Apps) ----------
+
+/** The MCP Apps resource type (@modelcontextprotocol/ext-apps' RESOURCE_MIME_TYPE). */
+export const RESOURCE_MIME_TYPE = 'text/html;profile=mcp-app';
+/** The widget's address before it is built (reading it says so). */
+export const UI_URI = 'ui://browser-workflow/app.html';
+
+/** The built widget: dist/widget.html, read on every request (a rebuild shows without a restart). */
+export function widgetHtml() {
+  const html = readText('../dist/widget.html');
+  if (!html) throw new Error('The widget is not built: run `npm run build`.');
+  return html;
+}
+
+/**
+ * The widget's address, different for each build of it (v1's uiUri()). Claude keeps the widget it fetched
+ * under an address, so a fixed one would leave users on the old widget after an update.
+ */
+export function uiUri() {
+  try {
+    return `ui://browser-workflow/app-${createHash('sha256').update(widgetHtml()).digest('hex').slice(0, 10)}.html`;
+  } catch {
+    return UI_URI;
+  }
+}
+
+/** Screenshots are data: URLs; strict hosts default to img-src 'none'. */
+const UI_META = { ui: { csp: { resourceDomains: ['data:'] } } };
 
 export const INSTRUCTIONS = [
   'browser-workflow creates, runs and fixes browser-automation workflows (JSON step graphs run in the user\'s own Chrome, in the background, by the Browser Workflow extension).',
@@ -62,13 +93,15 @@ const mine = 'For your own work, while you are still working: answers with text 
  * The workflow tools: browser-workflow v1's registrations (src/server/tools.ts), minus the tools of its hosted
  * server (link_computer, ui_confirm_link, ui_new_bridge_token) and of its browser modes (browser_settings,
  * ui_check_browser, ui_save_browser), and the mock's ui_set_plan. Each is run by the extension.
- * @type {{ name: string, title: string, description: string, input?: Record<string, import('zod').ZodType>, readOnly?: boolean, destructive?: boolean, appOnly?: boolean }[]}
+ * `noUi`: the tools v1 registered without the widget (text for Claude only); every other tool carries `_meta.ui`,
+ * and `appOnly` ones are visible to the widget only.
+ * @type {{ name: string, title: string, description: string, input?: Record<string, import('zod').ZodType>, readOnly?: boolean, destructive?: boolean, appOnly?: boolean, noUi?: boolean }[]}
  */
 export const WORKFLOW_TOOLS = [
   { name: 'setup', title: 'Set up browser-workflow', description: 'Shows the setup widget, where the user adds a first workflow. Call it for new users or when a tool says setup is not finished, alone: no other widget in the same reply.', readOnly: true },
   { name: 'list_workflows', title: 'List workflows', description: 'Lists the user\'s workflows for them, in a widget where they can open or run one (all of them, or a search). Use it whenever the user asks for their workflows, and do not write the list out yourself. Only while you are still working and need the list for yourself, use read_workflows, which shows nothing.', input: { query: z.string().optional().describe('Filter by name, host or description') }, readOnly: true },
   { name: 'show_workflow', title: 'Get workflow', description: 'For your final answer, not while you are still working. Shows the user one workflow (steps, variables, version); they can run it or ask for edits there. Use it when the user asks about one workflow, instead of writing its steps out. To read its definition for your own work, use get_workflow, which shows nothing.', input: { id: z.string() }, readOnly: true },
-  { name: 'get_step_schema', title: 'Get workflow format', description: 'How to build workflows, plus the JSON Schema of the format and every step type. Read this before drafting or changing workflows.', readOnly: true },
+  { name: 'get_step_schema', title: 'Get workflow format', description: 'How to build workflows, plus the JSON Schema of the format and every step type. Read this before drafting or changing workflows.', readOnly: true, noUi: true },
   { name: 'import_workflow', title: 'Import workflow', description: 'Validate a workflow JSON file (e.g. one the user attached) and show an import preview. Nothing is saved until the user confirms in the widget.', input: { json: z.string().describe('The workflow file content'), fileName: z.string().optional() } },
   { name: 'propose_workflow', title: 'Propose new workflow', description: 'Show a drafted workflow (format: get_step_schema) to the user for review. The user saves it, or saves and test-runs it, from the widget.', input: { workflow: z.record(z.string(), z.any()).describe('Workflow JSON: id, name, pageUrl?, description, steps[], environmentVariableSchema?') } },
   { name: 'run_workflow', title: 'Run workflow', description: 'Start a run from the first step. If required inputs are missing the user gets a form. Returns a runId; the widget shows live progress.', input: { id: z.string(), variables: z.record(z.string(), z.any()).optional().describe('Inputs (environment variables) for this run'), stopAfterStepId: z.string().optional().describe('Stop after this step (to test a change without running everything)'), form: z.boolean().optional().describe('Widget use: show the input form even if all inputs have defaults') } },
@@ -93,18 +126,18 @@ export const WORKFLOW_TOOLS = [
   { name: 'show_run_data', title: 'Get extracted data', description: 'For your final answer, not while you are still working. Shows the user the table of items a run extracted, with downloads. Use it when the user asks for the data or results of a run, instead of writing a table. To read the items for your own work, use get_run_data, which shows nothing and gives every item.', input: { runId: z.string() }, readOnly: true },
   { name: 'show_history', title: 'Workflow versions', description: 'For your final answer, not while you are still working. Shows the user the version history of a workflow; they can restore an older version there. Use it when the user asks what changed or wants an older version back. To read it for your own work, use get_history, which shows nothing.', input: { id: z.string() }, readOnly: true },
   { name: 'show_account', title: 'Account', description: 'For your final answer, not while you are still working. Shows the user their account and settings (language). Use it when the user asks about their account, usage or settings, and do not write the numbers out beside it. To read them for your own work, use get_account, which shows nothing.', readOnly: true },
-  { name: 'read_workflows', title: 'Read workflows', description: `${mine} The saved workflows: id, name, version, number of steps, last run.`, input: { query: z.string().optional().describe('Filter by name, host or description') }, readOnly: true },
-  { name: 'get_workflow', title: 'Read workflow', description: `${mine} The full definition of a workflow as JSON (steps, variables, version). Read it before proposing a change.`, input: { id: z.string() }, readOnly: true },
-  { name: 'get_history', title: 'Read workflow versions', description: `${mine} The versions of a workflow: when, by whom, and what changed.`, input: { id: z.string() }, readOnly: true },
-  { name: 'read_runs', title: 'Read runs', description: `${mine} Past runs of a workflow, newest first: run id, time, version, status, items.`, input: { workflowId: z.string() }, readOnly: true },
-  { name: 'get_run', title: 'Read run', description: `${mine} A run's status and the state of each step. Use it to check a run you started.`, input: { runId: z.string() }, readOnly: true },
-  { name: 'get_step', title: 'Read step in a run', description: `${mine} What one step did in one run: state, duration, URL, output or error, a downloaded file, variables before it, and its screenshot.`, input: { runId: z.string(), stepId: z.string() }, readOnly: true },
-  { name: 'get_run_data', title: 'Read extracted data', description: `${mine} The items a run extracted, one JSON object per line, a part at a time: the answer says how to get the next part.`, input: { runId: z.string(), offset: z.number().int().min(0).optional().describe('Skip this many items (default 0)'), limit: z.number().int().min(1).max(200).optional().describe('At most this many items (default 20)') }, readOnly: true },
-  { name: 'get_failure', title: 'Read run failure', description: `${mine} Everything captured when a run failed: failing step and its definition, error, URL, console errors, variables, HTML near the target element, and a screenshot.`, input: { runId: z.string() }, readOnly: true },
-  { name: 'get_account', title: 'Read account', description: `${mine} Where runs are stored, the language, and whether setup is finished. Call it first in a conversation, before any other tool.`, readOnly: true },
-  { name: 'set_language', title: 'Set language', description: 'Sets the language of the widgets (English or Vietnamese) to the one the user writes in, and shows nothing. Only when get_account says no language is chosen yet, and before any tool that shows a widget. It changes nothing once a language is chosen: the user changes it in their account settings.', input: { lang: z.enum(['en', 'vi']).describe('vi when the user writes in Vietnamese, en for anything else') } },
+  { name: 'read_workflows', title: 'Read workflows', description: `${mine} The saved workflows: id, name, version, number of steps, last run.`, input: { query: z.string().optional().describe('Filter by name, host or description') }, readOnly: true, noUi: true },
+  { name: 'get_workflow', title: 'Read workflow', description: `${mine} The full definition of a workflow as JSON (steps, variables, version). Read it before proposing a change.`, input: { id: z.string() }, readOnly: true, noUi: true },
+  { name: 'get_history', title: 'Read workflow versions', description: `${mine} The versions of a workflow: when, by whom, and what changed.`, input: { id: z.string() }, readOnly: true, noUi: true },
+  { name: 'read_runs', title: 'Read runs', description: `${mine} Past runs of a workflow, newest first: run id, time, version, status, items.`, input: { workflowId: z.string() }, readOnly: true, noUi: true },
+  { name: 'get_run', title: 'Read run', description: `${mine} A run's status and the state of each step. Use it to check a run you started.`, input: { runId: z.string() }, readOnly: true, noUi: true },
+  { name: 'get_step', title: 'Read step in a run', description: `${mine} What one step did in one run: state, duration, URL, output or error, a downloaded file, variables before it, and its screenshot.`, input: { runId: z.string(), stepId: z.string() }, readOnly: true, noUi: true },
+  { name: 'get_run_data', title: 'Read extracted data', description: `${mine} The items a run extracted, one JSON object per line, a part at a time: the answer says how to get the next part.`, input: { runId: z.string(), offset: z.number().int().min(0).optional().describe('Skip this many items (default 0)'), limit: z.number().int().min(1).max(200).optional().describe('At most this many items (default 20)') }, readOnly: true, noUi: true },
+  { name: 'get_failure', title: 'Read run failure', description: `${mine} Everything captured when a run failed: failing step and its definition, error, URL, console errors, variables, HTML near the target element, and a screenshot.`, input: { runId: z.string() }, readOnly: true, noUi: true },
+  { name: 'get_account', title: 'Read account', description: `${mine} Where runs are stored, the language, and whether setup is finished. Call it first in a conversation, before any other tool.`, readOnly: true, noUi: true },
+  { name: 'set_language', title: 'Set language', description: 'Sets the language of the widgets (English or Vietnamese) to the one the user writes in, and shows nothing. Only when get_account says no language is chosen yet, and before any tool that shows a widget. It changes nothing once a language is chosen: the user changes it in their account settings.', input: { lang: z.enum(['en', 'vi']).describe('vi when the user writes in Vietnamese, en for anything else') }, noUi: true },
   { name: 'delete_workflow', title: 'Delete workflow', description: 'Delete a workflow, all its versions and runs. Only when the user clearly asks.', input: { id: z.string() }, destructive: true },
-  // The widget's tools (shown with the widgets in F): the user's own decisions.
+  // The widget's tools (visibility "app": only the widget sees them): the user's own decisions.
   { name: 'show_workflows', title: 'List workflows', description: `The workflow library, for the widget.${WIDGET_ONLY}`, input: { query: z.string().optional() }, appOnly: true, readOnly: true },
   { name: 'show_runs', title: 'Workflow runs', description: `The past runs of a workflow, for the widget.${WIDGET_ONLY}`, input: { workflowId: z.string() }, appOnly: true, readOnly: true },
   { name: 'ui_confirm_import', title: 'Confirm import', description: `Save an import preview.${WIDGET_ONLY}`, input: { pendingId: z.string() }, appOnly: true },
@@ -121,6 +154,8 @@ export const WORKFLOW_TOOLS = [
   { name: 'ui_finish_setup', title: 'Finish setup', description: `Mark setup as done.${WIDGET_ONLY}`, appOnly: true },
   { name: 'ui_account_page', title: 'Account page', description: `The account page: plan, usage and settings.${WIDGET_ONLY}`, appOnly: true },
   { name: 'ui_account_link', title: 'Create account', description: `A page where the user creates an account.${WIDGET_ONLY}`, appOnly: true },
+  { name: 'ui_proposal', title: 'Proposal', description: `A proposal as it is now (it may have been approved in the side panel), or the proposals waiting.${WIDGET_ONLY}`, input: { pendingId: z.string().optional() }, appOnly: true, readOnly: true },
+  { name: 'ui_show_file', title: 'Show in folder', description: `Shows a file a download step saved in its folder.${WIDGET_ONLY}`, input: { runId: z.string(), stepId: z.string() }, appOnly: true, readOnly: true },
 ];
 
 const INSPECT = '[Inspector — the same Chrome as workflow runs, in the extension\'s own tab group]';
@@ -145,19 +180,100 @@ export const PAGE_TOOLS = [
   { name: 'page_get_network_request', method: 'inspect.request', title: 'Inspector: get network request', description: `${INSPECT} One request in detail: headers and the response body.`, input: { reqid: z.number().int() }, readOnly: true },
 ];
 
-/** A LinkError as a tool answer: "Open Chrome to continue." and friends. */
-function refusal(e) {
+/**
+ * A LinkError as a tool answer: "Open Chrome to continue." and friends. A tool with a widget also gets a view:
+ * Chrome closed (or the extension missing) shows how to get Browser Workflow running, with Check again.
+ */
+function refusal(e, tool) {
   if (e instanceof LinkError) {
-    if (e.code === 'not_running') return { content: [{ type: 'text', text: OPEN_CHROME }], isError: true };
+    if (e.code === 'not_running') {
+      const view = !tool || tool.noUi ? undefined
+        : tool.name === 'setup' ? { view: 'setup', step: 'extension', workflows: 0, link: WEB_STORE_URL }
+        : { view: 'error', code: 'not_running', message: OPEN_CHROME, link: WEB_STORE_URL };
+      return { content: [{ type: 'text', text: OPEN_CHROME }], ...(view ? { structuredContent: { ...view, modelText: OPEN_CHROME } } : {}), isError: true };
+    }
     if (e.code === 'unsupported') return { content: [{ type: 'text', text: `The Browser Workflow extension in Chrome is older than this plugin and does not know this yet. ${e.message} Ask the user to update the extension (Chrome updates it by itself, usually within a day).` }], isError: true };
     return { content: [{ type: 'text', text: e.message }], isError: true };
   }
   return { content: [{ type: 'text', text: `Error: ${e?.message ?? e}` }], isError: true };
 }
 
+/**
+ * The user's actions in the side panel (`user.action` events), for wait_for_user. An action that comes while no
+ * wait_for_user is waiting is kept (the last 20, for an hour) and answers the next one at once. A silent action
+ * (`silent`: what the panel tells Claude without asking anything, e.g. that a run ended) wakes nobody: its text
+ * goes with the next action. Shaped like the Link for waitForUser: `open()` and `on('user.action', fn)`.
+ */
+export class UserActions {
+  /** @param {{ open(): Promise<void>, on(name: string, fn: (d: any) => void): () => void }} link */
+  constructor(link, { keep = 20, keepMs = 60 * 60_000 } = {}) {
+    this.link = link;
+    this.keep = keep;
+    this.keepMs = keepMs;
+    /** @type {{ at: number, data: any }[]} */
+    this.queue = [];
+    /** @type {string[]} */
+    this.context = [];
+    /** @type {Set<(d: any) => void>} */
+    this.waiters = new Set();
+    link.on('user.action', (d) => this.push(d));
+  }
+
+  open() {
+    return this.link.open();
+  }
+
+  push(d) {
+    if (!d || typeof d !== 'object') return;
+    if (d.silent) {
+      this.context.push(String(d.text ?? ''));
+      if (this.context.length > 5) this.context.shift();
+      return;
+    }
+    const data = this.withContext(d);
+    if (this.waiters.size) {
+      for (const w of [...this.waiters]) w(data);
+      return;
+    }
+    this.queue.push({ at: Date.now(), data });
+    if (this.queue.length > this.keep) this.queue.shift();
+  }
+
+  /** Context the panel gave (with the action, or silently before it), after the action's own words. */
+  withContext(d) {
+    const ctx = [...this.context.splice(0), ...(d.context ? [String(d.context)] : [])].filter(Boolean);
+    return ctx.length ? { ...d, text: `${d.text ?? ''} (Details: ${ctx.join(' ')})` } : d;
+  }
+
+  /** Listens to the next action: one kept from before answers at once. */
+  on(name, fn) {
+    if (name !== 'user.action') return this.link.on(name, fn);
+    this.queue = this.queue.filter((q) => Date.now() - q.at < this.keepMs);
+    const kept = this.queue.shift();
+    if (kept) {
+      let off = false;
+      queueMicrotask(() => { if (!off) fn(kept.data); });
+      return () => { off = true; };
+    }
+    this.waiters.add(fn);
+    return () => this.waiters.delete(fn);
+  }
+}
+
 /** The MCP server with every tool, on a Link. */
 export function createServer(link) {
   const server = new McpServer({ name: 'browser-workflow', version: VERSION }, { instructions: INSTRUCTIONS });
+  const actions = new UserActions(link);
+
+  // The widget: one resource every view is drawn from, under an address that changes with each build.
+  const UI = uiUri();
+  server.registerResource('Browser Workflow views', UI, { description: 'Inline views for Browser Workflow', mimeType: RESOURCE_MIME_TYPE }, async () => ({
+    contents: [{ uri: UI, mimeType: RESOURCE_MIME_TYPE, text: widgetHtml(), _meta: UI_META }],
+  }));
+  // An app that listed the tools before an update still asks for the widget under that build's address: it gets today's.
+  server.registerResource('Browser Workflow views (an earlier address)', new ResourceTemplate('ui://browser-workflow/{file}', { list: undefined }), { mimeType: RESOURCE_MIME_TYPE }, async (uri) => ({
+    contents: [{ uri: uri.href, mimeType: RESOURCE_MIME_TYPE, text: widgetHtml(), _meta: UI_META }],
+  }));
 
   for (const t of WORKFLOW_TOOLS) {
     server.registerTool(t.name, {
@@ -165,6 +281,8 @@ export function createServer(link) {
       description: t.description,
       inputSchema: z.object(t.input ?? {}),
       annotations: { title: t.title, readOnlyHint: t.readOnly ?? false, destructiveHint: t.destructive ?? false },
+      // As ext-apps' registerAppTool: `ui.resourceUri` and the older `ui/resourceUri` key.
+      ...(t.noUi ? {} : { _meta: { ui: { resourceUri: UI, visibility: t.appOnly ? ['app'] : ['model', 'app'] }, 'ui/resourceUri': UI } }),
     }, async (args) => {
       try {
         const a = t.name === 'get_step_schema' ? { ...(args ?? {}), guide: guide() } : (args ?? {});
@@ -176,7 +294,7 @@ export function createServer(link) {
           isError: r.isError,
         };
       } catch (e) {
-        return refusal(e);
+        return refusal(e, t);
       }
     });
   }
@@ -213,7 +331,7 @@ export function createServer(link) {
     inputSchema: z.object({ minutes: z.number().min(0).max(30).optional().describe('How long to wait at most (default 10)') }),
     annotations: { title: 'Wait for the user', readOnlyHint: true, destructiveHint: false },
   }, async (args, ctx) => {
-    const r = await waitForUser(link, args ?? {}, ctx);
+    const r = await waitForUser(actions, args ?? {}, ctx);
     return { content: [{ type: 'text', text: r.text }], isError: r.isError };
   });
 

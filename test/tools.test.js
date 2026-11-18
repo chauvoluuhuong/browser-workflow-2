@@ -15,10 +15,12 @@ const V1 = [
   'ui_account_page', 'ui_account_link', 'link_computer', 'ui_confirm_link', 'ui_set_plan',
 ];
 const DROPPED = ['link_computer', 'ui_confirm_link', 'ui_new_bridge_token', 'browser_settings', 'ui_check_browser', 'ui_save_browser', 'ui_set_plan'];
+/** The widget's tools v2 adds: a proposal as it is now (approvals sync with the side panel), and Show in folder. */
+const ADDED = ['ui_proposal', 'ui_show_file'];
 const PAGE = ['list_pages', 'select_page', 'new_page', 'navigate_page', 'take_snapshot', 'take_screenshot', 'click', 'fill', 'press_key', 'evaluate_script', 'wait_for', 'list_console_messages', 'list_network_requests', 'get_network_request'];
 
-test('the workflow tools are v1\'s minus the dropped ones', () => {
-  assert.deepEqual(WORKFLOW_TOOLS.map((t) => t.name).sort(), V1.filter((n) => !DROPPED.includes(n)).sort());
+test('the workflow tools are v1\'s minus the dropped ones, plus the widget\'s two new ones', () => {
+  assert.deepEqual(WORKFLOW_TOOLS.map((t) => t.name).sort(), [...V1.filter((n) => !DROPPED.includes(n)), ...ADDED].sort());
 });
 
 test('the page tools are v1\'s page_* (chrome-devtools-mcp\'s curated set), each on an inspect.* method', () => {
