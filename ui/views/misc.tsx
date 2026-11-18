@@ -149,7 +149,7 @@ export function LanguagePicker({ compact = false }: { compact?: boolean }) {
 type AccountProps = { account: AccountInfo; limit?: { code: LimitCode; arg?: string }; retry?: { tool: string; args: Record<string, unknown> } };
 
 export function AccountView(p: AccountProps) {
-  return p.account.page === undefined ? <LocalAccountView account={p.account} /> : <AccountCard {...p} />;
+  return p.account.page === undefined ? <LocalAccountView {...p} /> : <AccountCard {...p} />;
 }
 
 /** How much of one limit is used, as a bar. */
@@ -233,9 +233,12 @@ function AccountCard({ account: a, limit, retry }: AccountProps) {
 }
 
 /** The local build: there is no site to go to, so usage, storage and the language are all here. */
-function LocalAccountView({ account: a }: { account: AccountInfo }) {
+function LocalAccountView({ account: a, limit, retry }: AccountProps) {
   const nav = useNav();
   const { t } = useI18n();
+  // After Upgrade (on the hub's page), what the limit refused can be tried again from here.
+  const [upgraded, setUpgraded] = useState(false);
+  const upgrade = (a.plan === 'free' || a.paidUntil) && a.links?.upgrade;
   const meter = (label: string, used: number, limit: number) => <Meter label={label} used={used} limit={limit} />;
   // Browser Workflow keeps everything in Chrome, on this computer.
   const storage = t('acct.storage.computer');
@@ -243,13 +246,24 @@ function LocalAccountView({ account: a }: { account: AccountInfo }) {
   return (
     <div class="w">
       <Header title={t('acct.title')} sub={a.anonymous ? t('acct.anonymous') : [a.name, a.paidUntil ? t('acct.until', { date: a.paidUntil.slice(0, 10) }) : ''].filter(Boolean).join(' · ') || undefined} right={<span class={`pill ${a.plan === 'paid' ? 'ok' : 'muted'}`}>{a.plan === 'paid' ? t('acct.pro') : t('acct.free')}</span>} />
+      {(a as { offline?: boolean }).offline && <Note kind="warn">{t('acct.offline')}</Note>}
+      {limit && <LimitNotice a={a} limit={limit} upgrade={!!upgrade} />}
+      {limit && retry && upgraded && (
+        <div class="actions"><AsyncButton onClick={() => nav.open(retry.tool, retry.args, 'replace')}>{t('acct.tryAgain')}</AsyncButton></div>
+      )}
       <div class="stack">
         {meter(t(`acct.runs.${a.usage.period}`), a.usage.runs, a.usage.runsLimit)}
         {a.usage.steps !== undefined && meter(t(`acct.steps.${a.usage.period}`), a.usage.steps, a.usage.stepsLimit ?? 0)}
         {meter(t('acct.workflows'), a.usage.workflows, a.usage.workflowsLimit)}
       </div>
       <div class="list">
-        {a.anonymous && <CreateAccountRow />}
+        {a.anonymous && <CreateAccountRow refresh />}
+        {a.anonymous && a.name && (
+          <div class="row" style="flex-direction:column;align-items:stretch;gap:8px">
+            <div class="row-main"><div class="row-sub" style="white-space:normal">{t('acct.loginHint')}</div></div>
+            <div><AsyncButton onClick={() => nav.open('ui_sign_in', {}, 'replace')}>{t('acct.login')}</AsyncButton></div>
+          </div>
+        )}
         <div class="row"><div class="row-main"><div class="row-sub">{t('acct.storedIn')}</div><div class="row-title">{storage}</div>
           {a.retentionDays ? <div class="row-sub">{t('acct.retention', { n: a.retentionDays })}</div> : null}
           {local ? <div class="row-sub" style="white-space:normal">{t('acct.storage.computerNote')}</div> : null}
@@ -261,8 +275,9 @@ function LocalAccountView({ account: a }: { account: AccountInfo }) {
         <LanguagePicker />
       </div>
       <div class="actions">
-        {(a.plan === 'free' || a.paidUntil) && a.links?.upgrade ? (
-          <AsyncButton primary onClick={() => nav.bridge.openLink(a.links!.upgrade!)}>{t('acct.upgrade')}</AsyncButton>
+        {!a.anonymous && a.name && <button class="link" style="margin-right:auto" onClick={() => nav.open('ui_sign_out', {}, 'replace')}>{t('acct.logout')}</button>}
+        {upgrade ? (
+          <AsyncButton primary onClick={async () => { await nav.bridge.openLink(a.links!.upgrade!); setUpgraded(true); }}>{t('acct.upgrade')}</AsyncButton>
         ) : a.plan === 'paid' && a.links?.manage ? (
           <AsyncButton onClick={() => nav.bridge.openLink(a.links!.manage!)}>{t('acct.manage')}</AsyncButton>
         ) : null}
@@ -275,7 +290,7 @@ function LocalAccountView({ account: a }: { account: AccountInfo }) {
  * Hosted, anonymous accounts: opens the page on our site where the user picks a username and
  * password. The account stays the same one, so nothing is lost; the password is never typed here.
  */
-export function CreateAccountRow({ onOpened }: { onOpened?: () => void }) {
+export function CreateAccountRow({ onOpened, refresh }: { onOpened?: () => void; refresh?: boolean }) {
   const nav = useNav();
   const { t } = useI18n();
   const [opened, setOpened] = useState(false);
@@ -293,6 +308,8 @@ export function CreateAccountRow({ onOpened }: { onOpened?: () => void }) {
           setOpened(true);
           onOpened?.();
         }}>{t(opened ? 'acct.createAgain' : 'acct.create')}</AsyncButton>
+        {/* In the account card: once the page is done, read the account again. */}
+        {opened && refresh && <> <AsyncButton primary onClick={() => nav.open('show_account', {}, 'replace')}>{t('acct.createDone')}</AsyncButton></>}
       </div>
     </div>
   );

@@ -6,7 +6,7 @@
 //                `user.action` event (wait_for_user answers it); with none connected the panel offers the text
 //                to copy into Claude.
 //   Home         the workflows with Run and their last result (list_workflows' view), and a "Waiting for your
-//                approval" badge while Claude's proposals wait (ui_proposal).
+//                approval" badge while Claude's proposals wait (ui_proposal). Account opens the account card.
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import './styles.css';
@@ -147,12 +147,12 @@ function PanelTop({ nav, current }: { nav: Nav; current?: ViewPayload }) {
   const home = current?.view === 'library';
   const shown = pendingOf(current);
   const waiting = proposals.filter((p) => p.pendingId !== shown);
-  if (home && !waiting.length) return null;
   return (
     <div class="w panel-top" style="padding-bottom:0">
-      {!home && (
-        <button class="back" onClick={() => nav.open('list_workflows', {}, 'reset')}>{t('panel.home')}</button>
-      )}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        {home ? <span /> : <button class="back" onClick={() => nav.open('list_workflows', {}, 'reset')}>{t('panel.home')}</button>}
+        {current?.view !== 'account' && <button class="link" onClick={() => nav.open('show_account', {}, 'push')}>{t('panel.account')}</button>}
+      </div>
       {waiting.length > 0 && (
         <div class="note warn" role="status" style="align-items:center">
           {Icon.alert()}

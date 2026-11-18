@@ -231,7 +231,7 @@ export const en = {
   'acct.steps.year': 'Steps run this year',
   'acct.anonymous': 'No account yet',
   'acct.createTitle': 'Create a free account',
-  'acct.createHint': 'Pick a username and password to get more runs and workflows. Everything you’ve made stays with the account.',
+  'acct.createHint': 'Pick a username and password, so you can log in again later and upgrade. Everything you’ve made stays in Chrome.',
   'acct.create': 'Create account',
   'acct.trying': 'You are trying it without an account',
   'acct.tryingHint': 'Create a free account to keep your workflows and run more each day.',
@@ -249,7 +249,7 @@ export const en = {
   'acct.workflows': 'Workflows',
   'acct.storedIn': 'Data stored in',
   'acct.storage.computer': 'In Chrome, on this computer',
-  'acct.storage.computerNote': 'Workflows, runs and results stay in Chrome, in Browser Workflow. Nothing is sent to a server.',
+  'acct.storage.computerNote': 'Workflows, runs and results stay in Chrome, in Browser Workflow. Only your plan and how many runs you made are kept with your account.',
   'acct.keepRuns': 'The last {n} runs of each workflow are kept',
   'acct.localUsed': '{mb} MB in {n} runs now',
   'acct.localWarn': 'Saved runs are taking a lot of space on your computer. Nothing is deleted automatically: delete workflows you no longer need to free space.',
@@ -333,6 +333,12 @@ export const en = {
   'panel.copy': 'Copy',
   'panel.copied': 'Copied',
   'panel.empty': 'No workflows yet. Ask {ai} to make one: describe what to do on a website.',
+  'acct.login': 'Log in',
+  'acct.loginHint': 'Already have an account? Log in to it.',
+  'acct.logout': 'Log out',
+  'acct.offline': 'Your account could not be reached just now: the plan you last had is shown.',
+  'acct.createDone': 'I created it',
+  'panel.account': 'Account',
 };
 
 export type Key = keyof typeof en;
@@ -544,7 +550,7 @@ export const vi: Record<Key, string> = {
   'acct.steps.year': 'Số bước đã chạy năm nay',
   'acct.anonymous': 'Chưa có tài khoản',
   'acct.createTitle': 'Tạo tài khoản miễn phí',
-  'acct.createHint': 'Chọn tên đăng nhập và mật khẩu để có thêm lần chạy và workflow. Mọi thứ bạn đã tạo vẫn thuộc về tài khoản.',
+  'acct.createHint': 'Chọn tên đăng nhập và mật khẩu để sau này đăng nhập lại và nâng cấp. Mọi thứ bạn đã tạo vẫn ở trong Chrome.',
   'acct.create': 'Tạo tài khoản',
   'acct.trying': 'Bạn đang dùng thử, chưa có tài khoản',
   'acct.tryingHint': 'Tạo tài khoản miễn phí để giữ các workflow và chạy được nhiều hơn mỗi ngày.',
@@ -562,7 +568,7 @@ export const vi: Record<Key, string> = {
   'acct.workflows': 'Workflow',
   'acct.storedIn': 'Dữ liệu lưu tại',
   'acct.storage.computer': 'Trong Chrome, trên máy tính này',
-  'acct.storage.computerNote': 'Workflow, lần chạy và kết quả được giữ trong Chrome, trong Browser Workflow. Không gửi gì lên máy chủ.',
+  'acct.storage.computerNote': 'Workflow, lần chạy và kết quả được giữ trong Chrome, trong Browser Workflow. Tài khoản chỉ lưu gói của bạn và số lần bạn đã chạy.',
   'acct.keepRuns': 'Giữ {n} lần chạy gần nhất của mỗi workflow',
   'acct.localUsed': 'Hiện có {mb} MB trong {n} lần chạy',
   'acct.localWarn': 'Các lần chạy đã lưu đang chiếm nhiều dung lượng trên máy của bạn. Không có gì bị xoá tự động: hãy xoá những workflow không còn dùng để giải phóng dung lượng.',
@@ -641,6 +647,12 @@ export const vi: Record<Key, string> = {
   'panel.copy': 'Sao chép',
   'panel.copied': 'Đã sao chép',
   'panel.empty': 'Chưa có workflow nào. Hãy nhờ {ai} tạo: mô tả việc cần làm trên một trang web.',
+  'acct.login': 'Đăng nhập',
+  'acct.loginHint': 'Đã có tài khoản? Đăng nhập vào tài khoản đó.',
+  'acct.logout': 'Đăng xuất',
+  'acct.offline': 'Hiện chưa kết nối được tới tài khoản của bạn: đang hiển thị gói gần nhất bạn có.',
+  'acct.createDone': 'Tôi đã tạo xong',
+  'panel.account': 'Tài khoản',
 };
 
 const DICTS: Record<Lang, Record<Key, string>> = { en, vi };

@@ -596,7 +596,7 @@ var Me = {
 	"acct.steps.year": "Steps run this year",
 	"acct.anonymous": "No account yet",
 	"acct.createTitle": "Create a free account",
-	"acct.createHint": "Pick a username and password to get more runs and workflows. Everything you’ve made stays with the account.",
+	"acct.createHint": "Pick a username and password, so you can log in again later and upgrade. Everything you’ve made stays in Chrome.",
 	"acct.create": "Create account",
 	"acct.trying": "You are trying it without an account",
 	"acct.tryingHint": "Create a free account to keep your workflows and run more each day.",
@@ -614,7 +614,7 @@ var Me = {
 	"acct.workflows": "Workflows",
 	"acct.storedIn": "Data stored in",
 	"acct.storage.computer": "In Chrome, on this computer",
-	"acct.storage.computerNote": "Workflows, runs and results stay in Chrome, in Browser Workflow. Nothing is sent to a server.",
+	"acct.storage.computerNote": "Workflows, runs and results stay in Chrome, in Browser Workflow. Only your plan and how many runs you made are kept with your account.",
 	"acct.keepRuns": "The last {n} runs of each workflow are kept",
 	"acct.localUsed": "{mb} MB in {n} runs now",
 	"acct.localWarn": "Saved runs are taking a lot of space on your computer. Nothing is deleted automatically: delete workflows you no longer need to free space.",
@@ -687,7 +687,13 @@ var Me = {
 	"panel.noAi": "Open {ai} and ask it to fix this workflow. Copy this and paste it in the chat:",
 	"panel.copy": "Copy",
 	"panel.copied": "Copied",
-	"panel.empty": "No workflows yet. Ask {ai} to make one: describe what to do on a website."
+	"panel.empty": "No workflows yet. Ask {ai} to make one: describe what to do on a website.",
+	"acct.login": "Log in",
+	"acct.loginHint": "Already have an account? Log in to it.",
+	"acct.logout": "Log out",
+	"acct.offline": "Your account could not be reached just now: the plan you last had is shown.",
+	"acct.createDone": "I created it",
+	"panel.account": "Account"
 }, Ne = {
 	en: Me,
 	vi: {
@@ -880,7 +886,7 @@ var Me = {
 		"acct.steps.year": "Số bước đã chạy năm nay",
 		"acct.anonymous": "Chưa có tài khoản",
 		"acct.createTitle": "Tạo tài khoản miễn phí",
-		"acct.createHint": "Chọn tên đăng nhập và mật khẩu để có thêm lần chạy và workflow. Mọi thứ bạn đã tạo vẫn thuộc về tài khoản.",
+		"acct.createHint": "Chọn tên đăng nhập và mật khẩu để sau này đăng nhập lại và nâng cấp. Mọi thứ bạn đã tạo vẫn ở trong Chrome.",
 		"acct.create": "Tạo tài khoản",
 		"acct.trying": "Bạn đang dùng thử, chưa có tài khoản",
 		"acct.tryingHint": "Tạo tài khoản miễn phí để giữ các workflow và chạy được nhiều hơn mỗi ngày.",
@@ -898,7 +904,7 @@ var Me = {
 		"acct.workflows": "Workflow",
 		"acct.storedIn": "Dữ liệu lưu tại",
 		"acct.storage.computer": "Trong Chrome, trên máy tính này",
-		"acct.storage.computerNote": "Workflow, lần chạy và kết quả được giữ trong Chrome, trong Browser Workflow. Không gửi gì lên máy chủ.",
+		"acct.storage.computerNote": "Workflow, lần chạy và kết quả được giữ trong Chrome, trong Browser Workflow. Tài khoản chỉ lưu gói của bạn và số lần bạn đã chạy.",
 		"acct.keepRuns": "Giữ {n} lần chạy gần nhất của mỗi workflow",
 		"acct.localUsed": "Hiện có {mb} MB trong {n} lần chạy",
 		"acct.localWarn": "Các lần chạy đã lưu đang chiếm nhiều dung lượng trên máy của bạn. Không có gì bị xoá tự động: hãy xoá những workflow không còn dùng để giải phóng dung lượng.",
@@ -971,7 +977,13 @@ var Me = {
 		"panel.noAi": "Hãy mở {ai} và nhờ sửa workflow này. Sao chép đoạn này rồi dán vào cuộc trò chuyện:",
 		"panel.copy": "Sao chép",
 		"panel.copied": "Đã sao chép",
-		"panel.empty": "Chưa có workflow nào. Hãy nhờ {ai} tạo: mô tả việc cần làm trên một trang web."
+		"panel.empty": "Chưa có workflow nào. Hãy nhờ {ai} tạo: mô tả việc cần làm trên một trang web.",
+		"acct.login": "Đăng nhập",
+		"acct.loginHint": "Đã có tài khoản? Đăng nhập vào tài khoản đó.",
+		"acct.logout": "Đăng xuất",
+		"acct.offline": "Hiện chưa kết nối được tới tài khoản của bạn: đang hiển thị gói gần nhất bạn có.",
+		"acct.createDone": "Tôi đã tạo xong",
+		"panel.account": "Tài khoản"
 	}
 };
 function Pe(e, t = "en") {
@@ -2879,7 +2891,7 @@ function Tt({ compact: e = !1 }) {
 	});
 }
 function Et(e) {
-	return e.account.page === void 0 ? /* @__PURE__ */ U(kt, { account: e.account }) : /* @__PURE__ */ U(Ot, { ...e });
+	return e.account.page === void 0 ? /* @__PURE__ */ U(kt, { ...e }) : /* @__PURE__ */ U(Ot, { ...e });
 }
 function Q({ label: e, used: t, limit: n }) {
 	return /* @__PURE__ */ U("div", {
@@ -2995,35 +3007,66 @@ function Ot({ account: e, limit: t, retry: n }) {
 		]
 	});
 }
-function kt({ account: e }) {
-	let t = W(), { t: n } = H(), r = (e, t, n) => /* @__PURE__ */ U(Q, {
+function kt({ account: e, limit: t, retry: n }) {
+	let r = W(), { t: i } = H(), [a, o] = R(!1), s = (e.plan === "free" || e.paidUntil) && e.links?.upgrade, c = (e, t, n) => /* @__PURE__ */ U(Q, {
 		label: e,
 		used: t,
 		limit: n
-	}), i = n("acct.storage.computer"), a = e.storage.kind === "computer" ? e.storage : void 0;
+	}), l = i("acct.storage.computer"), u = e.storage.kind === "computer" ? e.storage : void 0;
 	return /* @__PURE__ */ U("div", {
 		class: "w",
 		children: [
 			/* @__PURE__ */ U(q, {
-				title: n("acct.title"),
-				sub: e.anonymous ? n("acct.anonymous") : [e.name, e.paidUntil ? n("acct.until", { date: e.paidUntil.slice(0, 10) }) : ""].filter(Boolean).join(" · ") || void 0,
+				title: i("acct.title"),
+				sub: e.anonymous ? i("acct.anonymous") : [e.name, e.paidUntil ? i("acct.until", { date: e.paidUntil.slice(0, 10) }) : ""].filter(Boolean).join(" · ") || void 0,
 				right: /* @__PURE__ */ U("span", {
 					class: `pill ${e.plan === "paid" ? "ok" : "muted"}`,
-					children: e.plan === "paid" ? n("acct.pro") : n("acct.free")
+					children: e.plan === "paid" ? i("acct.pro") : i("acct.free")
+				})
+			}),
+			e.offline && /* @__PURE__ */ U(Y, {
+				kind: "warn",
+				children: i("acct.offline")
+			}),
+			t && /* @__PURE__ */ U(Dt, {
+				a: e,
+				limit: t,
+				upgrade: !!s
+			}),
+			t && n && a && /* @__PURE__ */ U("div", {
+				class: "actions",
+				children: /* @__PURE__ */ U(X, {
+					onClick: () => r.open(n.tool, n.args, "replace"),
+					children: i("acct.tryAgain")
 				})
 			}),
 			/* @__PURE__ */ U("div", {
 				class: "stack",
 				children: [
-					r(n(`acct.runs.${e.usage.period}`), e.usage.runs, e.usage.runsLimit),
-					e.usage.steps !== void 0 && r(n(`acct.steps.${e.usage.period}`), e.usage.steps, e.usage.stepsLimit ?? 0),
-					r(n("acct.workflows"), e.usage.workflows, e.usage.workflowsLimit)
+					c(i(`acct.runs.${e.usage.period}`), e.usage.runs, e.usage.runsLimit),
+					e.usage.steps !== void 0 && c(i(`acct.steps.${e.usage.period}`), e.usage.steps, e.usage.stepsLimit ?? 0),
+					c(i("acct.workflows"), e.usage.workflows, e.usage.workflowsLimit)
 				]
 			}),
 			/* @__PURE__ */ U("div", {
 				class: "list",
 				children: [
-					e.anonymous && /* @__PURE__ */ U(At, {}),
+					e.anonymous && /* @__PURE__ */ U(At, { refresh: !0 }),
+					e.anonymous && e.name && /* @__PURE__ */ U("div", {
+						class: "row",
+						style: "flex-direction:column;align-items:stretch;gap:8px",
+						children: [/* @__PURE__ */ U("div", {
+							class: "row-main",
+							children: /* @__PURE__ */ U("div", {
+								class: "row-sub",
+								style: "white-space:normal",
+								children: i("acct.loginHint")
+							})
+						}), /* @__PURE__ */ U("div", { children: /* @__PURE__ */ U(X, {
+							onClick: () => r.open("ui_sign_in", {}, "replace"),
+							children: i("acct.login")
+						}) })]
+					}),
 					/* @__PURE__ */ U("div", {
 						class: "row",
 						children: /* @__PURE__ */ U("div", {
@@ -3031,58 +3074,65 @@ function kt({ account: e }) {
 							children: [
 								/* @__PURE__ */ U("div", {
 									class: "row-sub",
-									children: n("acct.storedIn")
+									children: i("acct.storedIn")
 								}),
 								/* @__PURE__ */ U("div", {
 									class: "row-title",
-									children: i
+									children: l
 								}),
 								e.retentionDays ? /* @__PURE__ */ U("div", {
 									class: "row-sub",
-									children: n("acct.retention", { n: e.retentionDays })
+									children: i("acct.retention", { n: e.retentionDays })
 								}) : null,
-								a ? /* @__PURE__ */ U("div", {
+								u ? /* @__PURE__ */ U("div", {
 									class: "row-sub",
 									style: "white-space:normal",
-									children: n("acct.storage.computerNote")
+									children: i("acct.storage.computerNote")
 								}) : null,
-								a ? /* @__PURE__ */ U("div", {
+								u ? /* @__PURE__ */ U("div", {
 									class: "row-sub",
 									style: "white-space:normal",
-									children: [n("acct.keepRuns", { n: a.keepRuns }), a.bytes === void 0 ? "" : ` · ${n("acct.localUsed", {
-										mb: Math.round(a.bytes / 1024 / 1024),
-										n: a.runs ?? 0
+									children: [i("acct.keepRuns", { n: u.keepRuns }), u.bytes === void 0 ? "" : ` · ${i("acct.localUsed", {
+										mb: Math.round(u.bytes / 1024 / 1024),
+										n: u.runs ?? 0
 									})}`]
 								}) : null
 							]
 						})
 					}),
-					a?.warn && /* @__PURE__ */ U(Y, {
+					u?.warn && /* @__PURE__ */ U(Y, {
 						kind: "warn",
-						children: n("acct.localWarn")
+						children: i("acct.localWarn")
 					})
 				]
 			}),
 			/* @__PURE__ */ U("div", {
 				class: "field",
-				children: [/* @__PURE__ */ U("label", { children: n("lang.label") }), /* @__PURE__ */ U(Tt, {})]
+				children: [/* @__PURE__ */ U("label", { children: i("lang.label") }), /* @__PURE__ */ U(Tt, {})]
 			}),
 			/* @__PURE__ */ U("div", {
 				class: "actions",
-				children: (e.plan === "free" || e.paidUntil) && e.links?.upgrade ? /* @__PURE__ */ U(X, {
+				children: [!e.anonymous && e.name && /* @__PURE__ */ U("button", {
+					class: "link",
+					style: "margin-right:auto",
+					onClick: () => r.open("ui_sign_out", {}, "replace"),
+					children: i("acct.logout")
+				}), s ? /* @__PURE__ */ U(X, {
 					primary: !0,
-					onClick: () => t.bridge.openLink(e.links.upgrade),
-					children: n("acct.upgrade")
+					onClick: async () => {
+						await r.bridge.openLink(e.links.upgrade), o(!0);
+					},
+					children: i("acct.upgrade")
 				}) : e.plan === "paid" && e.links?.manage ? /* @__PURE__ */ U(X, {
-					onClick: () => t.bridge.openLink(e.links.manage),
-					children: n("acct.manage")
-				}) : null
+					onClick: () => r.bridge.openLink(e.links.manage),
+					children: i("acct.manage")
+				}) : null]
 			})
 		]
 	});
 }
-function At({ onOpened: e }) {
-	let t = W(), { t: n } = H(), [r, i] = R(!1);
+function At({ onOpened: e, refresh: t }) {
+	let n = W(), { t: r } = H(), [i, a] = R(!1);
 	return /* @__PURE__ */ U("div", {
 		class: "row",
 		style: "flex-direction:column;align-items:stretch;gap:8px",
@@ -3090,20 +3140,24 @@ function At({ onOpened: e }) {
 			class: "row-main",
 			children: [/* @__PURE__ */ U("div", {
 				class: "row-title",
-				children: n("acct.createTitle")
+				children: r("acct.createTitle")
 			}), /* @__PURE__ */ U("div", {
 				class: "row-sub",
 				style: "white-space:normal",
-				children: n(r ? "acct.createOpened" : "acct.createHint")
+				children: r(i ? "acct.createOpened" : "acct.createHint")
 			})]
-		}), /* @__PURE__ */ U("div", { children: /* @__PURE__ */ U(X, {
-			primary: !r,
+		}), /* @__PURE__ */ U("div", { children: [/* @__PURE__ */ U(X, {
+			primary: !i,
 			onClick: async () => {
-				let n = await t.bridge.call("ui_account_link");
-				n.payload.url && (await t.bridge.openLink(n.payload.url), i(!0), e?.());
+				let t = await n.bridge.call("ui_account_link");
+				t.payload.url && (await n.bridge.openLink(t.payload.url), a(!0), e?.());
 			},
-			children: n(r ? "acct.createAgain" : "acct.create")
-		}) })]
+			children: r(i ? "acct.createAgain" : "acct.create")
+		}), i && t && /* @__PURE__ */ U(C, { children: [" ", /* @__PURE__ */ U(X, {
+			primary: !0,
+			onClick: () => n.open("show_account", {}, "replace"),
+			children: r("acct.createDone")
+		})] })] })]
 	});
 }
 // ui/views/setup.tsx
@@ -3616,13 +3670,20 @@ function Ut({ nav: e, current: t }) {
 		};
 	}, [e.bridge]);
 	let a = t?.view === "library", o = $(t), s = r.filter((e) => e.pendingId !== o);
-	return a && !s.length ? null : /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ U("div", {
 		class: "w panel-top",
 		style: "padding-bottom:0",
-		children: [!a && /* @__PURE__ */ U("button", {
-			class: "back",
-			onClick: () => e.open("list_workflows", {}, "reset"),
-			children: n("panel.home")
+		children: [/* @__PURE__ */ U("div", {
+			style: "display:flex;justify-content:space-between;align-items:center",
+			children: [a ? /* @__PURE__ */ U("span", {}) : /* @__PURE__ */ U("button", {
+				class: "back",
+				onClick: () => e.open("list_workflows", {}, "reset"),
+				children: n("panel.home")
+			}), t?.view !== "account" && /* @__PURE__ */ U("button", {
+				class: "link",
+				onClick: () => e.open("show_account", {}, "push"),
+				children: n("panel.account")
+			})]
 		}), s.length > 0 && /* @__PURE__ */ U("div", {
 			class: "note warn",
 			role: "status",
