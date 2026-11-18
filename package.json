@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
     "test": "node --test test/",
     "check": "npm test && node scripts/build.mjs --check",
     "e2e": "node --test --test-concurrency=1 e2e/"
@@ -19,6 +20,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2",
     "@modelcontextprotocol/client": "2.1.0",
     "@modelcontextprotocol/ext-apps": "2.0.0",
     "@preact/preset-vite": "2.10.6",
