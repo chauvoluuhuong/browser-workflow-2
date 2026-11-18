@@ -1,6 +1,6 @@
 // The built host (dist/host.mjs) driven as Chrome drives it: framed messages on stdin/stdout, clients on its
 // socket. Calls are forwarded with a host id and `client`, replies go back with the client's id, events reach every
-// client, host_status is answered by the host, a leaving client is reported, and large messages are chunked.
+// client (or the one named by `to`), host_status is answered by the host, a leaving client is reported, and large messages are chunked.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
@@ -63,6 +63,15 @@ test('forwards calls, replies, events, host_status, client.left and chunks', asy
     h.toHost({ type: 'event', name: 'user.action', data: { kind: 'approve', text: 'ok' } });
     await until(() => a.lines.length === 2 && b.lines.length === 2);
     assert.deepEqual(a.lines[1], { type: 'event', name: 'user.action', data: { kind: 'approve', text: 'ok' } });
+
+    // With `to`: only that client gets it, without `to`.
+    h.toHost({ type: 'event', name: 'user.action', data: { kind: 'chat', text: 'hi' }, to: cb.client });
+    await until(() => b.lines.length === 3);
+    assert.deepEqual(b.lines[2], { type: 'event', name: 'user.action', data: { kind: 'chat', text: 'hi' } });
+    h.toHost({ type: 'event', name: 'user.action', data: { kind: 'chat', text: 'to nobody' }, to: 999 });
+    await new Promise((r) => setTimeout(r, 100));
+    assert.equal(a.lines.length, 2);
+    assert.equal(b.lines.length, 3);
 
     a.send({ id: 1, type: 'call', method: 'host_status' });
     const st = await until(() => a.lines[2]);

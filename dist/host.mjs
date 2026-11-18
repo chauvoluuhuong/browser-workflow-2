@@ -85,6 +85,13 @@ function send(client, obj) {
 }
 function fromExtension(msg, bytes) {
   if (msg.type === "event") {
+    if (typeof msg.to === "number") {
+      const { to, ...event } = msg;
+      const c = clients.get(to);
+      if (c) send(c, event);
+      else log(`event ${msg.name} for client ${to}, which is gone`);
+      return;
+    }
     for (const c of clients.values()) send(c, msg);
     return;
   }

@@ -7,7 +7,7 @@
 //     copy of the plugin's MCP server is a client; one JSON message per line.
 // A client's call `{ id, type: "call", method, params }` goes to the extension with a host-wide id and `client`
 // (the connection's number), and the reply comes back with the client's id. `host_status` is answered here.
-// Events from the extension go to every client; when a client leaves, the extension is told (`client.left`).
+// Events from the extension go to every client (or, with `to`, to that one); when a client leaves, the extension is told (`client.left`).
 // Logs: ~/.browser-workflow-2/logs/host.log, rolled over at 1 MB (one old file kept). Nothing is logged of what
 // the messages carry, only their method and size.
 import { appendFileSync, mkdirSync, renameSync, statSync, unlinkSync } from 'node:fs';
@@ -83,6 +83,14 @@ function send(client, obj) {
 
 function fromExtension(msg, bytes) {
   if (msg.type === 'event') {
+    // `to`: only that client (the side panel's chat goes to the Claude that listens). Dropped before sending.
+    if (typeof msg.to === 'number') {
+      const { to, ...event } = msg;
+      const c = clients.get(to);
+      if (c) send(c, event);
+      else log(`event ${msg.name} for client ${to}, which is gone`);
+      return;
+    }
     for (const c of clients.values()) send(c, msg);
     return;
   }
