@@ -7,6 +7,10 @@
 //                to copy into Claude.
 //   Home         the workflows with Run and their last result (list_workflows' view), and a "Waiting for your
 //                approval" badge while Claude's proposals wait (ui_proposal). Account opens the account card.
+//   Claude       the strip on Home (Use with Claude, or "Claude is listening" + Chat) and the chat screen
+//                (views/chat.tsx): `chat.*` messages to the service worker. An extension that does not answer
+//                them (older, or not built yet) leaves the strip at "not connected", and Send goes as today's
+//                `user.action` (kind chat).
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import './styles.css';
@@ -16,13 +20,18 @@ import { Icon } from './components.js';
 import { useI18n } from './i18n.js';
 import type { ViewPayload } from './types.js';
 import { pendingOf, Widget } from './widget.js';
+import { ClaudeStrip, type Candidates, type ChatBridge, type ChatEntry, type Mention, type RemoteState } from './views/chat.js';
 
 declare const chrome: any;
 
 /** The messages between the side panel and the service worker (chrome.runtime). */
 export type PanelMessage =
   | { bw: 'tools.call'; name: string; args: Record<string, unknown> }
-  | { bw: 'user.action'; action: UserAction };
+  | { bw: 'user.action'; action: UserAction }
+  | { bw: 'chat.state' }
+  | { bw: 'chat.log' }
+  | { bw: 'chat.mentions'; query: string }
+  | { bw: 'chat.send'; text: string; mentions: Mention[] };
 /** The service worker → open side panels. */
 export interface PanelEvent { bw: 'event'; name: string; data: unknown }
 
@@ -36,6 +45,8 @@ export interface UserAction {
   view?: string;
   context?: string;
   silent?: boolean;
+  /** `kind: "chat"`: what the user named with `@`. */
+  mentions?: Mention[];
 }
 
 /** The ids a view is about, so Claude knows what "this" is. */
@@ -51,7 +62,7 @@ function idsOf(p?: ViewPayload): Pick<UserAction, 'workflowId' | 'runId' | 'pend
   };
 }
 
-export class PanelBridge implements Bridge {
+export class PanelBridge implements Bridge, ChatBridge {
   readonly surface = 'panel' as const;
   private current?: ViewPayload;
   /** Context given just before a message goes with it (askClaude sends the two one after the other). */
@@ -100,6 +111,36 @@ export class PanelBridge implements Bridge {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  }
+
+  /** A message to the service worker; `undefined` when it does not answer (an older extension) or fails. */
+  private async ask(m: PanelMessage): Promise<any> {
+    try { return await this.runtime.sendMessage(m); } catch { return undefined; }
+  }
+
+  async chatState(): Promise<RemoteState | undefined> {
+    const r = await this.ask({ bw: 'chat.state' });
+    return ['none', 'listening', 'working', 'idle', 'connected'].includes(r?.state) ? r.state : undefined;
+  }
+
+  async chatLog(): Promise<ChatEntry[] | undefined> {
+    const r = await this.ask({ bw: 'chat.log' });
+    return Array.isArray(r?.entries) ? r.entries : undefined;
+  }
+
+  async mentions(query: string): Promise<Candidates | undefined> {
+    const r = await this.ask({ bw: 'chat.mentions', query });
+    if (!r || !(Array.isArray(r.workflows) || Array.isArray(r.runs) || Array.isArray(r.tabs))) return undefined;
+    return { workflows: r.workflows ?? [], runs: r.runs ?? [], tabs: r.tabs ?? [] };
+  }
+
+  async chatSend(text: string, mentions: Mention[]) {
+    const r = await this.ask({ bw: 'chat.send', text, mentions });
+    if (r && typeof r === 'object' && 'delivered' in r) return { delivered: !!r.delivered, fallback: false };
+    // An extension without the chat: the message goes as before, to every connected Claude.
+    const action: UserAction = { kind: 'chat', text, ...(mentions.length ? { mentions } : {}) };
+    const f = await this.ask({ bw: 'user.action', action });
+    return { delivered: !!f?.delivered, fallback: true };
   }
 
   onPayload() { /* nothing is pushed to the panel: it opens views itself */ }
@@ -153,6 +194,7 @@ function PanelTop({ nav, current }: { nav: Nav; current?: ViewPayload }) {
         {home ? <span /> : <button class="back" onClick={() => nav.open('list_workflows', {}, 'reset')}>{t('panel.home')}</button>}
         {current?.view !== 'account' && <button class="link" onClick={() => nav.open('show_account', {}, 'push')}>{t('panel.account')}</button>}
       </div>
+      {home && <ClaudeStrip nav={nav} />}
       {waiting.length > 0 && (
         <div class="note warn" role="status" style="align-items:center">
           {Icon.alert()}

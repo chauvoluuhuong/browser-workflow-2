@@ -11,6 +11,7 @@ import { RunSetupView, RunView, FailureView } from './views/run.js';
 import { ChangeView, DataView, HistoryView, AccountView, CreateAccountRow } from './views/misc.js';
 import { RunsView, StepRunView } from './views/runs.js';
 import { GetExtension, SetupView } from './views/setup.js';
+import { ChatView, isChat } from './views/chat.js';
 
 /**
  * An anonymous account reached what it can do without signing up. Not an error to the user: one
@@ -52,6 +53,8 @@ function ErrorView(p: Extract<ViewPayload, { view: 'error' }>) {
 }
 
 function View({ p }: { p: ViewPayload }) {
+  // The side panel's Claude chat (not a tool's view; ChatView draws nothing outside the panel).
+  if (isChat(p)) return <ChatView />;
   switch (p.view) {
     case 'setup': return <SetupView {...p} />;
     case 'library': return <LibraryView {...p} />;

@@ -34,53 +34,53 @@ function S(e, r, i, a, o) {
 function C(e) {
 	return e.children;
 }
-function ee(e, t) {
+function w(e, t) {
 	this.props = e, this.context = t;
 }
-function w(e, t) {
-	if (t == null) return e.__ ? w(e.__, e.__i + 1) : null;
+function T(e, t) {
+	if (t == null) return e.__ ? T(e.__, e.__i + 1) : null;
 	for (var n; t < e.__k.length; t++) if ((n = e.__k[t]) != null && n.__e != null) return n.__e;
-	return typeof e.type == "function" ? w(e) : null;
-}
-function T(e) {
-	if (e.__P && e.__d) {
-		var n = e.__v, r = n.__e, i = [], a = [], o = y({}, n);
-		o.__v = n.__v + 1, t.vnode && t.vnode(o), re(e.__P, o, n, e.__n, e.__P.namespaceURI, 32 & n.__u ? [r] : null, i, r ?? w(n), !!(32 & n.__u), a), o.__v = n.__v, o.__.__k[o.__i] = o, ae(i, o, a), n.__e = n.__ = null, o.__e != r && E(o);
-	}
+	return typeof e.type == "function" ? T(e) : null;
 }
 function E(e) {
-	if ((e = e.__) != null && e.__c != null) return e.__e = e.__c.base = null, e.__k.some(function(t) {
-		if (t != null && t.__e != null) return e.__e = e.__c.base = t.__e;
-	}), E(e);
+	if (e.__P && e.__d) {
+		var n = e.__v, r = n.__e, i = [], a = [], o = y({}, n);
+		o.__v = n.__v + 1, t.vnode && t.vnode(o), re(e.__P, o, n, e.__n, e.__P.namespaceURI, 32 & n.__u ? [r] : null, i, r ?? T(n), !!(32 & n.__u), a), o.__v = n.__v, o.__.__k[o.__i] = o, ae(i, o, a), n.__e = n.__ = null, o.__e != r && D(o);
+	}
 }
 function D(e) {
-	(!e.__d && (e.__d = !0) && r.push(e) && !O.__r++ || i != t.debounceRendering) && ((i = t.debounceRendering) || a)(O);
+	if ((e = e.__) != null && e.__c != null) return e.__e = e.__c.base = null, e.__k.some(function(t) {
+		if (t != null && t.__e != null) return e.__e = e.__c.base = t.__e;
+	}), D(e);
 }
-function O() {
+function O(e) {
+	(!e.__d && (e.__d = !0) && r.push(e) && !k.__r++ || i != t.debounceRendering) && ((i = t.debounceRendering) || a)(k);
+}
+function k() {
 	try {
-		for (var e, t = 1; r.length;) r.length > t && r.sort(o), e = r.shift(), t = r.length, T(e);
+		for (var e, t = 1; r.length;) r.length > t && r.sort(o), e = r.shift(), t = r.length, E(e);
 	} finally {
-		r.length = O.__r = 0;
+		r.length = k.__r = 0;
 	}
 }
-function te(e, t, n, r, i, a, o, s, c, l, u) {
+function ee(e, t, n, r, i, a, o, s, c, l, u) {
 	var d, f, p, m, _, v, y = r && r.__k || g, b = t.length;
-	for (c = k(n, t, y, c, b), d = 0; d < b; d++) (p = n.__k[d]) != null && (f = p.__i != -1 && y[p.__i] || h, p.__i = d, v = re(e, p, f, i, a, o, s, c, l, u), m = p.__e, p.ref && f.ref != p.ref && (f.ref && ce(f.ref, null, p), u.push(p.ref, p.__c || m, p)), _ == null && m != null && (_ = m), 4 & p.__u ? (c = A(p, c, e), f.__e && (f.__e = null)) : typeof p.type == "function" && v !== void 0 ? c = v : m && (c = m.nextSibling), p.__u &= -7);
+	for (c = A(n, t, y, c, b), d = 0; d < b; d++) (p = n.__k[d]) != null && (f = p.__i != -1 && y[p.__i] || h, p.__i = d, v = re(e, p, f, i, a, o, s, c, l, u), m = p.__e, p.ref && f.ref != p.ref && (f.ref && ce(f.ref, null, p), u.push(p.ref, p.__c || m, p)), _ == null && m != null && (_ = m), 4 & p.__u ? (c = te(p, c, e), f.__e && (f.__e = null)) : typeof p.type == "function" && v !== void 0 ? c = v : m && (c = m.nextSibling), p.__u &= -7);
 	return n.__e = _, c;
 }
-function k(e, t, n, r, i) {
+function A(e, t, n, r, i) {
 	var a, o, s, c, l, u = n.length, d = u, f = 0;
 	for (e.__k = Array(i), a = 0; a < i; a++) (o = t[a]) != null && typeof o != "boolean" && typeof o != "function" ? (typeof o == "string" || typeof o == "number" || typeof o == "bigint" || o.constructor == String ? o = e.__k[a] = S(null, o, null, null, null) : v(o) ? o = e.__k[a] = S(C, { children: o }, null, null, null) : o.constructor === void 0 && o.__b > 0 ? o = e.__k[a] = S(o.type, o.props, o.key, o.ref ? o.ref : null, o.__v) : e.__k[a] = o, c = a + f, o.__ = e, o.__b = e.__b + 1, s = null, (l = o.__i = j(o, n, c, d)) != -1 && (d--, (s = n[l]) && (s.__u |= 2)), s == null || s.__v == null ? (l == -1 && (i > u ? f-- : i < u && f++), typeof o.type != "function" && (o.__u |= 4)) : l != c && (l == c - 1 ? f-- : l == c + 1 ? f++ : (l > c ? f-- : f++, o.__u |= 4))) : e.__k[a] = null;
-	if (d) for (a = 0; a < u; a++) (s = n[a]) != null && !(2 & s.__u) && (s.__e == r && (r = w(s)), le(s, s));
+	if (d) for (a = 0; a < u; a++) (s = n[a]) != null && !(2 & s.__u) && (s.__e == r && (r = T(s)), le(s, s));
 	return r;
 }
-function A(e, t, n) {
+function te(e, t, n) {
 	var r, i;
 	if (typeof e.type == "function") {
-		for (r = e.__k, i = 0; r && i < r.length; i++) r[i] && (r[i].__ = e, t = A(r[i], t, n));
+		for (r = e.__k, i = 0; r && i < r.length; i++) r[i] && (r[i].__ = e, t = te(r[i], t, n));
 		return t;
 	}
-	e.__e != t && (t && e.type && !t.parentNode && (t = w(e)), t = n.insertBefore(e.__e, t || null));
+	e.__e != t && (t && e.type && !t.parentNode && (t = T(e)), t = n.insertBefore(e.__e, t || null));
 	do
 		t &&= t.nextSibling;
 	while (t != null && t.nodeType == 8);
@@ -126,29 +126,29 @@ function ne(e) {
 	};
 }
 function re(e, n, r, i, a, o, s, c, l, u) {
-	var d, f, p, m, h, _, x, S, T, E, D, O, k, A, j, M, N = n.type;
+	var d, f, p, m, h, _, x, S, E, D, O, k, A, te, j, M, N = n.type;
 	if (n.constructor !== void 0) return null;
 	128 & r.__u && (l = !!(32 & r.__u), o = [c = n.__e = r.__e]), (d = t.__b) && d(n);
 	n: if (typeof N == "function") {
 		f = s.length;
 		try {
-			if (T = n.props, E = N.prototype && N.prototype.render, D = (d = N.contextType) && i[d.__c], O = d ? D ? D.props.value : d.__ : i, r.__c ? S = (p = n.__c = r.__c).__ = p.__E : (E ? n.__c = p = new N(T, O) : (n.__c = p = new ee(T, O), p.constructor = N, p.render = ue), D && D.sub(p), p.state || (p.state = {}), p.__n = i, m = p.__d = !0, p.__h = [], p._sb = []), E && p.__s == null && (p.__s = p.state), E && N.getDerivedStateFromProps != null && (p.__s == p.state && (p.__s = y({}, p.__s)), y(p.__s, N.getDerivedStateFromProps(T, p.__s))), h = p.props, _ = p.state, p.__v = n, m) E && N.getDerivedStateFromProps == null && p.componentWillMount != null && p.componentWillMount(), E && p.componentDidMount != null && p.__h.push(p.componentDidMount);
+			if (E = n.props, D = N.prototype && N.prototype.render, O = (d = N.contextType) && i[d.__c], k = d ? O ? O.props.value : d.__ : i, r.__c ? S = (p = n.__c = r.__c).__ = p.__E : (D ? n.__c = p = new N(E, k) : (n.__c = p = new w(E, k), p.constructor = N, p.render = ue), O && O.sub(p), p.state || (p.state = {}), p.__n = i, m = p.__d = !0, p.__h = [], p._sb = []), D && p.__s == null && (p.__s = p.state), D && N.getDerivedStateFromProps != null && (p.__s == p.state && (p.__s = y({}, p.__s)), y(p.__s, N.getDerivedStateFromProps(E, p.__s))), h = p.props, _ = p.state, p.__v = n, m) D && N.getDerivedStateFromProps == null && p.componentWillMount != null && p.componentWillMount(), D && p.componentDidMount != null && p.__h.push(p.componentDidMount);
 			else {
-				if (E && N.getDerivedStateFromProps == null && T !== h && p.componentWillReceiveProps != null && p.componentWillReceiveProps(T, O), n.__v == r.__v || !p.__e && p.shouldComponentUpdate != null && !1 === p.shouldComponentUpdate(T, p.__s, O)) {
-					n.__v != r.__v && (p.props = T, p.state = p.__s, p.__d = !1), n.__e = r.__e, n.__k = r.__k, n.__k.some(function(e) {
+				if (D && N.getDerivedStateFromProps == null && E !== h && p.componentWillReceiveProps != null && p.componentWillReceiveProps(E, k), n.__v == r.__v || !p.__e && p.shouldComponentUpdate != null && !1 === p.shouldComponentUpdate(E, p.__s, k)) {
+					n.__v != r.__v && (p.props = E, p.state = p.__s, p.__d = !1), n.__e = r.__e, n.__k = r.__k, n.__k.some(function(e) {
 						e && (e.__ = n);
-					}), g.push.apply(p.__h, p._sb), p._sb = [], p.__h.length && s.push(p), c = w(r);
+					}), g.push.apply(p.__h, p._sb), p._sb = [], p.__h.length && s.push(p), c = T(r);
 					break n;
 				}
-				p.componentWillUpdate != null && p.componentWillUpdate(T, p.__s, O), E && p.componentDidUpdate != null && p.__h.push(function() {
+				p.componentWillUpdate != null && p.componentWillUpdate(E, p.__s, k), D && p.componentDidUpdate != null && p.__h.push(function() {
 					p.componentDidUpdate(h, _, x);
 				});
 			}
-			if (p.context = O, p.props = T, p.__P = e, p.__e = !1, k = t.__r, A = 0, E) p.state = p.__s, p.__d = !1, k && k(n), d = p.render(p.props, p.state, p.context), g.push.apply(p.__h, p._sb), p._sb = [];
+			if (p.context = k, p.props = E, p.__P = e, p.__e = !1, A = t.__r, te = 0, D) p.state = p.__s, p.__d = !1, A && A(n), d = p.render(p.props, p.state, p.context), g.push.apply(p.__h, p._sb), p._sb = [];
 			else do
-				p.__d = !1, k && k(n), d = p.render(p.props, p.state, p.context), p.state = p.__s;
-			while (p.__d && ++A < 25);
-			p.state = p.__s, p.getChildContext != null && (i = y(y({}, i), p.getChildContext())), E && !m && p.getSnapshotBeforeUpdate != null && (x = p.getSnapshotBeforeUpdate(h, _)), j = d != null && d.type === C && d.key == null ? oe(d.props.children) : d, c = te(e, v(j) ? j : [j], n, r, i, a, o, s, c, l, u), p.base = n.__e, n.__u &= -161, p.__h.length && s.push(p), S && (p.__E = p.__ = null);
+				p.__d = !1, A && A(n), d = p.render(p.props, p.state, p.context), p.state = p.__s;
+			while (p.__d && ++te < 25);
+			p.state = p.__s, p.getChildContext != null && (i = y(y({}, i), p.getChildContext())), D && !m && p.getSnapshotBeforeUpdate != null && (x = p.getSnapshotBeforeUpdate(h, _)), j = d != null && d.type === C && d.key == null ? oe(d.props.children) : d, c = ee(e, v(j) ? j : [j], n, r, i, a, o, s, c, l, u), p.base = n.__e, n.__u &= -161, p.__h.length && s.push(p), S && (p.__E = p.__ = null);
 		} catch (e) {
 			if (s.length = f, n.__v = null, l || o != null) {
 				if (e.then) {
@@ -197,7 +197,7 @@ function se(n, r, i, a, o, s, c, l, u) {
 		for (d in x) g = x[d], d == "dangerouslySetInnerHTML" ? p = g : d == "children" || d in S || d == "value" && "defaultValue" in S || d == "checked" && "defaultChecked" in S || N(n, d, null, g, o);
 		for (d in S) g = S[d], d == "children" ? m = g : d == "dangerouslySetInnerHTML" ? f = g : d == "value" ? _ = g : d == "checked" ? y = g : l && typeof g != "function" || x[d] === g || N(n, d, g, x[d], o);
 		if (f) l || p && (f.__html == p.__html || f.__html == n.innerHTML) || (n.innerHTML = f.__html), r.__k = [];
-		else if (p && (n.innerHTML = ""), te(r.type == "template" ? n.content : n, v(m) ? m : [m], r, i, a, C == "foreignObject" ? "http://www.w3.org/1999/xhtml" : o, s, c, s ? s[0] : i.__k && w(i, 0), l, u), s != null) for (d = s.length; d--;) b(s[d]);
+		else if (p && (n.innerHTML = ""), ee(r.type == "template" ? n.content : n, v(m) ? m : [m], r, i, a, C == "foreignObject" ? "http://www.w3.org/1999/xhtml" : o, s, c, s ? s[0] : i.__k && T(i, 0), l, u), s != null) for (d = s.length; d--;) b(s[d]);
 		l && C != "textarea" || (d = "value", C == "progress" && _ == null ? n.removeAttribute("value") : _ != null && (_ !== n[d] || C == "progress" && !_ || C == "option" && _ != x[d]) && N(n, d, _, x[d], o), d = "checked", y != null && y != n[d] && N(n, d, y, x[d], o));
 	}
 	return n;
@@ -241,7 +241,7 @@ function fe(e) {
 			n = null;
 		}, this.shouldComponentUpdate = function(e) {
 			this.props.value != e.value && n.forEach(function(e) {
-				e.__e = !0, D(e);
+				e.__e = !0, O(e);
 			});
 		}, this.sub = function(e) {
 			n.add(e);
@@ -262,14 +262,14 @@ e = g.slice, t = { __e: function(e, t, n, r) {
 		e = t;
 	}
 	throw e;
-} }, n = 0, ee.prototype.setState = function(e, t) {
+} }, n = 0, w.prototype.setState = function(e, t) {
 	var n = this.__s != null && this.__s != this.state ? this.__s : this.__s = y({}, this.state);
-	typeof e == "function" && (e = e(y({}, n), this.props)), e && y(n, e), e != null && this.__v && (t && this._sb.push(t), D(this));
-}, ee.prototype.forceUpdate = function(e) {
-	this.__v && (this.__e = !0, e && this.__h.push(e), D(this));
-}, ee.prototype.render = C, r = [], a = typeof Promise == "function" ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, o = function(e, t) {
+	typeof e == "function" && (e = e(y({}, n), this.props)), e && y(n, e), e != null && this.__v && (t && this._sb.push(t), O(this));
+}, w.prototype.forceUpdate = function(e) {
+	this.__v && (this.__e = !0, e && this.__h.push(e), O(this));
+}, w.prototype.render = C, r = [], a = typeof Promise == "function" ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, o = function(e, t) {
 	return e.__v.__b - t.__v.__b;
-}, O.__r = 0, s = Math.random().toString(8), c = "__d" + s, l = "__a" + s, u = /(PointerCapture)$|Capture$/i, d = 0, f = ne(!1), p = ne(!0), m = 0;
+}, k.__r = 0, s = Math.random().toString(8), c = "__d" + s, l = "__a" + s, u = /(PointerCapture)$|Capture$/i, d = 0, f = ne(!1), p = ne(!0), m = 0;
 // node_modules/preact/hooks/dist/hooks.module.js
 var P, F, pe, me, he = 0, ge = [], I = t, _e = I.__b, ve = I.__r, ye = I.diffed, be = I.__c, xe = I.unmount, Se = I.__;
 function L(e, t) {
@@ -281,11 +281,11 @@ function L(e, t) {
 	return e >= n.__.length && n.__.push({}), n.__[e];
 }
 function R(e) {
-	return he = 1, Ce(je, e);
+	return he = 1, Ce(Ne, e);
 }
 function Ce(e, t, n) {
 	var r = L(P++, 2);
-	if (r.t = e, !r.__c && (r.__ = [n ? n(t) : je(void 0, t), function(e) {
+	if (r.t = e, !r.__c && (r.__ = [n ? n(t) : Ne(void 0, t), function(e) {
 		var t = r.__N ? r.__N[0] : r.__[0], n = r.t(t, e);
 		t !== n && (r.__N = [n, r.__[1]], r.__c.setState({}));
 	}], r.__c = F, !F.__f)) {
@@ -318,26 +318,30 @@ function Ce(e, t, n) {
 }
 function z(e, t) {
 	var n = L(P++, 3);
-	!I.__s && Ae(n.__H, t) && (n.__ = e, n.u = t, F.__H.__h.push(n));
+	!I.__s && Me(n.__H, t) && (n.__ = e, n.u = t, F.__H.__h.push(n));
+}
+function we(e, t) {
+	var n = L(P++, 4);
+	!I.__s && Me(n.__H, t) && (n.__ = e, n.u = t, F.__h.push(n));
 }
 function B(e) {
-	return he = 5, we(function() {
+	return he = 5, Te(function() {
 		return { current: e };
 	}, []);
 }
-function we(e, t) {
+function Te(e, t) {
 	var n = L(P++, 7);
-	return Ae(n.__H, t) && (n.__ = e(), n.__H = t, n.__h = e), n.__;
+	return Me(n.__H, t) && (n.__ = e(), n.__H = t, n.__h = e), n.__;
 }
-function Te(e) {
+function Ee(e) {
 	var t = F.context[e.__c], n = L(P++, 9);
 	return n.c = e, t ? (n.__ ?? (n.__ = !0, t.sub(F)), t.props.value) : e.__;
 }
-function Ee() {
+function De() {
 	for (var e; e = ge.shift();) {
 		var t = e.__H;
 		if (e.__P && t) try {
-			t.__h.some(V), t.__h.some(ke), t.__h = [];
+			t.__h.some(Ae), t.__h.some(je), t.__h = [];
 		} catch (n) {
 			t.__h = [], I.__e(n, e.__v);
 		}
@@ -352,18 +356,18 @@ I.__b = function(e) {
 	var t = (F = e.__c).__H;
 	t && (pe === F ? (t.__h = [], F.__h = [], t.__.some(function(e) {
 		e.__N && (e.__ = e.__N), e.u = e.__N = void 0;
-	})) : (t.__h.some(V), t.__h.some(ke), t.__h = [], P = 0)), pe = F;
+	})) : (t.__h.some(Ae), t.__h.some(je), t.__h = [], P = 0)), pe = F;
 }, I.diffed = function(e) {
 	ye && ye(e);
 	var t = e.__c;
-	t && t.__H && (t.__H.__h.length && (ge.push(t) !== 1 && me === I.requestAnimationFrame || ((me = I.requestAnimationFrame) || Oe)(Ee)), t.__H.__.some(function(e) {
+	t && t.__H && (t.__H.__h.length && (ge.push(t) !== 1 && me === I.requestAnimationFrame || ((me = I.requestAnimationFrame) || ke)(De)), t.__H.__.some(function(e) {
 		e.u &&= (e.__H = e.u, void 0);
 	})), pe = F = null;
 }, I.__c = function(e, t) {
 	t.some(function(e) {
 		try {
-			e.__h.some(V), e.__h = e.__h.filter(function(e) {
-				return !e.__ || ke(e);
+			e.__h.some(Ae), e.__h = e.__h.filter(function(e) {
+				return !e.__ || je(e);
 			});
 		} catch (n) {
 			t.some(function(e) {
@@ -376,37 +380,37 @@ I.__b = function(e) {
 	var t, n = e.__c;
 	n && n.__H && (n.__H.__.some(function(e) {
 		try {
-			V(e);
+			Ae(e);
 		} catch (e) {
 			t = e;
 		}
 	}), n.__H = void 0, t && I.__e(t, n.__v));
 };
-var De = typeof requestAnimationFrame == "function";
-function Oe(e) {
+var Oe = typeof requestAnimationFrame == "function";
+function ke(e) {
 	var t, n = function() {
-		clearTimeout(r), De && cancelAnimationFrame(t), setTimeout(e);
+		clearTimeout(r), Oe && cancelAnimationFrame(t), setTimeout(e);
 	}, r = setTimeout(n, 35);
-	De && (t = requestAnimationFrame(n));
+	Oe && (t = requestAnimationFrame(n));
 }
-function V(e) {
+function Ae(e) {
 	var t = F, n = e.__c;
 	typeof n == "function" && (e.__c = void 0, n()), F = t;
 }
-function ke(e) {
+function je(e) {
 	var t = F;
 	e.__c = e.__(), F = t;
 }
-function Ae(e, t) {
+function Me(e, t) {
 	return !e || e.length !== t.length || t.some(function(t, n) {
 		return t !== e[n];
 	});
 }
-function je(e, t) {
+function Ne(e, t) {
 	return typeof t == "function" ? t(e) : t;
 }
 // ui/i18n.ts
-var Me = {
+var Pe = {
 	"common.back": "‹ Back",
 	"common.cancel": "Cancel",
 	"common.save": "Save",
@@ -693,9 +697,53 @@ var Me = {
 	"acct.logout": "Log out",
 	"acct.offline": "Your account could not be reached just now: the plan you last had is shown.",
 	"acct.createDone": "I created it",
-	"panel.account": "Account"
-}, Ne = {
-	en: Me,
+	"panel.account": "Account",
+	"chat.prompt": "Use Browser Workflow with me from its side panel in Chrome. Call wait_for_user to listen for my messages there. Do what each message asks, put your short answer to me in reply on your next wait_for_user call, and keep listening until I say stop.",
+	"chat.noneTitle": "Claude isn’t connected",
+	"chat.noneSub": "Open Claude to build workflows, fix them and talk to it from here.",
+	"chat.idleTitle": "Claude stopped listening",
+	"chat.use": "Use with Claude",
+	"chat.useCode": "Use Claude Code instead",
+	"chat.copyPrompt": "Copy the prompt",
+	"chat.copied": "Copied",
+	"chat.openChat": "Open the chat",
+	"chat.waitingTitle": "Waiting for Claude…",
+	"chat.step1": "Claude opened with a message ready.",
+	"chat.step2a": "Press ",
+	"chat.step2b": "Send",
+	"chat.step2c": " in Claude.",
+	"chat.step3": "This panel connects by itself.",
+	"chat.warnNote": "Claude may warn you before sending a prompt from a link: that’s normal. If Claude asks to allow Browser Workflow, choose Always allow.",
+	"chat.nothingOpened": "Nothing opened? Copy the prompt and paste it into Claude.",
+	"chat.openAgain": "Open Claude again",
+	"chat.liveListening": "Claude is listening",
+	"chat.liveWorking": "Claude is working",
+	"chat.liveConnected": "Claude is connected",
+	"chat.chat": "Chat",
+	"chat.title": "Claude",
+	"chat.pillListening": "Listening",
+	"chat.pillWorking": "Working",
+	"chat.pillConnected": "Connected",
+	"chat.pillOff": "Not listening",
+	"chat.you": "You",
+	"chat.claude": "Claude",
+	"chat.empty": "Write to Claude here: ask it to make a workflow, run one or fix one. Type @ to name a workflow, a run or a tab.",
+	"chat.working": "Claude is working… ({s} s)",
+	"chat.queued": "Waits until Claude is done with the first one",
+	"chat.ph": "Write to Claude…  (@ to mention)",
+	"chat.phOff": "Claude isn’t listening",
+	"chat.send": "Send",
+	"chat.mention": "Mention",
+	"chat.stoppedTitle": "Claude stopped listening",
+	"chat.stoppedSub": "If you stopped it in Claude, ask it there to listen again, or start a new chat.",
+	"chat.notDelivered": "Claude didn’t get this: no Claude is connected. Use with Claude first.",
+	"chat.pickWorkflows": "Workflows",
+	"chat.pickRuns": "Runs",
+	"chat.pickTabs": "Open tabs",
+	"chat.pickNone": "Nothing matches",
+	"chat.cardWaiting": "Waiting for your approval"
+}, Fe = {
+	en: Pe,
 	vi: {
 		"common.back": "‹ Quay lại",
 		"common.cancel": "Huỷ",
@@ -983,10 +1031,54 @@ var Me = {
 		"acct.logout": "Đăng xuất",
 		"acct.offline": "Hiện chưa kết nối được tới tài khoản của bạn: đang hiển thị gói gần nhất bạn có.",
 		"acct.createDone": "Tôi đã tạo xong",
-		"panel.account": "Tài khoản"
+		"panel.account": "Tài khoản",
+		"chat.prompt": "Hãy dùng Browser Workflow cùng tôi từ bảng bên của nó trong Chrome. Gọi wait_for_user để nghe tin nhắn của tôi ở đó. Làm theo từng tin nhắn, đưa câu trả lời ngắn cho tôi vào reply ở lần gọi wait_for_user tiếp theo, và tiếp tục nghe cho đến khi tôi bảo dừng.",
+		"chat.noneTitle": "Claude chưa được kết nối",
+		"chat.noneSub": "Mở Claude để tạo, sửa workflow và trò chuyện với Claude ngay tại đây.",
+		"chat.idleTitle": "Claude đã ngừng nghe",
+		"chat.use": "Dùng với Claude",
+		"chat.useCode": "Dùng Claude Code thay thế",
+		"chat.copyPrompt": "Sao chép lời nhắn",
+		"chat.copied": "Đã sao chép",
+		"chat.openChat": "Mở cuộc trò chuyện",
+		"chat.waitingTitle": "Đang chờ Claude…",
+		"chat.step1": "Claude đã mở với một tin nhắn soạn sẵn.",
+		"chat.step2a": "Bấm ",
+		"chat.step2b": "Gửi",
+		"chat.step2c": " trong Claude.",
+		"chat.step3": "Bảng này sẽ tự kết nối.",
+		"chat.warnNote": "Claude có thể cảnh báo trước khi gửi lời nhắn mở từ một liên kết: điều đó bình thường. Nếu Claude hỏi có cho phép Browser Workflow không, hãy chọn Luôn cho phép.",
+		"chat.nothingOpened": "Không thấy gì mở ra? Sao chép lời nhắn rồi dán vào Claude.",
+		"chat.openAgain": "Mở lại Claude",
+		"chat.liveListening": "Claude đang nghe",
+		"chat.liveWorking": "Claude đang làm",
+		"chat.liveConnected": "Claude đã kết nối",
+		"chat.chat": "Trò chuyện",
+		"chat.title": "Claude",
+		"chat.pillListening": "Đang nghe",
+		"chat.pillWorking": "Đang làm",
+		"chat.pillConnected": "Đã kết nối",
+		"chat.pillOff": "Không nghe",
+		"chat.you": "Bạn",
+		"chat.claude": "Claude",
+		"chat.empty": "Nhắn cho Claude ở đây: nhờ tạo, chạy hoặc sửa một workflow. Gõ @ để nhắc đến một workflow, một lần chạy hoặc một tab.",
+		"chat.working": "Claude đang làm… ({s} giây)",
+		"chat.queued": "Sẽ đến Claude khi nó làm xong tin nhắn trước",
+		"chat.ph": "Nhắn cho Claude…  (@ để nhắc đến)",
+		"chat.phOff": "Claude không nghe",
+		"chat.send": "Gửi",
+		"chat.mention": "Nhắc đến",
+		"chat.stoppedTitle": "Claude đã ngừng nghe",
+		"chat.stoppedSub": "Nếu bạn đã dừng Claude, hãy nhờ Claude nghe lại ở đó, hoặc mở cuộc trò chuyện mới.",
+		"chat.notDelivered": "Claude chưa nhận được tin này: chưa có Claude nào kết nối. Hãy bấm Dùng với Claude trước.",
+		"chat.pickWorkflows": "Workflow",
+		"chat.pickRuns": "Lần chạy",
+		"chat.pickTabs": "Tab đang mở",
+		"chat.pickNone": "Không có kết quả",
+		"chat.cardWaiting": "Đang chờ bạn duyệt"
 	}
 };
-function Pe(e, t = "en") {
+function Ie(e, t = "en") {
 	let n = (e ?? "").toLowerCase();
 	return n.includes("claude") ? {
 		kind: "claude",
@@ -1005,18 +1097,18 @@ function Pe(e, t = "en") {
 		ai: t === "vi" ? "AI của bạn" : "your AI app"
 	};
 }
-function Fe(e, t = Pe(void 0, e).ai) {
-	let n = Ne[e];
-	return (e, r = {}) => (n[e] ?? Me[e]).replace(/\{(\w+)(?:\|([^|}]*)\|([^}]*))?\}/g, (e, n, i, a) => {
+function Le(e, t = Ie(void 0, e).ai) {
+	let n = Fe[e];
+	return (e, r = {}) => (n[e] ?? Pe[e]).replace(/\{(\w+)(?:\|([^|}]*)\|([^}]*))?\}/g, (e, n, i, a) => {
 		let o = n === "ai" && r.ai === void 0 ? t : r[n];
 		return i === void 0 ? o === void 0 ? "" : String(o) : Number(o) === 1 ? i : a ?? "";
 	});
 }
-function Ie(e, t) {
+function Re(e, t) {
 	return e === "en" || e === "vi" ? e : (t || (typeof navigator < "u" ? navigator.language : "") || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
 }
-function Le(e, t) {
-	let n = Pe(t, e), r = Fe(e, n.ai), i = new Intl.RelativeTimeFormat(e, {
+function ze(e, t) {
+	let n = Ie(t, e), r = Le(e, n.ai), i = new Intl.RelativeTimeFormat(e, {
 		numeric: "auto",
 		style: "short"
 	}), a = new Intl.NumberFormat(e, { maximumFractionDigits: 1 });
@@ -1033,9 +1125,9 @@ function Le(e, t) {
 		}
 	};
 }
-var Re = fe(Le("en")), H = () => Te(Re), ze = 0;
+var Be = fe(ze("en")), V = () => Ee(Be), Ve = 0;
 Array.isArray;
-function U(e, n, r, i, a, o) {
+function H(e, n, r, i, a, o) {
 	n ||= {};
 	var s, c, l = n;
 	if ("ref" in l) for (c in l = {}, n) c == "ref" ? s = n[c] : l[c] = n[c];
@@ -1050,7 +1142,7 @@ function U(e, n, r, i, a, o) {
 		__e: null,
 		__c: null,
 		constructor: void 0,
-		__v: --ze,
+		__v: --Ve,
 		__i: -1,
 		__u: 0,
 		__source: a,
@@ -1060,7 +1152,7 @@ function U(e, n, r, i, a, o) {
 	return t.vnode && t.vnode(u), u;
 }
 // ui/components.tsx
-var Be = fe(null), W = () => Te(Be), G = (e, t = 16) => /* @__PURE__ */ U("svg", {
+var He = fe(null), U = () => Ee(He), W = (e, t = 16) => /* @__PURE__ */ H("svg", {
 	width: t,
 	height: t,
 	viewBox: "0 0 16 16",
@@ -1071,32 +1163,32 @@ var Be = fe(null), W = () => Te(Be), G = (e, t = 16) => /* @__PURE__ */ U("svg",
 	"stroke-linejoin": "round",
 	"aria-hidden": "true",
 	children: e
-}), K = {
-	check: () => G(/* @__PURE__ */ U("path", { d: "M3.5 8.5l3 3 6-7" })),
-	x: () => G(/* @__PURE__ */ U("path", { d: "M4.5 4.5l7 7M11.5 4.5l-7 7" })),
-	chevron: () => G(/* @__PURE__ */ U("path", { d: "M6 4l4 4-4 4" }), 14),
-	more: () => G(/* @__PURE__ */ U("g", {
+}), G = {
+	check: () => W(/* @__PURE__ */ H("path", { d: "M3.5 8.5l3 3 6-7" })),
+	x: () => W(/* @__PURE__ */ H("path", { d: "M4.5 4.5l7 7M11.5 4.5l-7 7" })),
+	chevron: () => W(/* @__PURE__ */ H("path", { d: "M6 4l4 4-4 4" }), 14),
+	more: () => W(/* @__PURE__ */ H("g", {
 		fill: "currentColor",
 		stroke: "none",
 		children: [
-			/* @__PURE__ */ U("circle", {
+			/* @__PURE__ */ H("circle", {
 				cx: "3.5",
 				cy: "8",
 				r: "1.3"
 			}),
-			/* @__PURE__ */ U("circle", {
+			/* @__PURE__ */ H("circle", {
 				cx: "8",
 				cy: "8",
 				r: "1.3"
 			}),
-			/* @__PURE__ */ U("circle", {
+			/* @__PURE__ */ H("circle", {
 				cx: "12.5",
 				cy: "8",
 				r: "1.3"
 			})
 		]
 	})),
-	spinner: () => /* @__PURE__ */ U("svg", {
+	spinner: () => /* @__PURE__ */ H("svg", {
 		class: "spin",
 		width: "16",
 		height: "16",
@@ -1106,76 +1198,76 @@ var Be = fe(null), W = () => Te(Be), G = (e, t = 16) => /* @__PURE__ */ U("svg",
 		"stroke-width": "1.8",
 		"stroke-linecap": "round",
 		"aria-hidden": "true",
-		children: /* @__PURE__ */ U("path", { d: "M8 2a6 6 0 1 1-6 6" })
+		children: /* @__PURE__ */ H("path", { d: "M8 2a6 6 0 1 1-6 6" })
 	}),
-	pause: () => G(/* @__PURE__ */ U("path", { d: "M6 4v8M10 4v8" })),
-	circle: () => G(/* @__PURE__ */ U("circle", {
+	pause: () => W(/* @__PURE__ */ H("path", { d: "M6 4v8M10 4v8" })),
+	circle: () => W(/* @__PURE__ */ H("circle", {
 		cx: "8",
 		cy: "8",
 		r: "4.5"
 	})),
-	skip: () => G(/* @__PURE__ */ U("path", { d: "M4 8h8" })),
-	alert: () => G(/* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("path", { d: "M8 2.5l6 11H2z" }), /* @__PURE__ */ U("path", { d: "M8 7v2.5M8 11.6v.1" })] })),
-	upload: () => G(/* @__PURE__ */ U("path", { d: "M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10" })),
-	play: () => G(/* @__PURE__ */ U("path", { d: "M5 3.5v9l7-4.5z" })),
-	sparkle: () => G(/* @__PURE__ */ U("path", { d: "M8 2.5l1.3 3.2 3.2 1.3-3.2 1.3L8 11.5 6.7 8.3 3.5 7l3.2-1.3zM12.5 11l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" })),
-	back: () => G(/* @__PURE__ */ U("path", { d: "M10 4L6 8l4 4" }), 14),
-	navigate: () => G(/* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("circle", {
+	skip: () => W(/* @__PURE__ */ H("path", { d: "M4 8h8" })),
+	alert: () => W(/* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("path", { d: "M8 2.5l6 11H2z" }), /* @__PURE__ */ H("path", { d: "M8 7v2.5M8 11.6v.1" })] })),
+	upload: () => W(/* @__PURE__ */ H("path", { d: "M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10" })),
+	play: () => W(/* @__PURE__ */ H("path", { d: "M5 3.5v9l7-4.5z" })),
+	sparkle: () => W(/* @__PURE__ */ H("path", { d: "M8 2.5l1.3 3.2 3.2 1.3-3.2 1.3L8 11.5 6.7 8.3 3.5 7l3.2-1.3zM12.5 11l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" })),
+	back: () => W(/* @__PURE__ */ H("path", { d: "M10 4L6 8l4 4" }), 14),
+	navigate: () => W(/* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("circle", {
 		cx: "8",
 		cy: "8",
 		r: "5.5"
-	}), /* @__PURE__ */ U("path", { d: "M2.5 8h11M8 2.5c1.8 1.8 1.8 9.2 0 11M8 2.5c-1.8 1.8-1.8 9.2 0 11" })] })),
-	executeXpathCommand: () => G(/* @__PURE__ */ U("path", { d: "M4 3l8 4.2-3.6 1.1L7 12z" })),
-	javascript: () => G(/* @__PURE__ */ U("path", { d: "M6 4c-1.5 0-1.5 1-1.5 2S4 8 3 8c1 0 1.5 0 1.5 2s0 2 1.5 2M10 4c1.5 0 1.5 1 1.5 2s.5 2 1.5 2c-1 0-1.5 0-1.5 2s0 2-1.5 2" })),
-	extractData: () => G(/* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("rect", {
+	}), /* @__PURE__ */ H("path", { d: "M2.5 8h11M8 2.5c1.8 1.8 1.8 9.2 0 11M8 2.5c-1.8 1.8-1.8 9.2 0 11" })] })),
+	executeXpathCommand: () => W(/* @__PURE__ */ H("path", { d: "M4 3l8 4.2-3.6 1.1L7 12z" })),
+	javascript: () => W(/* @__PURE__ */ H("path", { d: "M6 4c-1.5 0-1.5 1-1.5 2S4 8 3 8c1 0 1.5 0 1.5 2s0 2 1.5 2M10 4c1.5 0 1.5 1 1.5 2s.5 2 1.5 2c-1 0-1.5 0-1.5 2s0 2-1.5 2" })),
+	extractData: () => W(/* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("rect", {
 		x: "2.5",
 		y: "3",
 		width: "11",
 		height: "10",
 		rx: "1.5"
-	}), /* @__PURE__ */ U("path", { d: "M2.5 6.5h11M6.5 6.5V13" })] })),
-	if: () => G(/* @__PURE__ */ U(C, { children: [
-		/* @__PURE__ */ U("circle", {
+	}), /* @__PURE__ */ H("path", { d: "M2.5 6.5h11M6.5 6.5V13" })] })),
+	if: () => W(/* @__PURE__ */ H(C, { children: [
+		/* @__PURE__ */ H("circle", {
 			cx: "4",
 			cy: "4",
 			r: "1.5"
 		}),
-		/* @__PURE__ */ U("circle", {
+		/* @__PURE__ */ H("circle", {
 			cx: "12",
 			cy: "4",
 			r: "1.5"
 		}),
-		/* @__PURE__ */ U("circle", {
+		/* @__PURE__ */ H("circle", {
 			cx: "8",
 			cy: "12.5",
 			r: "1.5"
 		}),
-		/* @__PURE__ */ U("path", { d: "M8 11V8.5L4 5.5M8 8.5l4-3" })
+		/* @__PURE__ */ H("path", { d: "M8 11V8.5L4 5.5M8 8.5l4-3" })
 	] })),
-	switch: () => G(/* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("circle", {
+	switch: () => W(/* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("circle", {
 		cx: "3.5",
 		cy: "8",
 		r: "1.5"
-	}), /* @__PURE__ */ U("path", { d: "M5 8h2.5M7.5 8l5-4M7.5 8h5M7.5 8l5 4" })] })),
-	delay: () => G(/* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("circle", {
+	}), /* @__PURE__ */ H("path", { d: "M5 8h2.5M7.5 8l5-4M7.5 8h5M7.5 8l5 4" })] })),
+	delay: () => W(/* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("circle", {
 		cx: "8",
 		cy: "8",
 		r: "5.5"
-	}), /* @__PURE__ */ U("path", { d: "M8 5v3.2l2 1.3" })] })),
-	download: () => G(/* @__PURE__ */ U("path", { d: "M8 3v7.5M4.5 7L8 10.5 11.5 7M3 13h10" })),
-	manual: () => G(/* @__PURE__ */ U("path", { d: "M5.5 8V4.2a1 1 0 0 1 2 0V7.5M7.5 7V3.2a1 1 0 0 1 2 0V7.5M9.5 7.5V4.5a1 1 0 0 1 2 0V9c0 2.5-1.5 4.5-4 4.5-1.8 0-2.7-.8-3.7-2.3L2.6 8.7a1 1 0 0 1 1.6-1.1l1.3 1.4" }))
+	}), /* @__PURE__ */ H("path", { d: "M8 5v3.2l2 1.3" })] })),
+	download: () => W(/* @__PURE__ */ H("path", { d: "M8 3v7.5M4.5 7L8 10.5 11.5 7M3 13h10" })),
+	manual: () => W(/* @__PURE__ */ H("path", { d: "M5.5 8V4.2a1 1 0 0 1 2 0V7.5M7.5 7V3.2a1 1 0 0 1 2 0V7.5M9.5 7.5V4.5a1 1 0 0 1 2 0V9c0 2.5-1.5 4.5-4 4.5-1.8 0-2.7-.8-3.7-2.3L2.6 8.7a1 1 0 0 1 1.6-1.1l1.3 1.4" }))
 };
-function Ve({ type: e }) {
-	let { t } = H();
-	return /* @__PURE__ */ U("span", {
+function Ue({ type: e }) {
+	let { t } = V();
+	return /* @__PURE__ */ H("span", {
 		class: "st pending",
 		title: t(`stepType.${e}`),
-		children: K[e]()
+		children: G[e]()
 	});
 }
-function He({ status: e }) {
-	let { t } = H();
-	return /* @__PURE__ */ U("span", {
+function We({ status: e }) {
+	let { t } = V();
+	return /* @__PURE__ */ H("span", {
 		class: `pill ${{
 			running: "run",
 			waiting_manual: "warn",
@@ -1186,57 +1278,57 @@ function He({ status: e }) {
 		children: t(`status.${e}`)
 	});
 }
-function Ue({ status: e }) {
-	let { t } = H();
-	return /* @__PURE__ */ U("span", {
+function Ge({ status: e }) {
+	let { t } = V();
+	return /* @__PURE__ */ H("span", {
 		class: `dot ${e === "success" ? "ok" : e === "failure" ? "bad" : e === "running" ? "run" : e === "waiting_manual" ? "warn" : ""}`,
 		title: t(e ? `status.${e}` : "status.never")
 	});
 }
-function q({ title: e, sub: t, right: n }) {
-	let r = W(), { t: i } = H();
-	return /* @__PURE__ */ U(C, { children: [r.canBack && /* @__PURE__ */ U("button", {
+function K({ title: e, sub: t, right: n }) {
+	let r = U(), { t: i } = V();
+	return /* @__PURE__ */ H(C, { children: [r.canBack && /* @__PURE__ */ H("button", {
 		class: "back",
 		onClick: r.back,
 		children: i("common.back")
-	}), /* @__PURE__ */ U("div", {
+	}), /* @__PURE__ */ H("div", {
 		class: "hd",
-		children: [/* @__PURE__ */ U("div", {
+		children: [/* @__PURE__ */ H("div", {
 			class: "hd-main",
-			children: [/* @__PURE__ */ U("h1", {
+			children: [/* @__PURE__ */ H("h1", {
 				class: "title",
 				children: e
-			}), t && /* @__PURE__ */ U("div", {
+			}), t && /* @__PURE__ */ H("div", {
 				class: "sub",
 				children: t
 			})]
 		}), n]
 	})] });
 }
-function J({ label: e, children: t, initial: n = !1 }) {
+function q({ label: e, children: t, initial: n = !1 }) {
 	let [r, i] = R(n);
-	return /* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("button", {
+	return /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("button", {
 		class: "disclosure",
 		"aria-expanded": r,
 		onClick: () => i(!r),
-		children: [K.chevron(), e]
+		children: [G.chevron(), e]
 	}), r && t] });
 }
-function We({ items: e }) {
-	let [t, n] = R(!1), { t: r } = H();
-	return /* @__PURE__ */ U("div", {
+function Ke({ items: e }) {
+	let [t, n] = R(!1), { t: r } = V();
+	return /* @__PURE__ */ H("div", {
 		class: "menu",
-		children: [/* @__PURE__ */ U("button", {
+		children: [/* @__PURE__ */ H("button", {
 			class: "icon-btn",
 			"aria-label": r("common.moreActions"),
 			"aria-expanded": t,
 			onClick: () => n(!t),
-			children: K.more()
-		}), t && /* @__PURE__ */ U("div", {
+			children: G.more()
+		}), t && /* @__PURE__ */ H("div", {
 			class: "menu-pop",
 			role: "menu",
 			onMouseLeave: () => n(!1),
-			children: e.map((e) => /* @__PURE__ */ U("button", {
+			children: e.map((e) => /* @__PURE__ */ H("button", {
 				role: "menuitem",
 				onClick: () => {
 					n(!1), e.onClick();
@@ -1246,8 +1338,8 @@ function We({ items: e }) {
 		})]
 	});
 }
-function Ge({ runId: e, stepId: t, alt: n }) {
-	let r = W(), { t: i } = H(), [a, o] = R(), [s, c] = R(!1);
+function qe({ runId: e, stepId: t, alt: n }) {
+	let r = U(), { t: i } = V(), [a, o] = R(), [s, c] = R(!1);
 	return z(() => {
 		let n = !0;
 		return o(void 0), r.bridge.call("ui_get_screenshot", {
@@ -1258,27 +1350,27 @@ function Ge({ runId: e, stepId: t, alt: n }) {
 		}).catch(() => {}), () => {
 			n = !1;
 		};
-	}, [e, t]), a ? /* @__PURE__ */ U("button", {
+	}, [e, t]), a ? /* @__PURE__ */ H("button", {
 		class: `shot${s ? " open" : ""}`,
 		onClick: () => c(!s),
 		"aria-label": i(s ? "fail.collapse" : "fail.expand"),
-		children: /* @__PURE__ */ U("img", {
+		children: /* @__PURE__ */ H("img", {
 			src: a,
 			alt: n
 		})
 	}) : null;
 }
-function Y({ kind: e, children: t }) {
-	let n = e === "ok" ? K.check() : e === "info" ? K.circle() : K.alert();
-	return /* @__PURE__ */ U("div", {
+function J({ kind: e, children: t }) {
+	let n = e === "ok" ? G.check() : e === "info" ? G.circle() : G.alert();
+	return /* @__PURE__ */ H("div", {
 		class: `note ${e}`,
 		role: e === "bad" ? "alert" : "status",
-		children: [n, /* @__PURE__ */ U("div", { children: t })]
+		children: [n, /* @__PURE__ */ H("div", { children: t })]
 	});
 }
-function X({ onClick: e, children: t, primary: n, ghost: r, disabled: i, "aria-label": a }) {
-	let o = W(), [s, c] = R(!1);
-	return /* @__PURE__ */ U("button", {
+function Y({ onClick: e, children: t, primary: n, ghost: r, disabled: i, "aria-label": a }) {
+	let o = U(), [s, c] = R(!1);
+	return /* @__PURE__ */ H("button", {
 		class: `btn${n ? " primary" : ""}${r ? " ghost" : ""}`,
 		"aria-label": a,
 		disabled: s || i,
@@ -1290,33 +1382,33 @@ function X({ onClick: e, children: t, primary: n, ghost: r, disabled: i, "aria-l
 				c(!1);
 			}
 		},
-		children: [s && K.spinner(), t]
+		children: [s && G.spinner(), t]
 	});
 }
-async function Ke(e, t, n) {
+async function Je(e, t, n) {
 	return n && await e.updateContext(n).catch(() => {}), await e.sendMessage(t) ?? void 0;
 }
-function qe({ result: e, again: t }) {
-	let { t: n } = H(), [r, i] = R(!1), a = t && /* @__PURE__ */ U(C, { children: [" ", /* @__PURE__ */ U("button", {
+function Ye({ result: e, again: t }) {
+	let { t: n } = V(), [r, i] = R(!1), a = t && /* @__PURE__ */ H(C, { children: [" ", /* @__PURE__ */ H("button", {
 		class: "link",
 		onClick: t,
 		children: n("ask.again")
 	})] });
-	return e ? e.delivered ? /* @__PURE__ */ U(Y, {
+	return e ? e.delivered ? /* @__PURE__ */ H(J, {
 		kind: "info",
 		children: [n("panel.sent"), a]
-	}) : /* @__PURE__ */ U("div", {
+	}) : /* @__PURE__ */ H("div", {
 		class: "note info",
 		style: "flex-direction:column;align-items:stretch;gap:8px",
-		children: [/* @__PURE__ */ U("div", { children: n("panel.noAi") }), /* @__PURE__ */ U("div", {
+		children: [/* @__PURE__ */ H("div", { children: n("panel.noAi") }), /* @__PURE__ */ H("div", {
 			style: "display:flex;gap:6px",
-			children: [/* @__PURE__ */ U("input", {
+			children: [/* @__PURE__ */ H("input", {
 				class: "input",
 				readOnly: !0,
 				value: e.text,
 				onFocus: (e) => e.target.select(),
 				"aria-label": n("panel.copy")
-			}), /* @__PURE__ */ U("button", {
+			}), /* @__PURE__ */ H("button", {
 				class: "btn",
 				onClick: async () => {
 					try {
@@ -1326,40 +1418,40 @@ function qe({ result: e, again: t }) {
 				children: n(r ? "panel.copied" : "panel.copy")
 			})]
 		})]
-	}) : /* @__PURE__ */ U(Y, {
+	}) : /* @__PURE__ */ H(J, {
 		kind: "info",
 		children: [n("ask.sent"), a]
 	});
 }
-function Z({ message: e, context: t, placeholder: n, suggestions: r = [], label: i, allowEmpty: a = !1, heading: o }) {
-	let s = W(), { t: c } = H(), [l, u] = R(""), [d, f] = R();
-	if (d) return /* @__PURE__ */ U(qe, {
+function X({ message: e, context: t, placeholder: n, suggestions: r = [], label: i, allowEmpty: a = !1, heading: o }) {
+	let s = U(), { t: c } = V(), [l, u] = R(""), [d, f] = R();
+	if (d) return /* @__PURE__ */ H(Ye, {
 		result: d.result,
 		again: () => {
 			u(""), f(void 0);
 		}
 	});
 	let p = async () => {
-		f({ result: await Ke(s.bridge, e(l.trim()), t) });
+		f({ result: await Je(s.bridge, e(l.trim()), t) });
 	};
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: `ask${o ? " ask-view" : ""}`,
 		children: [
-			o && /* @__PURE__ */ U("div", {
+			o && /* @__PURE__ */ H("div", {
 				class: "ask-title",
 				children: o
 			}),
-			r.length > 0 && !l && /* @__PURE__ */ U("div", {
+			r.length > 0 && !l && /* @__PURE__ */ H("div", {
 				class: "chips",
-				children: r.map((e) => /* @__PURE__ */ U("button", {
+				children: r.map((e) => /* @__PURE__ */ H("button", {
 					class: "chip",
 					onClick: () => u(e),
 					children: e
 				}))
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "ask-row",
-				children: [/* @__PURE__ */ U("input", {
+				children: [/* @__PURE__ */ H("input", {
 					class: "input",
 					value: l,
 					placeholder: n,
@@ -1368,20 +1460,20 @@ function Z({ message: e, context: t, placeholder: n, suggestions: r = [], label:
 					onKeyDown: (e) => {
 						e.key === "Enter" && (l.trim() || a) && p();
 					}
-				}), /* @__PURE__ */ U(X, {
+				}), /* @__PURE__ */ H(Y, {
 					primary: !o,
 					disabled: !l.trim() && !a,
 					onClick: p,
-					children: [K.sparkle(), i ?? c("ask.button")]
+					children: [G.sparkle(), i ?? c("ask.button")]
 				})]
 			})
 		]
 	});
 }
 // ui/views/library.tsx
-var Je = 5;
-function Ye() {
-	let e = W(), { t } = H(), n = B(null), [r, i] = R();
+var Xe = 5;
+function Ze() {
+	let e = U(), { t } = V(), n = B(null), [r, i] = R();
 	async function a(r) {
 		let a = r.target.files?.[0];
 		if (!a) return;
@@ -1394,7 +1486,7 @@ function Ye() {
 	}
 	return {
 		pick: () => n.current?.click(),
-		input: /* @__PURE__ */ U("input", {
+		input: /* @__PURE__ */ H("input", {
 			ref: n,
 			type: "file",
 			accept: ".json,application/json",
@@ -1405,45 +1497,45 @@ function Ye() {
 		error: r
 	};
 }
-function Xe({ workflows: e, query: t }) {
-	let n = W(), { t: r, ago: i } = H(), [a, o] = R(!1), [s, c] = R(""), l = Ye(), u = n.bridge.surface === "panel", d = s.toLowerCase(), f = e.filter((e) => !d || `${e.name} ${e.host}`.toLowerCase().includes(d)), p = a ? f : f.slice(0, Je);
-	return /* @__PURE__ */ U("div", {
+function Qe({ workflows: e, query: t }) {
+	let n = U(), { t: r, ago: i } = V(), [a, o] = R(!1), [s, c] = R(""), l = Ze(), u = n.bridge.surface === "panel", d = s.toLowerCase(), f = e.filter((e) => !d || `${e.name} ${e.host}`.toLowerCase().includes(d)), p = a ? f : f.slice(0, Xe);
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: r("lib.title"),
 				sub: t ? r("lib.matching", { q: t }) : r("lib.saved", { n: e.length })
 			}),
-			e.length === 0 ? /* @__PURE__ */ U("div", {
+			e.length === 0 ? /* @__PURE__ */ H("div", {
 				class: "empty",
-				children: /* @__PURE__ */ U("div", { children: r(u ? "panel.empty" : "lib.empty") })
-			}) : /* @__PURE__ */ U(C, { children: [e.length > Je && /* @__PURE__ */ U("input", {
+				children: /* @__PURE__ */ H("div", { children: r(u ? "panel.empty" : "lib.empty") })
+			}) : /* @__PURE__ */ H(C, { children: [e.length > Xe && /* @__PURE__ */ H("input", {
 				class: "input",
 				type: "search",
 				placeholder: r("lib.filter"),
 				value: s,
 				onInput: (e) => c(e.target.value),
 				"aria-label": r("lib.filter")
-			}), /* @__PURE__ */ U("div", {
+			}), /* @__PURE__ */ H("div", {
 				class: "list",
 				children: [
 					p.map((e) => {
-						let t = /* @__PURE__ */ U("button", {
+						let t = /* @__PURE__ */ H("button", {
 							class: "row",
 							style: u ? "flex:1;min-width:0" : void 0,
 							onClick: () => n.open("show_workflow", { id: e.id }, "push"),
 							children: [
-								/* @__PURE__ */ U(Ue, { status: e.lastRun?.status }),
-								/* @__PURE__ */ U("div", {
+								/* @__PURE__ */ H(Ge, { status: e.lastRun?.status }),
+								/* @__PURE__ */ H("div", {
 									class: "row-main",
-									children: [/* @__PURE__ */ U("div", {
+									children: [/* @__PURE__ */ H("div", {
 										class: "row-title",
-										children: [e.name, e.example && /* @__PURE__ */ U("span", {
+										children: [e.name, e.example && /* @__PURE__ */ H("span", {
 											class: "pill muted",
 											style: "margin-left:6px",
 											children: r("lib.example")
 										})]
-									}), /* @__PURE__ */ U("div", {
+									}), /* @__PURE__ */ H("div", {
 										class: "row-sub",
 										children: [
 											e.host || r("wf.hostFromInputs"),
@@ -1452,64 +1544,64 @@ function Xe({ workflows: e, query: t }) {
 										]
 									})]
 								}),
-								/* @__PURE__ */ U("span", {
+								/* @__PURE__ */ H("span", {
 									class: "row-meta",
 									children: e.lastRun ? `${e.lastRun.status ? `${r(`status.${e.lastRun.status}`)} · ` : ""}${i(e.lastRun.at)}` : r("lib.neverRun")
 								})
 							]
 						});
-						return u ? /* @__PURE__ */ U("div", {
+						return u ? /* @__PURE__ */ H("div", {
 							class: "row-wrap",
 							style: "display:flex;align-items:center;gap:6px;padding-right:8px",
-							children: [t, /* @__PURE__ */ U(X, {
+							children: [t, /* @__PURE__ */ H(Y, {
 								onClick: () => n.open("run_workflow", {
 									id: e.id,
 									form: !0
 								}, "push"),
 								"aria-label": `${r("panel.run")} ${e.name}`,
-								children: [K.play(), r("panel.run")]
+								children: [G.play(), r("panel.run")]
 							})]
 						}) : t;
 					}),
-					!p.length && /* @__PURE__ */ U("div", {
+					!p.length && /* @__PURE__ */ H("div", {
 						class: "row",
-						children: /* @__PURE__ */ U("span", {
+						children: /* @__PURE__ */ H("span", {
 							class: "muted",
 							children: r("lib.noMatch")
 						})
 					}),
-					!a && f.length > Je && /* @__PURE__ */ U("button", {
+					!a && f.length > Xe && /* @__PURE__ */ H("button", {
 						class: "more",
 						onClick: () => o(!0),
 						children: r("common.showAll", { n: f.length })
 					})
 				]
 			})] }),
-			l.error && /* @__PURE__ */ U("div", {
+			l.error && /* @__PURE__ */ H("div", {
 				class: "field",
-				children: /* @__PURE__ */ U("span", {
+				children: /* @__PURE__ */ H("span", {
 					class: "err",
 					children: l.error
 				})
 			}),
 			l.input,
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U("button", {
+				children: /* @__PURE__ */ H("button", {
 					class: "btn primary",
 					onClick: l.pick,
-					children: [K.upload(), r("lib.import")]
+					children: [G.upload(), r("lib.import")]
 				})
 			})
 		]
 	});
 }
 // ui/views/importDraft.tsx
-function Ze({ preview: e, pendingId: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R(!1);
-	if (i) return /* @__PURE__ */ U("div", {
+function $e({ preview: e, pendingId: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R(!1);
+	if (i) return /* @__PURE__ */ H("div", {
 		class: "w",
-		children: /* @__PURE__ */ U(Y, {
+		children: /* @__PURE__ */ H(J, {
 			kind: "info",
 			children: r("imp.cancelled")
 		})
@@ -1517,102 +1609,102 @@ function Ze({ preview: e, pendingId: t }) {
 	let o = (e) => r(`imp.err.${e.code}`, { arg: e.arg });
 	if (!e.ok) {
 		let t = e.errors.slice(0, 3);
-		return /* @__PURE__ */ U("div", {
+		return /* @__PURE__ */ H("div", {
 			class: "w",
 			children: [
-				/* @__PURE__ */ U(q, {
+				/* @__PURE__ */ H(K, {
 					title: r("imp.cantTitle"),
 					sub: e.fileName
 				}),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "list",
-					children: [t.map((e) => /* @__PURE__ */ U("div", {
+					children: [t.map((e) => /* @__PURE__ */ H("div", {
 						class: "row",
-						children: [/* @__PURE__ */ U("span", {
+						children: [/* @__PURE__ */ H("span", {
 							class: "st bad",
-							children: K.x()
-						}), /* @__PURE__ */ U("div", {
+							children: G.x()
+						}), /* @__PURE__ */ H("div", {
 							class: "row-main",
-							children: [/* @__PURE__ */ U("div", {
+							children: [/* @__PURE__ */ H("div", {
 								class: "row-title mono",
 								children: e.path
-							}), /* @__PURE__ */ U("div", {
+							}), /* @__PURE__ */ H("div", {
 								class: "row-sub",
 								style: "white-space:normal",
 								children: o(e)
 							})]
 						})]
-					})), e.errors.length > 3 && /* @__PURE__ */ U("div", {
+					})), e.errors.length > 3 && /* @__PURE__ */ H("div", {
 						class: "row",
-						children: /* @__PURE__ */ U("span", {
+						children: /* @__PURE__ */ H("span", {
 							class: "muted",
 							children: r("imp.more", { n: e.errors.length - 3 })
 						})
 					})]
 				}),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "actions",
-					children: [/* @__PURE__ */ U("button", {
+					children: [/* @__PURE__ */ H("button", {
 						class: "btn ghost",
 						onClick: () => a(!0),
 						children: r("common.cancel")
-					}), /* @__PURE__ */ U(X, {
+					}), /* @__PURE__ */ H(Y, {
 						primary: !0,
-						onClick: () => Ke(n.bridge, r("msg.importFix", { file: e.fileName }), `The user's workflow file "${e.fileName}" failed validation:\n${e.errors.map((e) => `- ${e.path}: ${e.message}`).join("\n")}\nHelp fix the JSON (format: get_step_schema), then call import_workflow with the corrected content.`),
-						children: [K.sparkle(), r("ask.fix")]
+						onClick: () => Je(n.bridge, r("msg.importFix", { file: e.fileName }), `The user's workflow file "${e.fileName}" failed validation:\n${e.errors.map((e) => `- ${e.path}: ${e.message}`).join("\n")}\nHelp fix the JSON (format: get_step_schema), then call import_workflow with the corrected content.`),
+						children: [G.sparkle(), r("ask.fix")]
 					})]
 				})
 			]
 		});
 	}
 	let s = e.workflow;
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: r("imp.title", { name: s.name }),
 				sub: e.fileName
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "list",
 				children: [
-					/* @__PURE__ */ U("div", {
+					/* @__PURE__ */ H("div", {
 						class: "row",
-						children: /* @__PURE__ */ U("div", {
+						children: /* @__PURE__ */ H("div", {
 							class: "row-main",
-							children: [/* @__PURE__ */ U("div", {
+							children: [/* @__PURE__ */ H("div", {
 								class: "row-sub",
 								children: r("imp.site")
-							}), /* @__PURE__ */ U("div", {
+							}), /* @__PURE__ */ H("div", {
 								class: "row-title",
 								children: s.host || r("wf.hostFromInputs")
 							})]
 						})
 					}),
-					/* @__PURE__ */ U("div", {
+					/* @__PURE__ */ H("div", {
 						class: "row",
-						children: [/* @__PURE__ */ U("div", {
+						children: [/* @__PURE__ */ H("div", {
 							class: "row-main",
-							children: [/* @__PURE__ */ U("div", {
+							children: [/* @__PURE__ */ H("div", {
 								class: "row-sub",
 								children: r("imp.steps")
-							}), /* @__PURE__ */ U("div", {
+							}), /* @__PURE__ */ H("div", {
 								class: "row-title",
 								children: r("imp.allValid", { n: s.stepCount })
 							})]
-						}), /* @__PURE__ */ U("span", {
+						}), /* @__PURE__ */ H("span", {
 							class: "st ok",
-							children: K.check()
+							children: G.check()
 						})]
 					}),
-					!!e.inputs?.length && /* @__PURE__ */ U("div", {
+					!!e.inputs?.length && /* @__PURE__ */ H("div", {
 						class: "row",
-						children: /* @__PURE__ */ U("div", {
+						children: /* @__PURE__ */ H("div", {
 							class: "row-main",
-							children: [/* @__PURE__ */ U("div", {
+							children: [/* @__PURE__ */ H("div", {
 								class: "row-sub",
 								children: r("imp.asksFor")
-							}), /* @__PURE__ */ U("div", {
+							}), /* @__PURE__ */ H("div", {
 								class: "row-title",
 								children: e.inputs.join(", ")
 							})]
@@ -1620,7 +1712,7 @@ function Ze({ preview: e, pendingId: t }) {
 					})
 				]
 			}),
-			e.existingVersion !== void 0 && /* @__PURE__ */ U(Y, {
+			e.existingVersion !== void 0 && /* @__PURE__ */ H(J, {
 				kind: "warn",
 				children: r("imp.exists", {
 					id: s.id,
@@ -1628,13 +1720,13 @@ function Ze({ preview: e, pendingId: t }) {
 					next: e.existingVersion + 1
 				})
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: [/* @__PURE__ */ U("button", {
+				children: [/* @__PURE__ */ H("button", {
 					class: "btn ghost",
 					onClick: () => a(!0),
 					children: r("common.cancel")
-				}), /* @__PURE__ */ U(X, {
+				}), /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: () => n.open("ui_confirm_import", { pendingId: t }, "replace"),
 					children: r("imp.save")
@@ -1643,44 +1735,44 @@ function Ze({ preview: e, pendingId: t }) {
 		]
 	});
 }
-function Qe({ workflow: e, pendingId: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R(e.name);
-	return /* @__PURE__ */ U("div", {
+function et({ workflow: e, pendingId: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R(e.name);
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: e.name,
 				sub: r("draft.sub", {
 					host: e.host || r("wf.hostFromInputs"),
 					n: e.steps.length
 				})
 			}),
-			/* @__PURE__ */ U(gt, {
+			/* @__PURE__ */ H(vt, {
 				steps: e.steps,
 				limit: 5
 			}),
-			e.variables.length > 0 && /* @__PURE__ */ U("div", {
+			e.variables.length > 0 && /* @__PURE__ */ H("div", {
 				class: "chips",
-				children: [/* @__PURE__ */ U("span", {
+				children: [/* @__PURE__ */ H("span", {
 					class: "muted",
 					children: r("draft.inputs")
-				}), e.variables.map((e) => /* @__PURE__ */ U("span", {
+				}), e.variables.map((e) => /* @__PURE__ */ H("span", {
 					class: "tag",
 					children: [e.title, e.required ? " *" : ""]
 				}))]
 			}),
-			/* @__PURE__ */ U(Z, {
+			/* @__PURE__ */ H(X, {
 				heading: r("ask.draftTitle"),
 				placeholder: r("ask.phDraft"),
 				message: (e) => r("msg.editDraft", { text: e }),
 				context: `The user wants to change the draft workflow "${e.name}" (${e.steps.length} steps) that you proposed with propose_workflow. It is not saved yet, so propose_change cannot be used on it. Answer with propose_workflow again, with the whole workflow changed as asked.`
 			}, t),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "field",
-				children: [/* @__PURE__ */ U("label", {
+				children: [/* @__PURE__ */ H("label", {
 					for: `name-${t}`,
 					children: r("draft.name")
-				}), /* @__PURE__ */ U("input", {
+				}), /* @__PURE__ */ H("input", {
 					id: `name-${t}`,
 					class: "input",
 					value: i,
@@ -1688,40 +1780,40 @@ function Qe({ workflow: e, pendingId: t }) {
 					onInput: (e) => a(e.target.value)
 				})]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: [/* @__PURE__ */ U(X, {
+				children: [/* @__PURE__ */ H(Y, {
 					disabled: !i.trim(),
 					onClick: () => n.open("ui_save_draft", {
 						pendingId: t,
 						name: i.trim()
 					}, "replace"),
 					children: r("draft.save")
-				}), /* @__PURE__ */ U(X, {
+				}), /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: () => n.open("ui_test_draft", { pendingId: t }, "push"),
-					children: [K.play(), r("draft.testRun")]
+					children: [G.play(), r("draft.testRun")]
 				})]
 			})
 		]
 	});
 }
-function $e({ draft: e, primary: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R(e.name);
-	return /* @__PURE__ */ U("div", {
+function tt({ draft: e, primary: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R(e.name);
+	return /* @__PURE__ */ H("div", {
 		class: "draft-save",
 		children: [
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "muted",
 				style: "font-size:12.5px",
 				children: r("draft.saveHint")
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "field",
-				children: [/* @__PURE__ */ U("label", {
+				children: [/* @__PURE__ */ H("label", {
 					for: `save-${e.pendingId}`,
 					children: r("draft.name")
-				}), /* @__PURE__ */ U("input", {
+				}), /* @__PURE__ */ H("input", {
 					id: `save-${e.pendingId}`,
 					class: "input",
 					value: i,
@@ -1729,9 +1821,9 @@ function $e({ draft: e, primary: t }) {
 					onInput: (e) => a(e.target.value)
 				})]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					primary: t,
 					disabled: !i.trim(),
 					onClick: () => n.open("ui_save_draft", {
@@ -1745,15 +1837,15 @@ function $e({ draft: e, primary: t }) {
 	});
 }
 // ui/views/run.tsx
-function et(e, t) {
+function nt(e, t) {
 	let n = e.errorType ?? e.type, r = e.timeoutMs ? Math.round(e.timeoutMs / 1e3) : void 0;
 	return n === "cant_get_web_element_xpath" && e.target ? t("err.notFound", {
 		target: e.target,
 		s: r
 	}) : n === "timeout" && e.target === "run_limit" && e.timeoutMs ? t("err.runLimit", { m: Math.round(e.timeoutMs / 6e3) / 10 }) : n === "timeout" && r ? t("err.timeout", { s: r }) : e.reason ?? e.raw ?? "";
 }
-function tt({ workflow: e, draft: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R(Object.fromEntries(e.variables.map((e) => [e.name, e.default ?? (e.type !== "boolean" && "")]))), [o, s] = R(!1), c = e.variables.filter((e) => e.required), l = e.variables.filter((e) => !e.required), u = c.filter((e) => i[e.name] === "" || i[e.name] === void 0);
+function rt({ workflow: e, draft: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R(Object.fromEntries(e.variables.map((e) => [e.name, e.default ?? (e.type !== "boolean" && "")]))), [o, s] = R(!1), c = e.variables.filter((e) => e.required), l = e.variables.filter((e) => !e.required), u = c.filter((e) => i[e.name] === "" || i[e.name] === void 0);
 	async function d() {
 		if (s(!0), u.length) return;
 		let r = Object.fromEntries(Object.entries(i).map(([t, n]) => [t, e.variables.find((e) => e.name === t)?.type === "number" && n !== "" ? Number(n) : n]));
@@ -1765,9 +1857,9 @@ function tt({ workflow: e, draft: t }) {
 			variables: r
 		}, "replace");
 	}
-	let f = (e) => e.type === "boolean" ? /* @__PURE__ */ U("label", {
+	let f = (e) => e.type === "boolean" ? /* @__PURE__ */ H("label", {
 		class: "check",
-		children: [/* @__PURE__ */ U("input", {
+		children: [/* @__PURE__ */ H("input", {
 			type: "checkbox",
 			checked: !!i[e.name],
 			onChange: (t) => a({
@@ -1775,14 +1867,14 @@ function tt({ workflow: e, draft: t }) {
 				[e.name]: t.target.checked
 			})
 		}), e.title]
-	}) : /* @__PURE__ */ U("div", {
+	}) : /* @__PURE__ */ H("div", {
 		class: "field",
 		children: [
-			/* @__PURE__ */ U("label", {
+			/* @__PURE__ */ H("label", {
 				for: `v-${e.name}`,
 				children: [e.title, e.required ? "" : ` ${r("setupRun.optional")}`]
 			}),
-			/* @__PURE__ */ U("input", {
+			/* @__PURE__ */ H("input", {
 				id: `v-${e.name}`,
 				class: `input${o && e.required && u.includes(e) ? " invalid" : ""}`,
 				type: e.type === "number" ? "number" : "text",
@@ -1793,109 +1885,109 @@ function tt({ workflow: e, draft: t }) {
 					[e.name]: t.target.value
 				})
 			}),
-			o && e.required && u.includes(e) && /* @__PURE__ */ U("span", {
+			o && e.required && u.includes(e) && /* @__PURE__ */ H("span", {
 				class: "err",
 				children: r("setupRun.required")
 			})
 		]
 	});
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: r("setupRun.title", { name: e.name }),
 				sub: t ? `${r("draft.testing")} · ${r("lib.steps", { n: e.steps.length })}` : r("setupRun.sub", {
 					v: e.version,
 					n: e.steps.length
 				})
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "stack",
-				children: [c.map(f), l.length > 0 && /* @__PURE__ */ U(J, {
+				children: [c.map(f), l.length > 0 && /* @__PURE__ */ H(q, {
 					label: r("setupRun.more", { n: l.length }),
 					initial: c.length === 0,
-					children: /* @__PURE__ */ U("div", {
+					children: /* @__PURE__ */ H("div", {
 						class: "stack",
 						children: l.map(f)
 					})
 				})]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: d,
-					children: [K.play(), r(t ? "draft.startTest" : "setupRun.start")]
+					children: [G.play(), r(t ? "draft.startTest" : "setupRun.start")]
 				})
 			}),
-			t && /* @__PURE__ */ U($e, { draft: {
+			t && /* @__PURE__ */ H(tt, { draft: {
 				pendingId: t.pendingId,
 				name: e.name
 			} })
 		]
 	});
 }
-function nt({ s: e, index: t, isStopAfter: n, runId: r }) {
-	let i = W(), { t: a, dur: o } = H(), s = e.state === "ok" ? /* @__PURE__ */ U("span", {
+function it({ s: e, index: t, isStopAfter: n, runId: r }) {
+	let i = U(), { t: a, dur: o } = V(), s = e.state === "ok" ? /* @__PURE__ */ H("span", {
 		class: "st ok",
-		children: K.check()
-	}) : e.state === "failed" ? /* @__PURE__ */ U("span", {
+		children: G.check()
+	}) : e.state === "failed" ? /* @__PURE__ */ H("span", {
 		class: "st bad",
-		children: K.x()
-	}) : e.state === "running" ? /* @__PURE__ */ U("span", {
+		children: G.x()
+	}) : e.state === "running" ? /* @__PURE__ */ H("span", {
 		class: "st run",
-		children: K.spinner()
-	}) : e.state === "waiting" ? /* @__PURE__ */ U("span", {
+		children: G.spinner()
+	}) : e.state === "waiting" ? /* @__PURE__ */ H("span", {
 		class: "st warn",
-		children: K.pause()
-	}) : e.state === "skipped" ? /* @__PURE__ */ U("span", {
+		children: G.pause()
+	}) : e.state === "skipped" ? /* @__PURE__ */ H("span", {
 		class: "st pending",
-		children: K.skip()
-	}) : /* @__PURE__ */ U("span", {
+		children: G.skip()
+	}) : /* @__PURE__ */ H("span", {
 		class: "st pending",
-		children: K.circle()
-	}), c = e.state === "pending" || e.state === "skipped" ? " is-pending" : e.state === "running" || e.state === "waiting" ? " is-active" : e.state === "failed" ? " is-failed" : "", l = e.state === "ok" || e.state === "failed", u = /* @__PURE__ */ U(C, { children: [
-		/* @__PURE__ */ U("span", {
+		children: G.circle()
+	}), c = e.state === "pending" || e.state === "skipped" ? " is-pending" : e.state === "running" || e.state === "waiting" ? " is-active" : e.state === "failed" ? " is-failed" : "", l = e.state === "ok" || e.state === "failed", u = /* @__PURE__ */ H(C, { children: [
+		/* @__PURE__ */ H("span", {
 			class: "num",
 			children: t + 1
 		}),
 		s,
-		/* @__PURE__ */ U("div", {
+		/* @__PURE__ */ H("div", {
 			class: "row-main",
-			children: /* @__PURE__ */ U("div", {
+			children: /* @__PURE__ */ H("div", {
 				class: "row-title",
 				children: e.stepName
 			})
 		}),
-		n && /* @__PURE__ */ U("span", {
+		n && /* @__PURE__ */ H("span", {
 			class: "tag",
 			children: a("run.testStop")
 		}),
-		/* @__PURE__ */ U("span", {
+		/* @__PURE__ */ H("span", {
 			class: "row-meta",
 			children: l ? o(e.durationMs) : ""
 		}),
-		l && /* @__PURE__ */ U("span", {
+		l && /* @__PURE__ */ H("span", {
 			class: "st pending",
-			children: K.chevron()
+			children: G.chevron()
 		})
-	] }), d = l ? /* @__PURE__ */ U("button", {
+	] }), d = l ? /* @__PURE__ */ H("button", {
 		class: `row${c}`,
 		onClick: () => i.open("show_step", {
 			runId: r,
 			stepId: e.stepId
 		}, "push"),
 		children: u
-	}) : /* @__PURE__ */ U("div", {
+	}) : /* @__PURE__ */ H("div", {
 		class: `row${c}`,
 		children: u
 	});
-	return e.download ? /* @__PURE__ */ U("div", {
+	return e.download ? /* @__PURE__ */ H("div", {
 		class: "row-wrap",
-		children: [d, /* @__PURE__ */ U("div", {
+		children: [d, /* @__PURE__ */ H("div", {
 			class: "row-expand",
 			style: "padding-left:44px",
-			children: /* @__PURE__ */ U(it, {
+			children: /* @__PURE__ */ H(ot, {
 				file: e.download,
 				runId: r,
 				stepId: e.stepId
@@ -1903,7 +1995,7 @@ function nt({ s: e, index: t, isStopAfter: n, runId: r }) {
 		})]
 	}) : d;
 }
-function rt(e) {
+function at(e) {
 	if (e < 1024) return `${e} B`;
 	let t = [
 		"KB",
@@ -1913,39 +2005,39 @@ function rt(e) {
 	for (; n >= 1024 && r < t.length - 1;) n /= 1024, r++;
 	return `${n >= 10 ? Math.round(n) : Math.round(n * 10) / 10} ${t[r]}`;
 }
-function it({ file: e, runId: t, stepId: n }) {
-	let r = W(), { t: i } = H(), [a, o] = R(!1), s = [e.folder, e.fileName].filter(Boolean).join("/");
+function ot({ file: e, runId: t, stepId: n }) {
+	let r = U(), { t: i } = V(), [a, o] = R(!1), s = [e.folder, e.fileName].filter(Boolean).join("/");
 	if (!e.done) {
 		let t = e.received ?? e.bytes, n = e.total ? Math.min(100, Math.round(t / e.total * 100)) : void 0;
-		return /* @__PURE__ */ U("div", {
+		return /* @__PURE__ */ H("div", {
 			class: "stack",
 			style: "gap:4px;width:100%",
-			children: [/* @__PURE__ */ U("div", {
+			children: [/* @__PURE__ */ H("div", {
 				class: "row-sub",
 				children: [
 					i("dl.saving", { name: s }),
 					" ",
-					e.total ? `${rt(t)} / ${rt(e.total)}` : rt(t)
+					e.total ? `${at(t)} / ${at(e.total)}` : at(t)
 				]
-			}), /* @__PURE__ */ U("div", {
+			}), /* @__PURE__ */ H("div", {
 				class: "bar",
-				children: n === void 0 ? /* @__PURE__ */ U("i", { style: { width: "30%" } }) : /* @__PURE__ */ U("i", { style: { width: `${n}%` } })
+				children: n === void 0 ? /* @__PURE__ */ H("i", { style: { width: "30%" } }) : /* @__PURE__ */ H("i", { style: { width: `${n}%` } })
 			})]
 		});
 	}
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		style: "display:flex;gap:8px;align-items:center;width:100%",
-		children: [/* @__PURE__ */ U("div", {
+		children: [/* @__PURE__ */ H("div", {
 			class: "row-main",
-			children: [/* @__PURE__ */ U("div", {
+			children: [/* @__PURE__ */ H("div", {
 				class: "row-title",
 				title: s,
 				children: i("dl.saved", { name: s })
-			}), /* @__PURE__ */ U("div", {
+			}), /* @__PURE__ */ H("div", {
 				class: "row-sub",
-				children: a ? i("dl.gone") : rt(e.bytes)
+				children: a ? i("dl.gone") : at(e.bytes)
 			})]
-		}), /* @__PURE__ */ U(X, {
+		}), /* @__PURE__ */ H(Y, {
 			onClick: async () => {
 				let e = await r.bridge.call("ui_show_file", {
 					runId: t,
@@ -1957,13 +2049,13 @@ function it({ file: e, runId: t, stepId: n }) {
 		})]
 	});
 }
-function at({ run: e }) {
+function st({ run: e }) {
 	let t = e.steps.filter((e) => e.download);
-	return t.length ? /* @__PURE__ */ U("div", {
+	return t.length ? /* @__PURE__ */ H("div", {
 		class: "list",
-		children: t.map((t) => /* @__PURE__ */ U("div", {
+		children: t.map((t) => /* @__PURE__ */ H("div", {
 			class: "row",
-			children: /* @__PURE__ */ U(it, {
+			children: /* @__PURE__ */ H(ot, {
 				file: t.download,
 				runId: e.runId,
 				stepId: t.stepId
@@ -1971,7 +2063,7 @@ function at({ run: e }) {
 		}))
 	}) : null;
 }
-function ot(e, t) {
+function ct(e, t) {
 	if (t || e.length <= 7) return e.map((e, t) => ({
 		s: e,
 		i: t
@@ -1982,13 +2074,13 @@ function ot(e, t) {
 		i: i + t
 	}));
 }
-function st({ run: e }) {
-	let { t } = H();
-	return /* @__PURE__ */ U(J, {
+function lt({ run: e }) {
+	let { t } = V();
+	return /* @__PURE__ */ H(q, {
 		label: t("run.steps", { n: e.steps.length }),
-		children: /* @__PURE__ */ U("div", {
+		children: /* @__PURE__ */ H("div", {
 			class: "list",
-			children: e.steps.map((t, n) => /* @__PURE__ */ U(nt, {
+			children: e.steps.map((t, n) => /* @__PURE__ */ H(it, {
 				s: t,
 				index: n,
 				runId: e.runId,
@@ -1997,8 +2089,8 @@ function st({ run: e }) {
 		})
 	});
 }
-function ct({ run: e }) {
-	let t = W(), { t: n, dur: r } = H(), [i, a] = R(e), [o, s] = R(!1), c = B(), l = B(e.status === "running" || e.status === "waiting_manual");
+function ut({ run: e }) {
+	let t = U(), { t: n, dur: r } = V(), [i, a] = R(e), [o, s] = R(!1), c = B(), l = B(e.status === "running" || e.status === "waiting_manual");
 	z(() => a(e), [e]);
 	let u = i.status === "running" || i.status === "waiting_manual", d = i.live?.url, f = B(i.status);
 	if (f.current = i.status, z(() => {
@@ -2073,38 +2165,38 @@ function ct({ run: e }) {
 		c.current = i.status;
 		let e = i.failure;
 		t.bridge.updateContext(e ? `Run ${i.runId} of ${i.workflowName} failed at step ${e.stepIndex + 1} "${e.stepName}": ${e.reason}` : `Run ${i.runId} of ${i.workflowName} finished: ${i.status}${i.result ? `, ${i.result.rows} rows` : ""}`).catch(() => {});
-	}, [i.status]), i.status === "failure") return /* @__PURE__ */ U(lt, { run: i });
+	}, [i.status]), i.status === "failure") return /* @__PURE__ */ H(dt, { run: i });
 	let p = i.steps.filter((e) => e.state === "ok").length, m = i.stopAfterStepId ? i.steps.findIndex((e) => e.stepId === i.stopAfterStepId) + 1 : i.steps.length, h = i.steps.reduce((e, t) => e + (t.durationMs ?? 0), 0), g = () => i.draft ? t.open("ui_test_draft", {
 		pendingId: i.draft.pendingId,
 		variables: i.variables
 	}, "replace") : t.open("run_workflow", {
 		id: i.workflowId,
 		variables: i.variables
-	}, "replace"), _ = i.draft && /* @__PURE__ */ U($e, {
+	}, "replace"), _ = i.draft && /* @__PURE__ */ H(tt, {
 		draft: i.draft,
 		primary: i.status === "success"
-	}, i.runId), v = t.canBack && /* @__PURE__ */ U("button", {
+	}, i.runId), v = t.canBack && /* @__PURE__ */ H("button", {
 		class: "back",
 		onClick: t.back,
 		children: n("common.back")
 	});
 	if (i.status === "success") {
 		let e = i.stopAfterStepId;
-		return /* @__PURE__ */ U("div", {
+		return /* @__PURE__ */ H("div", {
 			class: "w",
 			children: [
 				v,
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "result",
-					children: [/* @__PURE__ */ U("span", {
+					children: [/* @__PURE__ */ H("span", {
 						class: "big ok",
-						children: K.check()
-					}), /* @__PURE__ */ U("div", {
+						children: G.check()
+					}), /* @__PURE__ */ H("div", {
 						class: "hd-main",
-						children: [/* @__PURE__ */ U("div", {
+						children: [/* @__PURE__ */ H("div", {
 							class: "title",
 							children: e ? n("run.changeWorks", { n: m }) : n("run.done", { n: i.steps.length })
-						}), /* @__PURE__ */ U("div", {
+						}), /* @__PURE__ */ H("div", {
 							class: "sub",
 							children: [
 								i.workflowName,
@@ -2117,9 +2209,9 @@ function ct({ run: e }) {
 						})]
 					})]
 				}),
-				/* @__PURE__ */ U(at, { run: i }),
-				/* @__PURE__ */ U(st, { run: i }),
-				/* @__PURE__ */ U(Z, {
+				/* @__PURE__ */ H(st, { run: i }),
+				/* @__PURE__ */ H(lt, { run: i }),
+				/* @__PURE__ */ H(X, {
 					heading: n("ask.runTitle"),
 					placeholder: n("ask.phRun"),
 					message: (e) => n("msg.aboutRun", {
@@ -2128,17 +2220,17 @@ function ct({ run: e }) {
 					}),
 					context: `The user is asking about run ${i.runId} of workflow "${i.workflowName}" (id ${i.workflowId}, v${i.version}), which finished OK${e ? " (a test that stopped after one step on purpose)" : ""}. Read it with get_run and get_run_data, and a step with get_step. If the workflow should change, answer with propose_change.`
 				}, i.runId),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "actions",
-					children: e ? /* @__PURE__ */ U(X, {
+					children: e ? /* @__PURE__ */ H(Y, {
 						primary: !0,
 						onClick: g,
-						children: [K.play(), n("run.runFull")]
-					}) : /* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U(X, {
+						children: [G.play(), n("run.runFull")]
+					}) : /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H(Y, {
 						ghost: !0,
 						onClick: g,
 						children: n(i.draft ? "draft.testAgain" : "run.runAgain")
-					}), /* @__PURE__ */ U(X, {
+					}), /* @__PURE__ */ H(Y, {
 						primary: !i.draft,
 						onClick: () => t.open("show_run_data", { runId: i.runId }, "push"),
 						children: n("run.viewData")
@@ -2150,22 +2242,22 @@ function ct({ run: e }) {
 	}
 	if (i.status === "stopped") {
 		let e = i.steps.findIndex((e) => e.state === "skipped" || e.state === "pending");
-		return /* @__PURE__ */ U("div", {
+		return /* @__PURE__ */ H("div", {
 			class: "w",
 			children: [
 				v,
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "result",
-					children: [/* @__PURE__ */ U("span", {
+					children: [/* @__PURE__ */ H("span", {
 						class: "big",
 						style: "background:var(--bg-2);color:var(--fg-2)",
-						children: K.skip()
-					}), /* @__PURE__ */ U("div", {
+						children: G.skip()
+					}), /* @__PURE__ */ H("div", {
 						class: "hd-main",
-						children: [/* @__PURE__ */ U("div", {
+						children: [/* @__PURE__ */ H("div", {
 							class: "title",
 							children: n("run.stoppedAt", { n: e + 1 })
-						}), /* @__PURE__ */ U("div", {
+						}), /* @__PURE__ */ H("div", {
 							class: "sub",
 							children: [
 								i.workflowName,
@@ -2175,10 +2267,10 @@ function ct({ run: e }) {
 						})]
 					})]
 				}),
-				/* @__PURE__ */ U(st, { run: i }),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H(lt, { run: i }),
+				/* @__PURE__ */ H("div", {
 					class: "actions",
-					children: /* @__PURE__ */ U(X, {
+					children: /* @__PURE__ */ H(Y, {
 						primary: !i.draft,
 						onClick: g,
 						children: n(i.draft ? "draft.testAgain" : "run.runAgain")
@@ -2188,25 +2280,25 @@ function ct({ run: e }) {
 			]
 		});
 	}
-	let y = ot(i.steps, o), b = async (e) => {
+	let y = ct(i.steps, o), b = async (e) => {
 		let n = await t.bridge.call(e, { runId: i.runId });
 		"run" in n.payload && a(n.payload.run);
 	};
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: i.workflowName,
-				sub: /* @__PURE__ */ U(C, { children: [i.version === 0 ? n("draft.testing") : `v${i.version}`, i.stopAfterStepId ? ` · ${n("run.testing")}` : ""] }),
-				right: /* @__PURE__ */ U(He, { status: i.status })
+				sub: /* @__PURE__ */ H(C, { children: [i.version === 0 ? n("draft.testing") : `v${i.version}`, i.stopAfterStepId ? ` · ${n("run.testing")}` : ""] }),
+				right: /* @__PURE__ */ H(We, { status: i.status })
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "stack",
 				style: "gap:6px",
-				children: [/* @__PURE__ */ U("div", {
+				children: [/* @__PURE__ */ H("div", {
 					class: "bar",
-					children: /* @__PURE__ */ U("i", { style: { width: `${Math.round(p / m * 100)}%` } })
-				}), /* @__PURE__ */ U("div", {
+					children: /* @__PURE__ */ H("i", { style: { width: `${Math.round(p / m * 100)}%` } })
+				}), /* @__PURE__ */ H("div", {
 					class: "muted",
 					children: n("run.progress", {
 						done: p,
@@ -2214,44 +2306,44 @@ function ct({ run: e }) {
 					})
 				})]
 			}),
-			i.manual && /* @__PURE__ */ U(Y, {
+			i.manual && /* @__PURE__ */ H(J, {
 				kind: "warn",
 				children: n("run.manual", { instruction: i.manual.instruction })
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "list",
 				children: [
-					y[0]?.i > 0 && /* @__PURE__ */ U("div", {
+					y[0]?.i > 0 && /* @__PURE__ */ H("div", {
 						class: "row is-pending",
-						children: [/* @__PURE__ */ U("span", { class: "num" }), /* @__PURE__ */ U("span", {
+						children: [/* @__PURE__ */ H("span", { class: "num" }), /* @__PURE__ */ H("span", {
 							class: "muted",
 							children: n("run.earlier", { n: y[0].i })
 						})]
 					}),
-					y.map(({ s: e, i: t }) => /* @__PURE__ */ U(nt, {
+					y.map(({ s: e, i: t }) => /* @__PURE__ */ H(it, {
 						s: e,
 						index: t,
 						runId: i.runId,
 						isStopAfter: e.stepId === i.stopAfterStepId
 					})),
-					!o && y.length < i.steps.length && /* @__PURE__ */ U("button", {
+					!o && y.length < i.steps.length && /* @__PURE__ */ H("button", {
 						class: "more",
 						onClick: () => s(!0),
 						children: n("common.showAll", { n: i.steps.length })
 					})
 				]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: i.manual ? /* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U(X, {
+				children: i.manual ? /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H(Y, {
 					ghost: !0,
 					onClick: () => b("ui_stop_run"),
 					children: n("run.stop")
-				}), /* @__PURE__ */ U(X, {
+				}), /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: () => b("ui_resume_manual"),
 					children: n("run.resume")
-				})] }) : /* @__PURE__ */ U(X, {
+				})] }) : /* @__PURE__ */ H(Y, {
 					onClick: () => b("ui_stop_run"),
 					children: n("run.stopRun")
 				})
@@ -2260,125 +2352,125 @@ function ct({ run: e }) {
 		]
 	});
 }
-function lt({ run: e, inspecting: t }) {
-	let n = W(), { t: r } = H(), i = e.failure, a = et(i, r), o = e.version === 0 ? `Test run ${e.runId} of the proposed workflow "${e.workflowName}" (id ${e.workflowId}, not saved yet) failed at step ${i.stepIndex + 1} [${i.stepId}] "${i.stepName}". Call get_failure("${e.runId}") for the error, screenshot and HTML, then answer with propose_workflow: the whole workflow, fixed (propose_change cannot be used, it is not saved).` : `Run ${e.runId} of workflow "${e.workflowName}" (id ${e.workflowId}, v${e.version}) failed at step ${i.stepIndex + 1} [${i.stepId}] "${i.stepName}". Call get_failure("${e.runId}") for the error, screenshot and HTML, then propose_change with runId "${e.runId}".`, s = () => e.draft ? n.open("ui_test_draft", {
+function dt({ run: e, inspecting: t }) {
+	let n = U(), { t: r } = V(), i = e.failure, a = nt(i, r), o = e.version === 0 ? `Test run ${e.runId} of the proposed workflow "${e.workflowName}" (id ${e.workflowId}, not saved yet) failed at step ${i.stepIndex + 1} [${i.stepId}] "${i.stepName}". Call get_failure("${e.runId}") for the error, screenshot and HTML, then answer with propose_workflow: the whole workflow, fixed (propose_change cannot be used, it is not saved).` : `Run ${e.runId} of workflow "${e.workflowName}" (id ${e.workflowId}, v${e.version}) failed at step ${i.stepIndex + 1} [${i.stepId}] "${i.stepName}". Call get_failure("${e.runId}") for the error, screenshot and HTML, then propose_change with runId "${e.runId}".`, s = () => e.draft ? n.open("ui_test_draft", {
 		pendingId: e.draft.pendingId,
 		variables: e.variables
 	}, "replace") : n.open("run_workflow", {
 		id: e.workflowId,
 		variables: e.variables
 	}, "replace"), c = i.errorType === "browser_unavailable";
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: r("fail.title", {
 					n: i.stepIndex + 1,
 					total: e.steps.length
 				}),
 				sub: `${e.workflowName} · ${e.version === 0 ? r("draft.testing") : `v${e.version}`}`,
-				right: /* @__PURE__ */ U(He, { status: "failure" })
+				right: /* @__PURE__ */ H(We, { status: "failure" })
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "stack",
 				style: "gap:4px",
-				children: [/* @__PURE__ */ U("div", {
+				children: [/* @__PURE__ */ H("div", {
 					class: "row-title",
 					children: i.stepName
-				}), /* @__PURE__ */ U("div", {
+				}), /* @__PURE__ */ H("div", {
 					style: "color:var(--bad);font-size:13px",
 					children: a
 				})]
 			}),
-			i.hasScreenshot && /* @__PURE__ */ U(Ge, {
+			i.hasScreenshot && /* @__PURE__ */ H(qe, {
 				runId: e.runId,
 				stepId: i.stepId,
 				alt: r("fail.shotAlt", { n: i.stepIndex + 1 })
 			}),
-			/* @__PURE__ */ U(st, { run: e }),
-			/* @__PURE__ */ U(J, {
+			/* @__PURE__ */ H(lt, { run: e }),
+			/* @__PURE__ */ H(q, {
 				label: r("common.details"),
 				children: [
-					/* @__PURE__ */ U("dl", {
+					/* @__PURE__ */ H("dl", {
 						class: "kv",
 						children: [
-							/* @__PURE__ */ U("dt", { children: r("fail.url") }),
-							/* @__PURE__ */ U("dd", {
+							/* @__PURE__ */ H("dt", { children: r("fail.url") }),
+							/* @__PURE__ */ H("dd", {
 								class: "mono",
 								children: i.url
 							}),
-							/* @__PURE__ */ U("dt", { children: r("fail.error") }),
-							/* @__PURE__ */ U("dd", {
+							/* @__PURE__ */ H("dt", { children: r("fail.error") }),
+							/* @__PURE__ */ H("dd", {
 								class: "mono",
 								children: i.errorType
 							}),
-							/* @__PURE__ */ U("dt", { children: r("fail.console") }),
-							/* @__PURE__ */ U("dd", { children: i.consoleErrors.length ? i.consoleErrors.join("; ") : r("fail.noErrors") })
+							/* @__PURE__ */ H("dt", { children: r("fail.console") }),
+							/* @__PURE__ */ H("dd", { children: i.consoleErrors.length ? i.consoleErrors.join("; ") : r("fail.noErrors") })
 						]
 					}),
-					/* @__PURE__ */ U("pre", {
+					/* @__PURE__ */ H("pre", {
 						class: "code",
 						children: i.stack
 					}),
-					/* @__PURE__ */ U("pre", {
+					/* @__PURE__ */ H("pre", {
 						class: "code",
 						children: JSON.stringify(i.variables, null, 2)
 					})
 				]
 			}),
-			t ? /* @__PURE__ */ U(Y, {
+			t ? /* @__PURE__ */ H(J, {
 				kind: "info",
 				children: r("fail.inspecting")
-			}) : c ? /* @__PURE__ */ U("div", {
+			}) : c ? /* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: s,
 					children: r(e.draft ? "draft.testAgain" : "run.runAgain")
 				})
-			}) : /* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U(Z, {
+			}) : /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H(X, {
 				label: r("ask.fix"),
 				allowEmpty: !0,
 				placeholder: r("ask.phFailed"),
 				message: (t) => t ? `${r("msg.fixRun", { runId: e.runId })} ${t}` : r("msg.fixRun", { runId: e.runId }),
 				context: o
-			}, e.runId), /* @__PURE__ */ U("div", {
+			}, e.runId), /* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					ghost: !0,
 					onClick: s,
 					children: r(e.draft ? "draft.testAgain" : "run.runAgain")
 				})
 			})] }),
-			e.draft && /* @__PURE__ */ U($e, { draft: e.draft }, e.runId)
+			e.draft && /* @__PURE__ */ H(tt, { draft: e.draft }, e.runId)
 		]
 	});
 }
 // ui/views/runs.tsx
-var ut = 5;
-function dt({ runs: e }) {
-	let t = W(), { t: n, ago: r, dur: i } = H(), [a, o] = R(!1);
-	if (!e.length) return /* @__PURE__ */ U("div", {
+var ft = 5;
+function pt({ runs: e }) {
+	let t = U(), { t: n, ago: r, dur: i } = V(), [a, o] = R(!1);
+	if (!e.length) return /* @__PURE__ */ H("div", {
 		class: "empty",
 		children: n("runs.none")
 	});
-	let s = a ? e : e.slice(0, ut), c = (e) => e.status === "success" ? e.testUntilStep ? n("runs.testPassed", { n: e.testUntilStep }) : n("runs.done", { n: e.stepCount }) : e.status === "failure" ? n("runs.failedAt", {
+	let s = a ? e : e.slice(0, ft), c = (e) => e.status === "success" ? e.testUntilStep ? n("runs.testPassed", { n: e.testUntilStep }) : n("runs.done", { n: e.stepCount }) : e.status === "failure" ? n("runs.failedAt", {
 		n: e.atStep,
 		name: e.atStepName
 	}) : e.status === "stopped" ? n("runs.stoppedAt", { n: e.atStep }) : e.status === "waiting_manual" ? n("runs.waiting") : n("runs.runningAt", { n: e.atStep });
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "list",
-		children: [s.map((e) => /* @__PURE__ */ U("button", {
+		children: [s.map((e) => /* @__PURE__ */ H("button", {
 			class: "row",
 			onClick: () => t.open("show_run", { runId: e.runId }, "push"),
 			children: [
-				/* @__PURE__ */ U(Ue, { status: e.status }),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H(Ge, { status: e.status }),
+				/* @__PURE__ */ H("div", {
 					class: "row-main",
-					children: [/* @__PURE__ */ U("div", {
+					children: [/* @__PURE__ */ H("div", {
 						class: "row-title",
 						children: c(e)
-					}), /* @__PURE__ */ U("div", {
+					}), /* @__PURE__ */ H("div", {
 						class: "row-sub",
 						children: [
 							r(e.at),
@@ -2389,42 +2481,42 @@ function dt({ runs: e }) {
 						]
 					})]
 				}),
-				/* @__PURE__ */ U("span", {
+				/* @__PURE__ */ H("span", {
 					class: "row-meta",
 					children: i(e.durationMs)
 				})
 			]
-		})), !a && e.length > ut && /* @__PURE__ */ U("button", {
+		})), !a && e.length > ft && /* @__PURE__ */ H("button", {
 			class: "more",
 			onClick: () => o(!0),
 			children: n("common.showAll", { n: e.length })
 		})]
 	});
 }
-function ft({ workflowName: e, runs: t }) {
-	let { t: n } = H();
-	return /* @__PURE__ */ U("div", {
+function mt({ workflowName: e, runs: t }) {
+	let { t: n } = V();
+	return /* @__PURE__ */ H("div", {
 		class: "w",
-		children: [/* @__PURE__ */ U(q, {
+		children: [/* @__PURE__ */ H(K, {
 			title: n("runs.title"),
 			sub: e
-		}), /* @__PURE__ */ U(dt, { runs: t })]
+		}), /* @__PURE__ */ H(pt, { runs: t })]
 	});
 }
-function pt({ step: e }) {
-	let { t, dur: n } = H(), r = e.state === "failed", i = e.error ? et(e.error, t) : void 0, a = e.state === "ok" ? /* @__PURE__ */ U(He, { status: "success" }) : r ? /* @__PURE__ */ U(He, { status: "failure" }) : /* @__PURE__ */ U("span", {
+function ht({ step: e }) {
+	let { t, dur: n } = V(), r = e.state === "failed", i = e.error ? nt(e.error, t) : void 0, a = e.state === "ok" ? /* @__PURE__ */ H(We, { status: "success" }) : r ? /* @__PURE__ */ H(We, { status: "failure" }) : /* @__PURE__ */ H("span", {
 		class: "pill muted",
 		children: t(e.state === "skipped" ? "sr.skipped" : e.state === "waiting" ? "sr.waiting" : e.state === "running" ? "sr.running" : "sr.notReached")
 	}), o = t(`stepType.${e.stepType}`);
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: `${e.stepIndex + 1}. ${e.stepName}`,
 				sub: `${e.workflowName} · v${e.version} · ${e.runId}${e.durationMs === void 0 ? "" : ` · ${n(e.durationMs)}`}`,
 				right: a
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "mono muted",
 				style: "overflow-wrap:anywhere",
 				children: [
@@ -2433,62 +2525,62 @@ function pt({ step: e }) {
 					e.detail
 				]
 			}),
-			i && /* @__PURE__ */ U("div", {
+			i && /* @__PURE__ */ H("div", {
 				style: "color:var(--bad);font-size:13px",
 				children: i
 			}),
-			e.download && /* @__PURE__ */ U("div", {
+			e.download && /* @__PURE__ */ H("div", {
 				class: "list",
-				children: /* @__PURE__ */ U("div", {
+				children: /* @__PURE__ */ H("div", {
 					class: "row",
-					children: /* @__PURE__ */ U(it, {
+					children: /* @__PURE__ */ H(ot, {
 						file: e.download,
 						runId: e.runId,
 						stepId: e.stepId
 					})
 				})
 			}),
-			e.hasScreenshot && /* @__PURE__ */ U(Ge, {
+			e.hasScreenshot && /* @__PURE__ */ H(qe, {
 				runId: e.runId,
 				stepId: e.stepId,
 				alt: t("sr.alt", { n: e.stepIndex + 1 })
 			}),
-			e.output && /* @__PURE__ */ U(J, {
+			e.output && /* @__PURE__ */ H(q, {
 				label: t("common.output"),
 				initial: e.stepType === "extractData",
-				children: /* @__PURE__ */ U("pre", {
+				children: /* @__PURE__ */ H("pre", {
 					class: "code",
 					children: e.output
 				})
 			}),
-			e.apiCalls && /* @__PURE__ */ U(J, {
+			e.apiCalls && /* @__PURE__ */ H(q, {
 				label: t("sr.requests", { n: e.apiCallCount ?? e.apiCalls.length }),
-				children: /* @__PURE__ */ U("pre", {
+				children: /* @__PURE__ */ H("pre", {
 					class: "code",
 					children: e.apiCalls.map((e) => `${e.method} ${e.url}`).join("\n")
 				})
 			}),
-			/* @__PURE__ */ U(J, {
+			/* @__PURE__ */ H(q, {
 				label: t("common.details"),
-				children: [/* @__PURE__ */ U("dl", {
+				children: [/* @__PURE__ */ H("dl", {
 					class: "kv",
 					children: [
-						e.url && /* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U("dt", { children: t("fail.url") }), /* @__PURE__ */ U("dd", {
+						e.url && /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("dt", { children: t("fail.url") }), /* @__PURE__ */ H("dd", {
 							class: "mono",
 							children: e.url
 						})] }),
-						/* @__PURE__ */ U("dt", { children: t("sr.stepId") }),
-						/* @__PURE__ */ U("dd", {
+						/* @__PURE__ */ H("dt", { children: t("sr.stepId") }),
+						/* @__PURE__ */ H("dd", {
 							class: "mono",
 							children: e.stepId
 						})
 					]
-				}), /* @__PURE__ */ U("pre", {
+				}), /* @__PURE__ */ H("pre", {
 					class: "code",
 					children: JSON.stringify(e.variablesBefore, null, 2)
 				})]
 			}),
-			e.state === "ok" || r ? /* @__PURE__ */ U(Z, {
+			e.state === "ok" || r ? /* @__PURE__ */ H(X, {
 				label: t(r ? "ask.fix" : "ask.button"),
 				allowEmpty: r,
 				placeholder: t(r ? "ask.phFailed" : "ask.phEdit"),
@@ -2499,10 +2591,10 @@ function pt({ step: e }) {
 					text: n
 				}),
 				context: `The user is asking about step ${e.stepIndex + 1} [${e.stepId}] "${e.stepName}" in run ${e.runId} of workflow "${e.workflowName}" (id ${e.workflowId}, v${e.version}); the step ${r ? "failed" : "finished OK"}. Read it with get_step(runId, stepId)${r ? " and get_failure(runId)" : ""}, then propose_change${r ? " with runId" : ""}.`
-			}) : /* @__PURE__ */ U("div", {
+			}) : /* @__PURE__ */ H("div", {
 				class: "muted",
 				children: [
-					K.circle(),
+					G.circle(),
 					" ",
 					t("sr.didntRun")
 				]
@@ -2511,7 +2603,7 @@ function pt({ step: e }) {
 	});
 }
 // ui/views/workflow.tsx
-var mt = 6, ht = {
+var gt = 6, _t = {
 	executeXpathCommand: ["sug.stableSelector", "sug.waitFirst"],
 	extractData: ["sug.alsoLink", "sug.skipEmpty"],
 	navigate: ["sug.otherUrl"],
@@ -2522,55 +2614,55 @@ var mt = 6, ht = {
 	manual: ["sug.automate"],
 	download: ["sug.fileName", "sug.otherFile"]
 };
-function gt({ steps: e, limit: t = mt, workflow: n }) {
-	let { t: r } = H(), [i, a] = R(), [o, s] = R(!1);
-	return /* @__PURE__ */ U("div", {
+function vt({ steps: e, limit: t = gt, workflow: n }) {
+	let { t: r } = V(), [i, a] = R(), [o, s] = R(!1);
+	return /* @__PURE__ */ H("div", {
 		class: "list",
 		children: [(o ? e : e.slice(0, t)).map((e, t) => {
-			let o = r(`stepType.${e.stepType}`), s = e.detail.startsWith("waitFor") ? ["sug.stableSelector", "sug.waitLonger"] : ht[e.stepType];
-			return /* @__PURE__ */ U("div", {
+			let o = r(`stepType.${e.stepType}`), s = e.detail.startsWith("waitFor") ? ["sug.stableSelector", "sug.waitLonger"] : _t[e.stepType];
+			return /* @__PURE__ */ H("div", {
 				class: "row-wrap",
-				children: [/* @__PURE__ */ U("button", {
+				children: [/* @__PURE__ */ H("button", {
 					class: "row",
 					"aria-expanded": i === e.id,
 					onClick: () => a(i === e.id ? void 0 : e.id),
 					children: [
-						/* @__PURE__ */ U("span", {
+						/* @__PURE__ */ H("span", {
 							class: "num",
 							children: t + 1
 						}),
-						/* @__PURE__ */ U(Ve, { type: e.stepType }),
-						/* @__PURE__ */ U("div", {
+						/* @__PURE__ */ H(Ue, { type: e.stepType }),
+						/* @__PURE__ */ H("div", {
 							class: "row-main",
-							children: [/* @__PURE__ */ U("div", {
+							children: [/* @__PURE__ */ H("div", {
 								class: "row-title",
 								children: e.stepName
-							}), /* @__PURE__ */ U("div", {
+							}), /* @__PURE__ */ H("div", {
 								class: "row-sub mono",
 								children: e.detail
 							})]
 						})
 					]
-				}), i === e.id && /* @__PURE__ */ U("div", {
+				}), i === e.id && /* @__PURE__ */ H("div", {
 					class: "row-expand",
 					children: [
-						/* @__PURE__ */ U("div", { children: [
-							/* @__PURE__ */ U("span", {
+						/* @__PURE__ */ H("div", { children: [
+							/* @__PURE__ */ H("span", {
 								class: "tag",
 								children: o
 							}),
 							" ",
-							/* @__PURE__ */ U("span", {
+							/* @__PURE__ */ H("span", {
 								class: "mono",
 								children: e.id
 							})
 						] }),
-						e.description && /* @__PURE__ */ U("div", { children: e.description }),
-						e.code && /* @__PURE__ */ U("pre", {
+						e.description && /* @__PURE__ */ H("div", { children: e.description }),
+						e.code && /* @__PURE__ */ H("pre", {
 							class: "code",
 							children: e.code
 						}),
-						n && /* @__PURE__ */ U(Z, {
+						n && /* @__PURE__ */ H(X, {
 							placeholder: r("ask.phEdit"),
 							suggestions: s.map((e) => r(e)),
 							message: (t) => r("msg.editStep", {
@@ -2583,71 +2675,71 @@ function gt({ steps: e, limit: t = mt, workflow: n }) {
 					]
 				})]
 			});
-		}), !o && e.length > t && /* @__PURE__ */ U("button", {
+		}), !o && e.length > t && /* @__PURE__ */ H("button", {
 			class: "more",
 			onClick: () => s(!0),
 			children: r("common.showAll", { n: e.length })
 		})]
 	});
 }
-function _t(e, t) {
+function yt(e, t) {
 	return e.kind === "saved" ? t("wf.saved", { v: e.version }) : e.kind === "restored" ? t("wf.restored", {
 		v: e.version,
 		from: e.from
 	}) : t("wf.discarded", { v: e.version });
 }
-async function vt(e, t, n) {
+async function bt(e, t, n) {
 	let r = await e.bridge.call("get_workflow", { id: t }), i = r.text.indexOf("Full definition:\n");
 	if (r.isError || i < 0) return;
 	let a = r.text.slice(i + 17, r.text.lastIndexOf("}") + 1);
 	await e.bridge.download(`${n.toLowerCase().replace(/\W+/g, "-") || t}.json`, "application/json", a);
 }
-function yt({ workflow: e, notice: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R("steps"), [o, s] = R();
+function xt({ workflow: e, notice: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R("steps"), [o, s] = R();
 	return z(() => {
 		i !== "runs" || o || n.bridge.call("list_runs", { workflowId: e.id }).then((e) => {
 			e.payload.view === "runs" && s(e.payload.runs);
 		});
-	}, [i]), /* @__PURE__ */ U("div", {
+	}, [i]), /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: e.name,
 				sub: `${e.host || r("wf.hostFromInputs")} · v${e.version}`,
-				right: /* @__PURE__ */ U(We, { items: [{
+				right: /* @__PURE__ */ H(Ke, { items: [{
 					label: r("wf.history"),
 					onClick: () => n.open("show_history", { id: e.id }, "push")
 				}, {
 					label: r("wf.export"),
-					onClick: () => vt(n, e.id, e.name)
+					onClick: () => bt(n, e.id, e.name)
 				}] })
 			}),
-			t && /* @__PURE__ */ U(Y, {
+			t && /* @__PURE__ */ H(J, {
 				kind: t.kind === "discarded" ? "info" : "ok",
-				children: _t(t, r)
+				children: yt(t, r)
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "seg",
 				role: "group",
-				children: [/* @__PURE__ */ U("button", {
+				children: [/* @__PURE__ */ H("button", {
 					"aria-pressed": i === "steps",
 					onClick: () => a("steps"),
 					children: r("wf.stepsTab", { n: e.steps.length })
-				}), /* @__PURE__ */ U("button", {
+				}), /* @__PURE__ */ H("button", {
 					"aria-pressed": i === "runs",
 					onClick: () => a("runs"),
 					children: r("wf.runsTab")
 				})]
 			}),
-			i === "steps" ? /* @__PURE__ */ U(gt, {
+			i === "steps" ? /* @__PURE__ */ H(vt, {
 				steps: e.steps,
 				workflow: e
-			}) : o ? /* @__PURE__ */ U(dt, { runs: o }) : /* @__PURE__ */ U("div", {
+			}) : o ? /* @__PURE__ */ H(pt, { runs: o }) : /* @__PURE__ */ H("div", {
 				class: "stack",
 				"aria-busy": "true",
-				children: [/* @__PURE__ */ U("div", { class: "skel" }), /* @__PURE__ */ U("div", { class: "skel" })]
+				children: [/* @__PURE__ */ H("div", { class: "skel" }), /* @__PURE__ */ H("div", { class: "skel" })]
 			}),
-			/* @__PURE__ */ U(Z, {
+			/* @__PURE__ */ H(X, {
 				heading: r("ask.wfTitle"),
 				placeholder: r("ask.phWorkflow"),
 				message: (t) => r("msg.editWorkflow", {
@@ -2656,65 +2748,65 @@ function yt({ workflow: e, notice: t }) {
 				}),
 				context: `The user wants to change workflow "${e.name}" (id ${e.id}, v${e.version}) as a whole, not one step. Read it with get_workflow, explore the site with the page_* inspector tools when the change needs new selectors or code, then answer with propose_change.`
 			}, e.id),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: () => n.open("run_workflow", {
 						id: e.id,
 						form: !0
 					}, "push"),
-					children: [K.play(), r("wf.run")]
+					children: [G.play(), r("wf.run")]
 				})
 			})
 		]
 	});
 }
 // ui/views/misc.tsx
-function bt(e) {
-	let t = W(), { t: n } = H(), [r, i] = R(!1);
-	return r ? /* @__PURE__ */ U("div", {
+function St(e) {
+	let t = U(), { t: n } = V(), [r, i] = R(!1);
+	return r ? /* @__PURE__ */ H("div", {
 		class: "w",
-		children: /* @__PURE__ */ U(Y, {
+		children: /* @__PURE__ */ H(J, {
 			kind: "info",
 			children: n(e.isFix ? "chg.discardedFix" : "chg.discardedChange", {
 				name: e.workflowName,
 				v: e.fromVersion
 			})
 		})
-	}) : /* @__PURE__ */ U("div", {
+	}) : /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: n(e.isFix ? "chg.fixTitle" : "chg.changeTitle"),
 				sub: `${e.workflowName} · v${e.fromVersion} → v${e.fromVersion + 1}`
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				style: "font-size:13px",
 				children: e.reason
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "list",
-				children: e.changes.map((e) => /* @__PURE__ */ U("div", {
+				children: e.changes.map((e) => /* @__PURE__ */ H("div", {
 					class: "row-wrap",
 					style: "padding:8px 10px;display:flex;flex-direction:column;gap:6px",
-					children: [/* @__PURE__ */ U("div", {
+					children: [/* @__PURE__ */ H("div", {
 						class: "row-title",
 						children: [
 							e.stepName,
 							" ",
-							/* @__PURE__ */ U("span", {
+							/* @__PURE__ */ H("span", {
 								class: "tag",
 								children: n(`chg.${e.kind}`)
 							})
 						]
-					}), /* @__PURE__ */ U("div", {
+					}), /* @__PURE__ */ H("div", {
 						class: "diff",
-						children: [e.before && /* @__PURE__ */ U("div", {
+						children: [e.before && /* @__PURE__ */ H("div", {
 							class: "del",
 							"aria-label": n("chg.before"),
 							children: e.before
-						}), e.after && /* @__PURE__ */ U("div", {
+						}), e.after && /* @__PURE__ */ H("div", {
 							class: "add",
 							"aria-label": n("chg.after"),
 							children: e.after
@@ -2722,74 +2814,74 @@ function bt(e) {
 					})]
 				}))
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: [/* @__PURE__ */ U(X, {
+				children: [/* @__PURE__ */ H(Y, {
 					ghost: !0,
 					onClick: async () => {
 						await t.bridge.call("ui_discard_change", { pendingId: e.pendingId }), i(!0);
 					},
 					children: n("chg.discard")
-				}), /* @__PURE__ */ U(X, {
+				}), /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: () => t.open("ui_apply_change", { pendingId: e.pendingId }, "replace"),
-					children: [K.play(), n("chg.apply")]
-				})]
-			})
-		]
-	});
-}
-function xt(e, t) {
-	let n = (e) => {
-		let t = e == null ? "" : typeof e == "object" ? JSON.stringify(e) : String(e);
-		return /[",\n]/.test(t) ? `"${t.replace(/"/g, "\"\"")}"` : t;
-	};
-	return [e.join(","), ...t.map((t) => e.map((e) => n(t[e])).join(","))].join("\n");
-}
-function St(e) {
-	let t = W(), { t: n } = H(), [r, i] = R(!1), a = e.columns.slice(0, 3), o = r ? e.rows : e.rows.slice(0, 5), s = e.workflowName.toLowerCase().replace(/\W+/g, "-");
-	return /* @__PURE__ */ U("div", {
-		class: "w",
-		children: [
-			/* @__PURE__ */ U(q, {
-				title: n("data.items", { n: e.total }),
-				sub: `${e.workflowName} · ${e.runId}`
-			}),
-			/* @__PURE__ */ U("div", {
-				class: "tbl-wrap",
-				children: /* @__PURE__ */ U("table", { children: [/* @__PURE__ */ U("thead", { children: /* @__PURE__ */ U("tr", { children: a.map((e) => /* @__PURE__ */ U("th", { children: e })) }) }), /* @__PURE__ */ U("tbody", { children: o.map((e) => /* @__PURE__ */ U("tr", { children: a.map((t) => /* @__PURE__ */ U("td", {
-					title: String(e[t] ?? ""),
-					children: String(e[t] ?? "")
-				})) })) })] })
-			}),
-			e.rows.length > 5 && !r || e.columns.length > 3 ? /* @__PURE__ */ U("div", {
-				class: "actions",
-				style: "justify-content:flex-start",
-				children: [e.rows.length > 5 && !r && /* @__PURE__ */ U("button", {
-					class: "link",
-					onClick: () => i(!0),
-					children: n("common.showAll", { n: e.total })
-				}), e.columns.length > 3 && /* @__PURE__ */ U("span", {
-					class: "muted",
-					children: n("data.extraCols", { n: e.columns.length - 3 })
-				})]
-			}) : null,
-			/* @__PURE__ */ U("div", {
-				class: "actions",
-				children: [/* @__PURE__ */ U(X, {
-					ghost: !0,
-					onClick: () => t.bridge.download(`${s}.json`, "application/json", JSON.stringify(e.rows, null, 2)),
-					children: n("data.json")
-				}), /* @__PURE__ */ U(X, {
-					primary: !0,
-					onClick: () => t.bridge.download(`${s}.csv`, "text/csv", xt(e.columns, e.rows)),
-					children: n("data.csv")
+					children: [G.play(), n("chg.apply")]
 				})]
 			})
 		]
 	});
 }
 function Ct(e, t) {
+	let n = (e) => {
+		let t = e == null ? "" : typeof e == "object" ? JSON.stringify(e) : String(e);
+		return /[",\n]/.test(t) ? `"${t.replace(/"/g, "\"\"")}"` : t;
+	};
+	return [e.join(","), ...t.map((t) => e.map((e) => n(t[e])).join(","))].join("\n");
+}
+function wt(e) {
+	let t = U(), { t: n } = V(), [r, i] = R(!1), a = e.columns.slice(0, 3), o = r ? e.rows : e.rows.slice(0, 5), s = e.workflowName.toLowerCase().replace(/\W+/g, "-");
+	return /* @__PURE__ */ H("div", {
+		class: "w",
+		children: [
+			/* @__PURE__ */ H(K, {
+				title: n("data.items", { n: e.total }),
+				sub: `${e.workflowName} · ${e.runId}`
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "tbl-wrap",
+				children: /* @__PURE__ */ H("table", { children: [/* @__PURE__ */ H("thead", { children: /* @__PURE__ */ H("tr", { children: a.map((e) => /* @__PURE__ */ H("th", { children: e })) }) }), /* @__PURE__ */ H("tbody", { children: o.map((e) => /* @__PURE__ */ H("tr", { children: a.map((t) => /* @__PURE__ */ H("td", {
+					title: String(e[t] ?? ""),
+					children: String(e[t] ?? "")
+				})) })) })] })
+			}),
+			e.rows.length > 5 && !r || e.columns.length > 3 ? /* @__PURE__ */ H("div", {
+				class: "actions",
+				style: "justify-content:flex-start",
+				children: [e.rows.length > 5 && !r && /* @__PURE__ */ H("button", {
+					class: "link",
+					onClick: () => i(!0),
+					children: n("common.showAll", { n: e.total })
+				}), e.columns.length > 3 && /* @__PURE__ */ H("span", {
+					class: "muted",
+					children: n("data.extraCols", { n: e.columns.length - 3 })
+				})]
+			}) : null,
+			/* @__PURE__ */ H("div", {
+				class: "actions",
+				children: [/* @__PURE__ */ H(Y, {
+					ghost: !0,
+					onClick: () => t.bridge.download(`${s}.json`, "application/json", JSON.stringify(e.rows, null, 2)),
+					children: n("data.json")
+				}), /* @__PURE__ */ H(Y, {
+					primary: !0,
+					onClick: () => t.bridge.download(`${s}.csv`, "text/csv", Ct(e.columns, e.rows)),
+					children: n("data.csv")
+				})]
+			})
+		]
+	});
+}
+function Tt(e, t) {
 	switch (e.kind) {
 		case "initial": return t("hist.ev.initial");
 		case "create": return t("hist.ev.create");
@@ -2801,36 +2893,36 @@ function Ct(e, t) {
 		}
 	}
 }
-function wt(e) {
-	let t = W(), { t: n, ago: r } = H(), [i, a] = R(), [o, s] = R(!1), c = o ? e.versions : e.versions.slice(0, 5);
-	return /* @__PURE__ */ U("div", {
+function Et(e) {
+	let t = U(), { t: n, ago: r } = V(), [i, a] = R(), [o, s] = R(!1), c = o ? e.versions : e.versions.slice(0, 5);
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: n("hist.title"),
 				sub: e.workflowName
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "list",
-				children: [c.map((o) => /* @__PURE__ */ U("div", {
+				children: [c.map((o) => /* @__PURE__ */ H("div", {
 					class: "row-wrap",
-					children: [/* @__PURE__ */ U("button", {
+					children: [/* @__PURE__ */ H("button", {
 						class: "row",
 						disabled: o.current,
 						"aria-expanded": i === o.version,
 						onClick: () => a(i === o.version ? void 0 : o.version),
 						children: [
-							/* @__PURE__ */ U("span", {
+							/* @__PURE__ */ H("span", {
 								class: "tag",
 								style: "flex:none",
 								children: ["v", o.version]
 							}),
-							/* @__PURE__ */ U("div", {
+							/* @__PURE__ */ H("div", {
 								class: "row-main",
-								children: [/* @__PURE__ */ U("div", {
+								children: [/* @__PURE__ */ H("div", {
 									class: "row-title",
-									children: Ct(o.event, n)
-								}), /* @__PURE__ */ U("div", {
+									children: Tt(o.event, n)
+								}), /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									children: [
 										n(`hist.who.${o.author}`),
@@ -2839,18 +2931,18 @@ function wt(e) {
 									]
 								})]
 							}),
-							o.current ? /* @__PURE__ */ U("span", {
+							o.current ? /* @__PURE__ */ H("span", {
 								class: "pill ok",
 								children: n("hist.current")
-							}) : /* @__PURE__ */ U("span", {
+							}) : /* @__PURE__ */ H("span", {
 								class: "st pending",
-								children: K.chevron()
+								children: G.chevron()
 							})
 						]
-					}), i === o.version && /* @__PURE__ */ U("div", {
+					}), i === o.version && /* @__PURE__ */ H("div", {
 						class: "row-expand",
 						style: "padding-left:10px;align-items:flex-end",
-						children: /* @__PURE__ */ U(X, {
+						children: /* @__PURE__ */ H(Y, {
 							primary: !0,
 							onClick: () => t.open("ui_restore_version", {
 								id: e.workflowId,
@@ -2859,30 +2951,30 @@ function wt(e) {
 							children: n("hist.restore", { v: o.version })
 						})
 					})]
-				})), !o && e.versions.length > 5 && /* @__PURE__ */ U("button", {
+				})), !o && e.versions.length > 5 && /* @__PURE__ */ H("button", {
 					class: "more",
 					onClick: () => s(!0),
 					children: n("common.showAll", { n: e.versions.length })
 				})]
 			}),
-			e.versions.length === 1 && /* @__PURE__ */ U("div", {
+			e.versions.length === 1 && /* @__PURE__ */ H("div", {
 				class: "muted",
 				children: n("hist.onlyOne")
 			})
 		]
 	});
 }
-function Tt({ compact: e = !1 }) {
-	let t = W(), { t: n, lang: r } = H(), i = e ? ["en", "vi"] : [
+function Dt({ compact: e = !1 }) {
+	let t = U(), { t: n, lang: r } = V(), i = e ? ["en", "vi"] : [
 		"auto",
 		"en",
 		"vi"
 	], a = (n) => e ? r === n : t.langPref === n;
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: `seg${e ? " seg-sm" : ""}`,
 		role: "group",
 		"aria-label": n("lang.label"),
-		children: i.map((r) => /* @__PURE__ */ U("button", {
+		children: i.map((r) => /* @__PURE__ */ H("button", {
 			"aria-pressed": a(r),
 			onClick: () => t.setLang(r),
 			title: r === "auto" ? void 0 : n(`lang.${r}`),
@@ -2890,68 +2982,68 @@ function Tt({ compact: e = !1 }) {
 		}))
 	});
 }
-function Et(e) {
-	return e.account.page === void 0 ? /* @__PURE__ */ U(kt, { ...e }) : /* @__PURE__ */ U(Ot, { ...e });
+function Ot(e) {
+	return e.account.page === void 0 ? /* @__PURE__ */ H(Mt, { ...e }) : /* @__PURE__ */ H(jt, { ...e });
 }
-function Q({ label: e, used: t, limit: n }) {
-	return /* @__PURE__ */ U("div", {
+function kt({ label: e, used: t, limit: n }) {
+	return /* @__PURE__ */ H("div", {
 		class: "meter",
-		children: [/* @__PURE__ */ U("div", {
+		children: [/* @__PURE__ */ H("div", {
 			class: "meter-top",
-			children: [/* @__PURE__ */ U("span", { children: e }), /* @__PURE__ */ U("span", { children: n ? `${t} / ${n}` : t })]
-		}), n > 0 && /* @__PURE__ */ U("div", {
+			children: [/* @__PURE__ */ H("span", { children: e }), /* @__PURE__ */ H("span", { children: n ? `${t} / ${n}` : t })]
+		}), n > 0 && /* @__PURE__ */ H("div", {
 			class: `bar${t / n > .9 ? " bad" : ""}`,
-			children: /* @__PURE__ */ U("i", { style: { width: `${Math.min(100, t / n * 100)}%` } })
+			children: /* @__PURE__ */ H("i", { style: { width: `${Math.min(100, t / n * 100)}%` } })
 		})]
 	});
 }
-function Dt({ a: e, limit: t, upgrade: n }) {
-	let { t: r } = H(), i = e.usage, a = t.code.startsWith("limit_runs_") ? /* @__PURE__ */ U(Q, {
+function At({ a: e, limit: t, upgrade: n }) {
+	let { t: r } = V(), i = e.usage, a = t.code.startsWith("limit_runs_") ? /* @__PURE__ */ H(kt, {
 		label: r(`acct.runs.${i.period}`),
 		used: i.runs,
 		limit: i.runsLimit
-	}) : t.code.startsWith("limit_steps_") && i.steps !== void 0 ? /* @__PURE__ */ U(Q, {
+	}) : t.code.startsWith("limit_steps_") && i.steps !== void 0 ? /* @__PURE__ */ H(kt, {
 		label: r(`acct.steps.${i.period}`),
 		used: i.steps,
 		limit: i.stepsLimit ?? 0
-	}) : t.code === "limit_workflows" ? /* @__PURE__ */ U(Q, {
+	}) : t.code === "limit_workflows" ? /* @__PURE__ */ H(kt, {
 		label: r("acct.workflows"),
 		used: i.workflows,
 		limit: i.workflowsLimit
 	}) : null;
-	return /* @__PURE__ */ U(C, { children: [/* @__PURE__ */ U(Y, {
+	return /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H(J, {
 		kind: "warn",
 		children: [r(`error.${t.code}`, { arg: t.arg ?? "" }), n ? ` ${r("acct.limitUpgrade")}` : ""]
-	}), a && /* @__PURE__ */ U("div", {
+	}), a && /* @__PURE__ */ H("div", {
 		class: "stack",
 		children: a
 	})] });
 }
-function Ot({ account: e, limit: t, retry: n }) {
-	let r = W(), { t: i } = H(), a = e.plan === "paid", [o, s] = R(!1), c = async () => {
+function jt({ account: e, limit: t, retry: n }) {
+	let r = U(), { t: i } = V(), a = e.plan === "paid", [o, s] = R(!1), c = async () => {
 		let e = await r.bridge.call("ui_account_page");
 		e.payload.url && await r.bridge.openLink(e.payload.url);
 	};
-	if (e.anonymous) return /* @__PURE__ */ U("div", {
+	if (e.anonymous) return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: i("acct.title"),
 				sub: i("acct.trying"),
-				right: /* @__PURE__ */ U(Tt, { compact: !0 })
+				right: /* @__PURE__ */ H(Dt, { compact: !0 })
 			}),
-			t && /* @__PURE__ */ U(Dt, {
+			t && /* @__PURE__ */ H(At, {
 				a: e,
 				limit: t,
 				upgrade: !1
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "muted",
 				children: i("acct.tryingHint")
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: async () => {
 						let e = await r.bridge.call("ui_account_link");
@@ -2963,43 +3055,43 @@ function Ot({ account: e, limit: t, retry: n }) {
 		]
 	});
 	let l = !a && e.links?.upgrade;
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: e.name || i("acct.title"),
 				sub: a ? e.paidUntil ? i("acct.until", { date: e.paidUntil.slice(0, 10) }) : i("acct.planLife") : i("acct.planFree"),
-				right: e.page ? /* @__PURE__ */ U("span", {
+				right: e.page ? /* @__PURE__ */ H("span", {
 					class: `pill ${a ? "ok" : "muted"}`,
 					children: i(a ? "acct.pro" : "acct.free")
-				}) : /* @__PURE__ */ U(Tt, { compact: !0 })
+				}) : /* @__PURE__ */ H(Dt, { compact: !0 })
 			}),
-			t && /* @__PURE__ */ U(Dt, {
+			t && /* @__PURE__ */ H(At, {
 				a: e,
 				limit: t,
 				upgrade: !!l
 			}),
-			t && n && o && /* @__PURE__ */ U("div", {
+			t && n && o && /* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					onClick: () => r.open(n.tool, n.args, "replace"),
 					children: i("acct.tryAgain")
 				})
 			}),
-			(l || e.page) && /* @__PURE__ */ U("div", {
+			(l || e.page) && /* @__PURE__ */ H("div", {
 				class: "actions",
-				children: [l && e.page && /* @__PURE__ */ U("button", {
+				children: [l && e.page && /* @__PURE__ */ H("button", {
 					class: "link",
 					style: "margin-right:auto",
 					onClick: c,
 					children: i("acct.details")
-				}), l ? /* @__PURE__ */ U(X, {
+				}), l ? /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: async () => {
 						await r.bridge.openLink(e.links.upgrade), s(!0);
 					},
 					children: i("acct.upgrade")
-				}) : /* @__PURE__ */ U(X, {
+				}) : /* @__PURE__ */ H(Y, {
 					onClick: c,
 					children: i("acct.details")
 				})]
@@ -3007,40 +3099,40 @@ function Ot({ account: e, limit: t, retry: n }) {
 		]
 	});
 }
-function kt({ account: e, limit: t, retry: n }) {
-	let r = W(), { t: i } = H(), [a, o] = R(!1), s = (e.plan === "free" || e.paidUntil) && e.links?.upgrade, c = (e, t, n) => /* @__PURE__ */ U(Q, {
+function Mt({ account: e, limit: t, retry: n }) {
+	let r = U(), { t: i } = V(), [a, o] = R(!1), s = (e.plan === "free" || e.paidUntil) && e.links?.upgrade, c = (e, t, n) => /* @__PURE__ */ H(kt, {
 		label: e,
 		used: t,
 		limit: n
 	}), l = i("acct.storage.computer"), u = e.storage.kind === "computer" ? e.storage : void 0;
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(q, {
+			/* @__PURE__ */ H(K, {
 				title: i("acct.title"),
 				sub: e.anonymous ? i("acct.anonymous") : [e.name, e.paidUntil ? i("acct.until", { date: e.paidUntil.slice(0, 10) }) : ""].filter(Boolean).join(" · ") || void 0,
-				right: /* @__PURE__ */ U("span", {
+				right: /* @__PURE__ */ H("span", {
 					class: `pill ${e.plan === "paid" ? "ok" : "muted"}`,
 					children: e.plan === "paid" ? i("acct.pro") : i("acct.free")
 				})
 			}),
-			e.offline && /* @__PURE__ */ U(Y, {
+			e.offline && /* @__PURE__ */ H(J, {
 				kind: "warn",
 				children: i("acct.offline")
 			}),
-			t && /* @__PURE__ */ U(Dt, {
+			t && /* @__PURE__ */ H(At, {
 				a: e,
 				limit: t,
 				upgrade: !!s
 			}),
-			t && n && a && /* @__PURE__ */ U("div", {
+			t && n && a && /* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					onClick: () => r.open(n.tool, n.args, "replace"),
 					children: i("acct.tryAgain")
 				})
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "stack",
 				children: [
 					c(i(`acct.runs.${e.usage.period}`), e.usage.runs, e.usage.runsLimit),
@@ -3048,48 +3140,48 @@ function kt({ account: e, limit: t, retry: n }) {
 					c(i("acct.workflows"), e.usage.workflows, e.usage.workflowsLimit)
 				]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "list",
 				children: [
-					e.anonymous && /* @__PURE__ */ U(At, { refresh: !0 }),
-					e.anonymous && e.name && /* @__PURE__ */ U("div", {
+					e.anonymous && /* @__PURE__ */ H(Nt, { refresh: !0 }),
+					e.anonymous && e.name && /* @__PURE__ */ H("div", {
 						class: "row",
 						style: "flex-direction:column;align-items:stretch;gap:8px",
-						children: [/* @__PURE__ */ U("div", {
+						children: [/* @__PURE__ */ H("div", {
 							class: "row-main",
-							children: /* @__PURE__ */ U("div", {
+							children: /* @__PURE__ */ H("div", {
 								class: "row-sub",
 								style: "white-space:normal",
 								children: i("acct.loginHint")
 							})
-						}), /* @__PURE__ */ U("div", { children: /* @__PURE__ */ U(X, {
+						}), /* @__PURE__ */ H("div", { children: /* @__PURE__ */ H(Y, {
 							onClick: () => r.open("ui_sign_in", {}, "replace"),
 							children: i("acct.login")
 						}) })]
 					}),
-					/* @__PURE__ */ U("div", {
+					/* @__PURE__ */ H("div", {
 						class: "row",
-						children: /* @__PURE__ */ U("div", {
+						children: /* @__PURE__ */ H("div", {
 							class: "row-main",
 							children: [
-								/* @__PURE__ */ U("div", {
+								/* @__PURE__ */ H("div", {
 									class: "row-sub",
 									children: i("acct.storedIn")
 								}),
-								/* @__PURE__ */ U("div", {
+								/* @__PURE__ */ H("div", {
 									class: "row-title",
 									children: l
 								}),
-								e.retentionDays ? /* @__PURE__ */ U("div", {
+								e.retentionDays ? /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									children: i("acct.retention", { n: e.retentionDays })
 								}) : null,
-								u ? /* @__PURE__ */ U("div", {
+								u ? /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									style: "white-space:normal",
 									children: i("acct.storage.computerNote")
 								}) : null,
-								u ? /* @__PURE__ */ U("div", {
+								u ? /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									style: "white-space:normal",
 									children: [i("acct.keepRuns", { n: u.keepRuns }), u.bytes === void 0 ? "" : ` · ${i("acct.localUsed", {
@@ -3100,30 +3192,30 @@ function kt({ account: e, limit: t, retry: n }) {
 							]
 						})
 					}),
-					u?.warn && /* @__PURE__ */ U(Y, {
+					u?.warn && /* @__PURE__ */ H(J, {
 						kind: "warn",
 						children: i("acct.localWarn")
 					})
 				]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "field",
-				children: [/* @__PURE__ */ U("label", { children: i("lang.label") }), /* @__PURE__ */ U(Tt, {})]
+				children: [/* @__PURE__ */ H("label", { children: i("lang.label") }), /* @__PURE__ */ H(Dt, {})]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "actions",
-				children: [!e.anonymous && e.name && /* @__PURE__ */ U("button", {
+				children: [!e.anonymous && e.name && /* @__PURE__ */ H("button", {
 					class: "link",
 					style: "margin-right:auto",
 					onClick: () => r.open("ui_sign_out", {}, "replace"),
 					children: i("acct.logout")
-				}), s ? /* @__PURE__ */ U(X, {
+				}), s ? /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: async () => {
 						await r.bridge.openLink(e.links.upgrade), o(!0);
 					},
 					children: i("acct.upgrade")
-				}) : e.plan === "paid" && e.links?.manage ? /* @__PURE__ */ U(X, {
+				}) : e.plan === "paid" && e.links?.manage ? /* @__PURE__ */ H(Y, {
 					onClick: () => r.bridge.openLink(e.links.manage),
 					children: i("acct.manage")
 				}) : null]
@@ -3131,29 +3223,29 @@ function kt({ account: e, limit: t, retry: n }) {
 		]
 	});
 }
-function At({ onOpened: e, refresh: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R(!1);
-	return /* @__PURE__ */ U("div", {
+function Nt({ onOpened: e, refresh: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R(!1);
+	return /* @__PURE__ */ H("div", {
 		class: "row",
 		style: "flex-direction:column;align-items:stretch;gap:8px",
-		children: [/* @__PURE__ */ U("div", {
+		children: [/* @__PURE__ */ H("div", {
 			class: "row-main",
-			children: [/* @__PURE__ */ U("div", {
+			children: [/* @__PURE__ */ H("div", {
 				class: "row-title",
 				children: r("acct.createTitle")
-			}), /* @__PURE__ */ U("div", {
+			}), /* @__PURE__ */ H("div", {
 				class: "row-sub",
 				style: "white-space:normal",
 				children: r(i ? "acct.createOpened" : "acct.createHint")
 			})]
-		}), /* @__PURE__ */ U("div", { children: [/* @__PURE__ */ U(X, {
+		}), /* @__PURE__ */ H("div", { children: [/* @__PURE__ */ H(Y, {
 			primary: !i,
 			onClick: async () => {
 				let t = await n.bridge.call("ui_account_link");
 				t.payload.url && (await n.bridge.openLink(t.payload.url), a(!0), e?.());
 			},
 			children: r(i ? "acct.createAgain" : "acct.create")
-		}), i && t && /* @__PURE__ */ U(C, { children: [" ", /* @__PURE__ */ U(X, {
+		}), i && t && /* @__PURE__ */ H(C, { children: [" ", /* @__PURE__ */ H(Y, {
 			primary: !0,
 			onClick: () => n.open("show_account", {}, "replace"),
 			children: r("acct.createDone")
@@ -3161,32 +3253,32 @@ function At({ onOpened: e, refresh: t }) {
 	});
 }
 // ui/views/setup.tsx
-var jt = "https://chromewebstore.google.com/search/Browser%20Workflow";
-function Mt({ link: e, onReady: t }) {
-	let n = W(), { t: r } = H();
-	return /* @__PURE__ */ U(C, { children: [
-		/* @__PURE__ */ U("div", {
+var Pt = "https://chromewebstore.google.com/search/Browser%20Workflow";
+function Ft({ link: e, onReady: t }) {
+	let n = U(), { t: r } = V();
+	return /* @__PURE__ */ H(C, { children: [
+		/* @__PURE__ */ H("div", {
 			class: "stack",
 			style: "gap:4px",
-			children: [/* @__PURE__ */ U("div", {
+			children: [/* @__PURE__ */ H("div", {
 				class: "row-title",
 				children: r("setup.extTitle")
-			}), /* @__PURE__ */ U("div", {
+			}), /* @__PURE__ */ H("div", {
 				class: "muted",
 				children: r("setup.extNote")
 			})]
 		}),
-		/* @__PURE__ */ U(Y, {
+		/* @__PURE__ */ H(J, {
 			kind: "warn",
 			children: r("setup.extOpen")
 		}),
-		/* @__PURE__ */ U("div", {
+		/* @__PURE__ */ H("div", {
 			class: "actions",
-			children: [/* @__PURE__ */ U(X, {
+			children: [/* @__PURE__ */ H(Y, {
 				ghost: !0,
-				onClick: () => n.bridge.openLink(e || jt),
+				onClick: () => n.bridge.openLink(e || Pt),
 				children: r("setup.extGet")
-			}), /* @__PURE__ */ U(X, {
+			}), /* @__PURE__ */ H(Y, {
 				primary: !0,
 				onClick: async () => {
 					await n.open("setup", {}, "replace"), t?.();
@@ -3196,112 +3288,112 @@ function Mt({ link: e, onReady: t }) {
 		})
 	] });
 }
-function Nt(e) {
-	let t = W(), { t: n } = H(), r = ["extension", "first"], i = e.step === "extension" ? "extension" : "first", a = r.indexOf(i), [o, s] = R(!1), [c, l] = R(!1), u = Ye();
+function It(e) {
+	let t = U(), { t: n } = V(), r = ["extension", "first"], i = e.step === "extension" ? "extension" : "first", a = r.indexOf(i), [o, s] = R(!1), [c, l] = R(!1), u = Ze();
 	async function d() {
-		await t.bridge.call("ui_finish_setup"), l(!0), await Ke(t.bridge, n("msg.setupDone"), "The user finished setup in the widget. Go on with what they asked for. If they asked for nothing yet, call list_workflows and ask in one line which example to run first, or what they want to automate.").catch(() => {});
+		await t.bridge.call("ui_finish_setup"), l(!0), await Je(t.bridge, n("msg.setupDone"), "The user finished setup in the widget. Go on with what they asked for. If they asked for nothing yet, call list_workflows and ask in one line which example to run first, or what they want to automate.").catch(() => {});
 	}
-	return c ? /* @__PURE__ */ U("div", {
+	return c ? /* @__PURE__ */ H("div", {
 		class: "w",
-		children: /* @__PURE__ */ U(Y, {
+		children: /* @__PURE__ */ H(J, {
 			kind: "ok",
 			children: n("setup.ready")
 		})
-	}) : /* @__PURE__ */ U("div", {
+	}) : /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "hd",
-				children: [/* @__PURE__ */ U("div", {
+				children: [/* @__PURE__ */ H("div", {
 					class: "hd-main",
-					children: [/* @__PURE__ */ U("h1", {
+					children: [/* @__PURE__ */ H("h1", {
 						class: "title",
 						children: n("setup.title")
-					}), /* @__PURE__ */ U("div", {
+					}), /* @__PURE__ */ H("div", {
 						class: "sub",
 						children: n("setup.stepOf", {
 							n: a + 1,
 							total: r.length
 						})
 					})]
-				}), /* @__PURE__ */ U(Tt, { compact: !0 })]
+				}), /* @__PURE__ */ H(Dt, { compact: !0 })]
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "steps-dots",
 				"aria-hidden": "true",
-				children: r.map((e, t) => /* @__PURE__ */ U("i", { class: t <= a ? "on" : "" }, e))
+				children: r.map((e, t) => /* @__PURE__ */ H("i", { class: t <= a ? "on" : "" }, e))
 			}),
-			i === "extension" && /* @__PURE__ */ U(Mt, { link: e.link }),
-			i === "first" && /* @__PURE__ */ U(C, { children: [
-				/* @__PURE__ */ U(Y, {
+			i === "extension" && /* @__PURE__ */ H(Ft, { link: e.link }),
+			i === "first" && /* @__PURE__ */ H(C, { children: [
+				/* @__PURE__ */ H(J, {
 					kind: "ok",
 					children: n("setup.extOk")
 				}),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "row-title",
 					children: n("setup.firstTitle")
 				}),
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "list",
 					children: [
-						/* @__PURE__ */ U("button", {
+						/* @__PURE__ */ H("button", {
 							class: "row",
 							onClick: u.pick,
-							children: [/* @__PURE__ */ U("span", {
+							children: [/* @__PURE__ */ H("span", {
 								class: "st pending",
-								children: K.upload()
-							}), /* @__PURE__ */ U("div", {
+								children: G.upload()
+							}), /* @__PURE__ */ H("div", {
 								class: "row-main",
-								children: [/* @__PURE__ */ U("div", {
+								children: [/* @__PURE__ */ H("div", {
 									class: "row-title",
 									children: n("setup.importFile")
-								}), /* @__PURE__ */ U("div", {
+								}), /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									children: n("setup.importHint")
 								})]
 							})]
 						}),
-						/* @__PURE__ */ U("button", {
+						/* @__PURE__ */ H("button", {
 							class: "row",
 							onClick: async () => {
 								await t.bridge.call("ui_finish_setup"), await t.open("list_workflows", {}, "push");
 							},
-							children: [/* @__PURE__ */ U("span", {
+							children: [/* @__PURE__ */ H("span", {
 								class: "st pending",
-								children: K.play()
-							}), /* @__PURE__ */ U("div", {
+								children: G.play()
+							}), /* @__PURE__ */ H("div", {
 								class: "row-main",
-								children: [/* @__PURE__ */ U("div", {
+								children: [/* @__PURE__ */ H("div", {
 									class: "row-title",
 									children: n("setup.example")
-								}), /* @__PURE__ */ U("div", {
+								}), /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									children: n("setup.exampleHint")
 								})]
 							})]
 						}),
-						/* @__PURE__ */ U("button", {
+						/* @__PURE__ */ H("button", {
 							class: "row",
 							"aria-expanded": o,
 							onClick: () => s(!o),
-							children: [/* @__PURE__ */ U("span", {
+							children: [/* @__PURE__ */ H("span", {
 								class: "st pending",
-								children: K.sparkle()
-							}), /* @__PURE__ */ U("div", {
+								children: G.sparkle()
+							}), /* @__PURE__ */ H("div", {
 								class: "row-main",
-								children: [/* @__PURE__ */ U("div", {
+								children: [/* @__PURE__ */ H("div", {
 									class: "row-title",
 									children: n("setup.describe")
-								}), /* @__PURE__ */ U("div", {
+								}), /* @__PURE__ */ H("div", {
 									class: "row-sub",
 									children: n("setup.describeHint")
 								})]
 							})]
 						}),
-						o && /* @__PURE__ */ U("div", {
+						o && /* @__PURE__ */ H("div", {
 							class: "row-expand",
 							style: "padding-left:10px",
-							children: /* @__PURE__ */ U(Z, {
+							children: /* @__PURE__ */ H(X, {
 								placeholder: n("setup.describePh"),
 								message: (e) => n("msg.describe", { text: e }),
 								context: "The user wants a new browser workflow. Read get_step_schema, explore the site with the page_* tools, then show a draft with propose_workflow."
@@ -3309,14 +3401,14 @@ function Nt(e) {
 						})
 					]
 				}),
-				u.error && /* @__PURE__ */ U("span", {
+				u.error && /* @__PURE__ */ H("span", {
 					class: "err",
 					children: u.error
 				}),
 				u.input,
-				/* @__PURE__ */ U("div", {
+				/* @__PURE__ */ H("div", {
 					class: "actions",
-					children: /* @__PURE__ */ U(X, {
+					children: /* @__PURE__ */ H(Y, {
 						primary: !0,
 						onClick: d,
 						children: n("setup.finish")
@@ -3326,23 +3418,688 @@ function Nt(e) {
 		]
 	});
 }
+// ui/views/chat.tsx
+var Lt = (e) => e.surface === "panel" && typeof e.chatState == "function" ? e : void 0, Rt = { view: "chat" }, zt = (e) => e?.view === "chat", Z = {
+	openedAt: 0,
+	local: [],
+	subs: /* @__PURE__ */ new Set()
+}, Bt = () => Z.subs.forEach((e) => e());
+function Vt(e, t) {
+	return `claude://${e === "chat" ? "claude.ai" : "code"}/new?q=${encodeURIComponent(t)}`;
+}
+function Ht(e) {
+	let t = document.createElement("a");
+	t.href = e, t.rel = "noopener", document.body.appendChild(t), t.click(), t.remove();
+}
+async function Ut(e) {
+	try {
+		await navigator.clipboard.writeText(e);
+		return;
+	} catch {}
+	let t = document.createElement("textarea");
+	t.value = e, t.style.position = "fixed", t.style.opacity = "0", document.body.appendChild(t), t.select(), document.execCommand("copy"), t.remove();
+}
+function Wt(e) {
+	let { t } = V(), n = Lt(e.bridge), [r, i] = R({}), [, a] = R(0);
+	z(() => {
+		let e = () => a((e) => e + 1);
+		return Z.subs.add(e), () => {
+			Z.subs.delete(e);
+		};
+	}, []);
+	let o = async () => {
+		if (!n) return;
+		let [e, t] = await Promise.all([n.chatState().catch(() => void 0), n.chatLog().catch(() => void 0)]);
+		i({
+			state: e,
+			entries: t
+		});
+	};
+	z(() => {
+		if (!n) return;
+		let e = !1;
+		(async () => {
+			let [t, r] = await Promise.all([n.chatState().catch(() => void 0), n.chatLog().catch(() => void 0)]);
+			e || i({
+				state: t,
+				entries: r
+			});
+		})();
+		let t = n.onEvent("chat.update", (e) => {
+			e && typeof e == "object" && i((t) => ({
+				state: e.state ?? t.state,
+				entries: Array.isArray(e.entries) ? e.entries : t.entries
+			}));
+		});
+		return () => {
+			e = !0, t();
+		};
+	}, [n]);
+	let s = r.state === "listening" || r.state === "working" || r.state === "connected";
+	s && Z.openedAt && (Z.openedAt = 0);
+	let c = !!Z.openedAt, [l, u] = R(Date.now());
+	z(() => {
+		if (!c) return;
+		let e = setInterval(() => {
+			u(Date.now()), o();
+		}, 2e3);
+		return () => clearInterval(e);
+	}, [c, n]);
+	let d = r.state !== void 0;
+	return {
+		bridge: n,
+		state: c ? "opening" : r.state ?? "none",
+		known: d,
+		entries: r.entries ?? Z.local,
+		nothingOpened: c && l - Z.openedAt >= 1e4,
+		canSend: s || !d,
+		open(e) {
+			Z.openedAt = Date.now(), u(Z.openedAt), Ht(Vt(e, t("chat.prompt"))), Bt();
+		},
+		copy: () => Ut(t("chat.prompt")),
+		async send(e, r) {
+			if (!n) return;
+			let i = await n.chatSend(e, r);
+			i.fallback ? (Z.local = [...Z.local, {
+				at: Date.now(),
+				from: "you",
+				text: e,
+				mentions: r
+			}], i.delivered || Z.local.push({
+				at: Date.now(),
+				from: "event",
+				text: t("chat.notDelivered"),
+				warn: !0
+			}), Bt()) : await o();
+		}
+	};
+}
+function Q({ kind: e, pulse: t }) {
+	return /* @__PURE__ */ H("span", { class: `dot${e ? ` ${e}` : ""}${t ? " pulse" : ""}` });
+}
+function Gt({ chat: e, button: t }) {
+	let { t: n } = V(), [r, i] = R(!1), a = n(r ? "chat.copied" : "chat.copyPrompt"), o = async () => {
+		await e.copy(), i(!0), setTimeout(() => i(!1), 2e3);
+	};
+	return t ? /* @__PURE__ */ H("button", {
+		class: "btn sm",
+		onClick: o,
+		children: a
+	}) : /* @__PURE__ */ H("button", {
+		class: "link",
+		onClick: o,
+		children: a
+	});
+}
+var Kt = () => G.sparkle();
+function qt({ nav: e }) {
+	let { t } = V(), n = Wt(e);
+	if (!n.bridge) return null;
+	let r = () => e.push(Rt), i = n.state;
+	if (i === "listening" || i === "working" || i === "connected") {
+		let e = t(i === "listening" ? "chat.liveListening" : i === "working" ? "chat.liveWorking" : "chat.liveConnected");
+		return /* @__PURE__ */ H("div", {
+			class: "strip live",
+			role: "status",
+			children: [
+				/* @__PURE__ */ H(Q, {
+					kind: i === "working" ? "run" : "ok",
+					pulse: i === "working"
+				}),
+				/* @__PURE__ */ H("span", {
+					class: "strip-sub",
+					children: e
+				}),
+				/* @__PURE__ */ H("button", {
+					class: "btn sm primary",
+					onClick: r,
+					children: t("chat.chat")
+				})
+			]
+		});
+	}
+	return i === "opening" ? /* @__PURE__ */ H("div", {
+		class: "strip",
+		role: "status",
+		children: [
+			/* @__PURE__ */ H("div", {
+				class: "strip-top",
+				children: [/* @__PURE__ */ H(Q, {
+					kind: "run",
+					pulse: !0
+				}), /* @__PURE__ */ H("span", {
+					class: "strip-title",
+					children: t("chat.waitingTitle")
+				})]
+			}),
+			/* @__PURE__ */ H("ol", {
+				class: "steps-ol",
+				children: [
+					/* @__PURE__ */ H("li", { children: t("chat.step1") }),
+					/* @__PURE__ */ H("li", { children: [
+						t("chat.step2a"),
+						/* @__PURE__ */ H("b", { children: t("chat.step2b") }),
+						t("chat.step2c")
+					] }),
+					/* @__PURE__ */ H("li", { children: t("chat.step3") })
+				]
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "strip-sub",
+				children: t("chat.warnNote")
+			}),
+			n.nothingOpened && /* @__PURE__ */ H("div", {
+				class: "strip-sub strong",
+				children: t("chat.nothingOpened")
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "strip-links",
+				children: [/* @__PURE__ */ H("button", {
+					class: "link",
+					onClick: () => n.open("chat"),
+					children: t("chat.openAgain")
+				}), /* @__PURE__ */ H(Gt, { chat: n })]
+			})
+		]
+	}) : /* @__PURE__ */ H("div", {
+		class: "strip",
+		children: [
+			/* @__PURE__ */ H("div", {
+				class: "strip-top",
+				children: [/* @__PURE__ */ H(Q, {}), /* @__PURE__ */ H("span", {
+					class: "strip-title",
+					children: t(i === "idle" ? "chat.idleTitle" : "chat.noneTitle")
+				})]
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "strip-sub",
+				children: t("chat.noneSub")
+			}),
+			/* @__PURE__ */ H("button", {
+				class: "btn primary block",
+				onClick: () => n.open("chat"),
+				children: [Kt(), t("chat.use")]
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "strip-links",
+				children: [
+					/* @__PURE__ */ H("button", {
+						class: "link",
+						onClick: () => n.open("code"),
+						children: t("chat.useCode")
+					}),
+					/* @__PURE__ */ H(Gt, { chat: n }),
+					(i === "idle" || !n.known || n.entries.length > 0) && /* @__PURE__ */ H("button", {
+						class: "link",
+						onClick: r,
+						children: t("chat.openChat")
+					})
+				]
+			})
+		]
+	});
+}
+var Jt = "M8 2.5a5.5 5.5 0 1 1 0 11a5.5 5.5 0 1 1 0-11z";
+function Yt(e) {
+	return e.type === "workflow" ? ["M3 3h4v4H3zM9 9h4v4H9zM7 5h3.5a1.5 1.5 0 0 1 1.5 1.5V9"] : e.type === "tab" ? ["M3.5 3h9A1.5 1.5 0 0 1 14 4.5v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5v-7A1.5 1.5 0 0 1 3.5 3zM2 6h12"] : e.status === "failure" ? [Jt, "M8 5v3.5M8 10.8v.1"] : [Jt, "M6.8 5.8 10 8l-3.2 2.2z"];
+}
+function Xt({ m: e }) {
+	return /* @__PURE__ */ H("svg", {
+		width: "14",
+		height: "14",
+		viewBox: "0 0 16 16",
+		fill: "none",
+		stroke: "currentColor",
+		"stroke-width": "1.6",
+		"stroke-linecap": "round",
+		"stroke-linejoin": "round",
+		"aria-hidden": "true",
+		class: e.type === "run" && e.status === "failure" ? "is-bad" : void 0,
+		children: Yt(e).map((e) => /* @__PURE__ */ H("path", { d: e }))
+	});
+}
+function Zt(e) {
+	let t = "http://www.w3.org/2000/svg", n = document.createElementNS(t, "svg");
+	for (let [e, t] of Object.entries({
+		width: "12",
+		height: "12",
+		viewBox: "0 0 16 16",
+		fill: "none",
+		stroke: "currentColor",
+		"stroke-width": "1.6",
+		"stroke-linecap": "round",
+		"stroke-linejoin": "round",
+		"aria-hidden": "true"
+	})) n.setAttribute(e, t);
+	for (let r of Yt(e)) {
+		let e = document.createElementNS(t, "path");
+		e.setAttribute("d", r), n.appendChild(e);
+	}
+	return n;
+}
+function Qt({ m: e }) {
+	return /* @__PURE__ */ H("span", {
+		class: "mchip",
+		title: e.url ?? e.name,
+		children: [/* @__PURE__ */ H(Xt, { m: e }), e.name]
+	});
+}
+function $t(e, t = []) {
+	let n = t.map((e) => ({
+		m: e,
+		s: `@${e.name}`
+	})).sort((e, t) => t.s.length - e.s.length), r = [], i = /* @__PURE__ */ new Set(), a = "";
+	for (let t = 0; t < e.length;) {
+		let o = e[t] === "@" ? n.find((n) => e.startsWith(n.s, t)) : void 0;
+		o ? (a && r.push(a), a = "", r.push(/* @__PURE__ */ H(Qt, { m: o.m })), i.add(o.m), t += o.s.length) : (a += e[t], t += 1);
+	}
+	a && r.push(a);
+	for (let e of t) i.has(e) || r.push(" ", /* @__PURE__ */ H(Qt, { m: e }));
+	return r;
+}
+var en = (e) => e && [
+	"running",
+	"waiting_manual",
+	"success",
+	"failure",
+	"stopped"
+].includes(e) ? `status.${e}` : void 0;
+function tn(e, t) {
+	if (e.type === "tab") return e.url?.replace(/^https?:\/\//, "");
+	if (e.type === "run") {
+		let n = en(e.status);
+		return n ? t(n) : e.status;
+	}
+}
+var nn = 5, rn = (e, t) => e.type === t.type && (e.id ?? e.url ?? e.name) === (t.id ?? t.url ?? t.name);
+function an(e, t) {
+	let n = t.toLowerCase(), r = (e = []) => e.filter((e) => !n || `${e.name} ${e.url ?? ""}`.toLowerCase().includes(n)).slice(0, nn);
+	return {
+		workflows: r(e?.workflows),
+		runs: r(e?.runs),
+		tabs: r(e?.tabs)
+	};
+}
+function on(e) {
+	let t = getSelection();
+	if (!e || !t || !t.rangeCount || !t.isCollapsed) return null;
+	let n = t.anchorNode;
+	if (!n || n.nodeType !== Node.TEXT_NODE || !e.contains(n)) return null;
+	let r = (n.textContent ?? "").slice(0, t.anchorOffset), i = /(?:^|[\s ])@([^\s @]{0,40})$/.exec(r);
+	return i ? {
+		node: n,
+		start: t.anchorOffset - i[1].length - 1,
+		end: t.anchorOffset,
+		query: i[1]
+	} : null;
+}
+function sn({ enabled: e, chat: t }) {
+	let { t: n } = V(), r = B(null), i = B(/* @__PURE__ */ new Map()), a = B(0), [o, s] = R(!0), [c, l] = R(!1), [u, d] = R(null), f = B(null), p = B(0), m = Te(() => an(u?.cands, u?.query ?? ""), [u]), h = [
+		...m.workflows,
+		...m.runs,
+		...m.tabs
+	], g = () => {
+		let e = "", t = [], n = (r) => {
+			r.childNodes.forEach((r) => {
+				if (r.nodeType === Node.TEXT_NODE) {
+					e += r.textContent ?? "";
+					return;
+				}
+				if (!(r instanceof HTMLElement)) return;
+				let a = r.dataset.k;
+				if (a) {
+					let n = i.current.get(a);
+					n && (e += `@${n.name}`, t.some((e) => rn(e, n)) || t.push(n));
+				} else r.tagName === "BR" ? e += "\n" : (r.tagName === "DIV" && e && !e.endsWith("\n") && (e += "\n"), n(r));
+			});
+		};
+		return r.current && n(r.current), {
+			text: e.replace(/ /g, " ").replace(/[ \t]+\n/g, "\n").trim(),
+			mentions: t
+		};
+	}, _ = (e) => {
+		let n = ++p.current;
+		d((t) => ({
+			query: e,
+			cands: t?.cands,
+			on: 0
+		})), t.bridge?.mentions(e).catch(() => void 0).then((e) => {
+			n === p.current && d((t) => t && {
+				...t,
+				cands: e ?? t.cands ?? {
+					workflows: [],
+					runs: [],
+					tabs: []
+				}
+			});
+		});
+	}, v = () => {
+		s(!g().text && !r.current?.querySelector("[data-k]"));
+		let e = on(r.current), t = f.current;
+		e || (f.current = null), e && !(t && t.node === e.node && t.start === e.start) ? _(e.query) : d(null);
+	}, y = (e) => {
+		let t = r.current;
+		if (!t) return;
+		let n = String(++a.current);
+		i.current.set(n, e);
+		let o = document.createElement("span");
+		o.className = "mchip", o.contentEditable = "false", o.dataset.k = n, o.title = e.url ?? e.name, o.append(Zt(e), document.createTextNode(e.name));
+		let c = document.createTextNode("\xA0"), l = on(t);
+		if (l) {
+			let e = l.node.splitText(l.start);
+			e.textContent = (e.textContent ?? "").slice(l.end - l.start), e.before(o, c);
+		} else t.append(o, c);
+		let u = getSelection(), f = document.createRange();
+		f.setStart(c, 1), f.collapse(!0), u?.removeAllRanges(), u?.addRange(f), d(null), s(!1), t.focus();
+	}, b = () => {
+		let t = r.current;
+		if (!t || !e) return;
+		t.focus();
+		let n = getSelection();
+		if (!n || !n.rangeCount || !t.contains(n.anchorNode)) {
+			let e = document.createRange();
+			e.selectNodeContents(t), e.collapse(!1), n?.removeAllRanges(), n?.addRange(e);
+		}
+		let i = getSelection()?.anchorNode, a = i?.nodeType === Node.TEXT_NODE ? (i.textContent ?? "").slice(0, getSelection().anchorOffset) : "";
+		f.current = null, document.execCommand("insertText", !1, a && !/[\s ]$/.test(a) ? " @" : "@");
+	}, x = async () => {
+		let { text: n, mentions: a } = g();
+		if (n && e && !c) {
+			l(!0);
+			try {
+				await t.send(n, a), r.current && (r.current.textContent = ""), i.current.clear(), s(!0), d(null);
+			} finally {
+				l(!1);
+			}
+		}
+	}, S = (e) => {
+		if (!e.isComposing) {
+			if (u) {
+				if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+					e.preventDefault(), h.length && d({
+						...u,
+						on: (u.on + (e.key === "ArrowDown" ? 1 : h.length - 1)) % h.length
+					});
+					return;
+				}
+				if ((e.key === "Enter" || e.key === "Tab") && h.length) {
+					e.preventDefault(), y(h[Math.min(u.on, h.length - 1)]);
+					return;
+				}
+				if (e.key === "Escape") {
+					e.preventDefault();
+					let t = on(r.current);
+					f.current = t ? {
+						node: t.node,
+						start: t.start
+					} : null, d(null);
+					return;
+				}
+			}
+			e.key === "Enter" && !e.shiftKey ? (e.preventDefault(), x()) : e.key === "Enter" && (e.preventDefault(), document.execCommand("insertLineBreak"));
+		}
+	}, w = (e) => {
+		e.preventDefault(), document.execCommand("insertText", !1, e.clipboardData?.getData("text/plain") ?? "");
+	}, T = (e, t, r) => t.length > 0 && /* @__PURE__ */ H(C, { children: [/* @__PURE__ */ H("div", {
+		class: "pick-h",
+		children: n(e)
+	}), t.map((e, t) => /* @__PURE__ */ H("button", {
+		class: `pick${u && u.on === r + t ? " on" : ""}`,
+		role: "option",
+		"aria-selected": u?.on === r + t,
+		onMouseDown: (t) => {
+			t.preventDefault(), y(e);
+		},
+		children: [/* @__PURE__ */ H(Xt, { m: e }), /* @__PURE__ */ H("div", {
+			class: "row-main",
+			children: [/* @__PURE__ */ H("div", {
+				class: "row-title",
+				children: e.name
+			}), tn(e, n) && /* @__PURE__ */ H("div", {
+				class: "row-sub",
+				children: tn(e, n)
+			})]
+		})]
+	}))] });
+	return /* @__PURE__ */ H("div", {
+		class: "composer-wrap",
+		children: [
+			u && e && /* @__PURE__ */ H("div", {
+				class: "picker",
+				role: "listbox",
+				"aria-label": n("chat.mention"),
+				children: [
+					T("chat.pickWorkflows", m.workflows, 0),
+					T("chat.pickRuns", m.runs, m.workflows.length),
+					T("chat.pickTabs", m.tabs, m.workflows.length + m.runs.length),
+					!h.length && u.cands && /* @__PURE__ */ H("div", {
+						class: "pick-none",
+						children: n("chat.pickNone")
+					})
+				]
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "composer",
+				children: [/* @__PURE__ */ H("div", {
+					ref: r,
+					class: `ced${o ? " is-empty" : ""}${e ? "" : " is-off"}`,
+					contentEditable: e,
+					role: "textbox",
+					"aria-multiline": "true",
+					"aria-disabled": !e,
+					"aria-label": n(e ? "chat.ph" : "chat.phOff"),
+					"data-ph": n(e ? "chat.ph" : "chat.phOff"),
+					onInput: v,
+					onKeyDown: S,
+					onPaste: w,
+					onBlur: () => setTimeout(() => d(null), 150)
+				}), /* @__PURE__ */ H("button", {
+					class: "btn primary",
+					disabled: !e || o || c,
+					onClick: () => void x(),
+					children: n("chat.send")
+				})]
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "tools",
+				children: /* @__PURE__ */ H("button", {
+					class: `tool${u ? " on" : ""}`,
+					disabled: !e,
+					onMouseDown: (e) => e.preventDefault(),
+					onClick: b,
+					children: ["@ ", n("chat.mention")]
+				})
+			})
+		]
+	});
+}
+function cn({ e }) {
+	let t = U(), { t: n } = V(), r = e.card;
+	return r.kind === "proposal" && r.pendingId && (!r.state || r.state === "pending") ? /* @__PURE__ */ H("div", {
+		class: "card-mini",
+		children: [
+			/* @__PURE__ */ H("span", {
+				class: "is-warn",
+				children: G.alert()
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "row-main",
+				children: [/* @__PURE__ */ H("div", {
+					class: "row-title",
+					children: n("chat.cardWaiting")
+				}), /* @__PURE__ */ H("div", {
+					class: "row-sub",
+					children: r.name ?? e.text
+				})]
+			}),
+			/* @__PURE__ */ H("button", {
+				class: "btn sm primary",
+				onClick: () => t.open("ui_proposal", { pendingId: r.pendingId }, "push"),
+				children: n("panel.review")
+			})
+		]
+	}) : /* @__PURE__ */ H("div", {
+		class: "ev",
+		children: [/* @__PURE__ */ H(Q, { kind: r.status === "success" || r.state === "saved" || r.state === "applied" ? "ok" : r.status === "failure" ? "bad" : void 0 }), e.text]
+	});
+}
+function ln({ chat: e }) {
+	let { t } = V(), n = B(null), r = e.entries, i = r.reduce((e, t, n) => t.from === "claude" ? n : e, -1), a = e.state === "working" ? r.findIndex((e, t) => t > i && e.from === "you") : -1, o = a < 0 ? -1 : r.reduce((e, t, n) => t.from === "you" ? n : e, -1), [s, c] = R(Date.now());
+	z(() => {
+		if (a < 0) return;
+		let e = setInterval(() => c(Date.now()), 1e3);
+		return () => clearInterval(e);
+	}, [a]);
+	let l = a >= 0 ? new Date(r[a].at).getTime() : 0;
+	we(() => {
+		let e = n.current;
+		e && (e.scrollTop = e.scrollHeight);
+	}, [r.length, e.state]);
+	let u = [];
+	return r.forEach((e, n) => {
+		let i = r[n - 1];
+		if (e.from === "event" || e.card) u.push(e.card ? /* @__PURE__ */ H(cn, { e }) : /* @__PURE__ */ H("div", {
+			class: `ev${e.warn ? " warn" : ""}`,
+			children: [e.warn ? G.alert() : /* @__PURE__ */ H(Q, {}), e.text]
+		}));
+		else {
+			let n = e.from === "you";
+			(i?.from !== e.from || i?.card) && u.push(/* @__PURE__ */ H("div", {
+				class: `who${n ? " me" : ""}`,
+				children: t(n ? "chat.you" : "chat.claude")
+			})), u.push(/* @__PURE__ */ H("div", {
+				class: `msg ${n ? "me" : "claude"}`,
+				children: n ? $t(e.text, e.mentions) : e.text
+			}));
+		}
+		n === a && u.push(/* @__PURE__ */ H("div", {
+			class: "working",
+			role: "status",
+			children: [/* @__PURE__ */ H("span", {
+				class: "typing",
+				children: [
+					/* @__PURE__ */ H("i", {}),
+					/* @__PURE__ */ H("i", {}),
+					/* @__PURE__ */ H("i", {})
+				]
+			}), t("chat.working", { s: Number.isFinite(l) ? Math.max(0, Math.round((s - l) / 1e3)) : 0 })]
+		})), n === o && o > a && u.push(/* @__PURE__ */ H("div", {
+			class: "ev",
+			children: [/* @__PURE__ */ H(Q, {}), t("chat.queued")]
+		}));
+	}), /* @__PURE__ */ H("div", {
+		class: "log",
+		ref: n,
+		"aria-live": "polite",
+		children: [
+			r.length === 0 && /* @__PURE__ */ H("div", {
+				class: "muted log-empty",
+				children: t("chat.empty")
+			}),
+			u,
+			e.known && !e.canSend && /* @__PURE__ */ H(un, { chat: e })
+		]
+	});
+}
+function un({ chat: e }) {
+	let { t } = V(), n = e.state, r = t(n === "idle" ? "chat.stoppedTitle" : n === "opening" ? "chat.waitingTitle" : "chat.noneTitle"), i = n === "idle" ? t("chat.stoppedSub") : n === "opening" ? e.nothingOpened ? t("chat.nothingOpened") : `${t("chat.step2a")}${t("chat.step2b")}${t("chat.step2c")}` : t("chat.noneSub");
+	return /* @__PURE__ */ H("div", {
+		class: "banner",
+		role: "status",
+		children: [
+			/* @__PURE__ */ H("div", {
+				class: "banner-title",
+				children: r
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "strip-sub",
+				children: i
+			}),
+			/* @__PURE__ */ H("div", {
+				class: "actions",
+				children: [/* @__PURE__ */ H(Gt, {
+					chat: e,
+					button: !0
+				}), /* @__PURE__ */ H("button", {
+					class: "btn sm primary",
+					onClick: () => e.open("chat"),
+					children: t(n === "opening" ? "chat.openAgain" : "chat.use")
+				})]
+			})
+		]
+	});
+}
+function dn() {
+	let e = U(), { t } = V(), n = Wt(e), r = B(null);
+	if (we(() => {
+		let e = () => {
+			let e = r.current;
+			if (!e || !e.offsetParent) return;
+			let t = e.getBoundingClientRect().top + window.scrollY;
+			e.style.height = `${Math.max(320, window.innerHeight - t)}px`;
+		};
+		e();
+		let t = new ResizeObserver(e);
+		return r.current?.parentElement && t.observe(r.current.parentElement), window.addEventListener("resize", e), () => {
+			t.disconnect(), window.removeEventListener("resize", e);
+		};
+	}, []), !n.bridge) return null;
+	let i = n.state, a = i === "listening" ? /* @__PURE__ */ H("span", {
+		class: "pill ok",
+		children: [/* @__PURE__ */ H(Q, { kind: "ok" }), t("chat.pillListening")]
+	}) : i === "working" ? /* @__PURE__ */ H("span", {
+		class: "pill run",
+		children: [/* @__PURE__ */ H(Q, {
+			kind: "run",
+			pulse: !0
+		}), t("chat.pillWorking")]
+	}) : i === "connected" ? /* @__PURE__ */ H("span", {
+		class: "pill ok",
+		children: [/* @__PURE__ */ H(Q, { kind: "ok" }), t("chat.pillConnected")]
+	}) : n.known ? /* @__PURE__ */ H("span", {
+		class: "pill muted",
+		children: [/* @__PURE__ */ H(Q, {}), t("chat.pillOff")]
+	}) : null;
+	return /* @__PURE__ */ H("div", {
+		class: "w chat",
+		ref: r,
+		children: [
+			/* @__PURE__ */ H("div", {
+				class: "hd",
+				style: "align-items:center",
+				children: [/* @__PURE__ */ H("div", {
+					class: "hd-main",
+					children: /* @__PURE__ */ H("h1", {
+						class: "title",
+						children: t("chat.title")
+					})
+				}), a]
+			}),
+			/* @__PURE__ */ H(ln, { chat: n }),
+			/* @__PURE__ */ H(sn, {
+				enabled: n.canSend,
+				chat: n
+			})
+		]
+	});
+}
 // ui/widget.tsx
-function Pt({ arg: e, retry: t }) {
-	let n = W(), { t: r } = H(), [i, a] = R(!1);
-	return /* @__PURE__ */ U("div", {
+function fn({ arg: e, retry: t }) {
+	let n = U(), { t: r } = V(), [i, a] = R(!1);
+	return /* @__PURE__ */ H("div", {
 		class: "w",
 		children: [
-			/* @__PURE__ */ U(Y, {
+			/* @__PURE__ */ H(J, {
 				kind: "info",
 				children: r(e === "workflows" ? "need.workflows" : "need.runs")
 			}),
-			/* @__PURE__ */ U("div", {
+			/* @__PURE__ */ H("div", {
 				class: "list",
-				children: /* @__PURE__ */ U(At, { onOpened: () => a(!0) })
+				children: /* @__PURE__ */ H(Nt, { onOpened: () => a(!0) })
 			}),
-			i && /* @__PURE__ */ U("div", {
+			i && /* @__PURE__ */ H("div", {
 				class: "actions",
-				children: /* @__PURE__ */ U(X, {
+				children: /* @__PURE__ */ H(Y, {
 					primary: !0,
 					onClick: () => t ? n.open(t.tool, t.args, "replace") : n.bridge.sendMessage(r("need.message")),
 					children: r("need.continue")
@@ -3351,7 +4108,7 @@ function Pt({ arg: e, retry: t }) {
 		]
 	});
 }
-var Ft = [
+var pn = [
 	"limit_steps",
 	"limit_runs_day",
 	"limit_runs_year",
@@ -3359,17 +4116,17 @@ var Ft = [
 	"limit_steps_year",
 	"limit_workflows"
 ];
-function It(e) {
-	let { message: t, code: n, arg: r } = e, i = W(), { t: a } = H();
-	return n === "account_needed" ? /* @__PURE__ */ U(Pt, { ...e }) : n === "not_running" ? /* @__PURE__ */ U("div", {
+function mn(e) {
+	let { message: t, code: n, arg: r } = e, i = U(), { t: a } = V();
+	return n === "account_needed" ? /* @__PURE__ */ H(fn, { ...e }) : n === "not_running" ? /* @__PURE__ */ H("div", {
 		class: "w",
-		children: /* @__PURE__ */ U(Mt, { link: e.link })
-	}) : /* @__PURE__ */ U("div", {
+		children: /* @__PURE__ */ H(Ft, { link: e.link })
+	}) : /* @__PURE__ */ H("div", {
 		class: "w",
-		children: [/* @__PURE__ */ U(Y, {
+		children: [/* @__PURE__ */ H(J, {
 			kind: "bad",
 			children: n ? a(`error.${n}`, { arg: r }) : t
-		}), n && Ft.includes(n) && /* @__PURE__ */ U("button", {
+		}), n && pn.includes(n) && /* @__PURE__ */ H("button", {
 			class: "link",
 			style: "align-self:flex-start",
 			onClick: () => i.open("show_account", {}, "push"),
@@ -3377,34 +4134,35 @@ function It(e) {
 		})]
 	});
 }
-function Lt({ p: e }) {
+function hn({ p: e }) {
+	if (zt(e)) return /* @__PURE__ */ H(dn, {});
 	switch (e.view) {
-		case "setup": return /* @__PURE__ */ U(Nt, { ...e });
-		case "library": return /* @__PURE__ */ U(Xe, { ...e });
-		case "workflow": return /* @__PURE__ */ U(yt, { ...e });
-		case "import": return /* @__PURE__ */ U(Ze, { ...e });
-		case "draft": return /* @__PURE__ */ U(Qe, { ...e });
-		case "runSetup": return /* @__PURE__ */ U(tt, { ...e });
-		case "run": return /* @__PURE__ */ U(ct, { run: e.run });
-		case "failure": return /* @__PURE__ */ U(lt, {
+		case "setup": return /* @__PURE__ */ H(It, { ...e });
+		case "library": return /* @__PURE__ */ H(Qe, { ...e });
+		case "workflow": return /* @__PURE__ */ H(xt, { ...e });
+		case "import": return /* @__PURE__ */ H($e, { ...e });
+		case "draft": return /* @__PURE__ */ H(et, { ...e });
+		case "runSetup": return /* @__PURE__ */ H(rt, { ...e });
+		case "run": return /* @__PURE__ */ H(ut, { run: e.run });
+		case "failure": return /* @__PURE__ */ H(dt, {
 			run: e.run,
 			inspecting: e.inspecting
 		});
-		case "change": return /* @__PURE__ */ U(bt, { ...e });
-		case "runs": return /* @__PURE__ */ U(ft, { ...e });
-		case "stepRun": return /* @__PURE__ */ U(pt, { ...e });
-		case "data": return /* @__PURE__ */ U(St, { ...e });
-		case "history": return /* @__PURE__ */ U(wt, { ...e });
-		case "account": return /* @__PURE__ */ U(Et, { ...e });
-		case "error": return /* @__PURE__ */ U(It, { ...e });
+		case "change": return /* @__PURE__ */ H(St, { ...e });
+		case "runs": return /* @__PURE__ */ H(mt, { ...e });
+		case "stepRun": return /* @__PURE__ */ H(ht, { ...e });
+		case "data": return /* @__PURE__ */ H(wt, { ...e });
+		case "history": return /* @__PURE__ */ H(Et, { ...e });
+		case "account": return /* @__PURE__ */ H(Ot, { ...e });
+		case "error": return /* @__PURE__ */ H(mn, { ...e });
 		default: return null;
 	}
 }
-var Rt = 45e3, zt = 3e3;
+var gn = 45e3, _n = 3e3;
 function $(e) {
 	if (e && (e.view === "draft" || e.view === "change" || e.view === "import")) return e.pendingId;
 }
-function Bt({ bridge: e, start: t, top: n }) {
+function vn({ bridge: e, start: t, top: n }) {
 	let [r, i] = R([]), a = B(0), [o, s] = R(), [c, l] = R("auto"), [u, d] = R(0), f = B(0);
 	f.current = u;
 	let p = (e, t) => {
@@ -3418,18 +4176,18 @@ function Bt({ bridge: e, start: t, top: n }) {
 	z(() => e.onPayload((e) => {
 		s(void 0), p(e, "reset");
 	}), [e]);
-	let m = we(() => Le(Ie(c, e.hostLocale()), e.hostName()), [c, e]), h = async (e) => {
+	let m = Te(() => ze(Re(c, e.hostLocale()), e.hostName()), [c, e]), h = async (e) => {
 		let t = !0, n = () => {
 			t && (t = !1, d((e) => Math.max(0, e - 1)));
 		};
 		d((e) => e + 1);
-		let r = setTimeout(n, Rt);
+		let r = setTimeout(n, gn);
 		try {
 			return await e();
 		} finally {
 			clearTimeout(r), n();
 		}
-	}, g = we(() => ({
+	}, g = Te(() => ({
 		bridge: e,
 		langPref: c,
 		push: (e) => p(e, "push"),
@@ -3499,7 +4257,7 @@ function Bt({ bridge: e, start: t, top: n }) {
 					n = !1;
 				}
 			}
-		}, o = setInterval(r, zt), s = () => {
+		}, o = setInterval(r, _n), s = () => {
 			document.visibilityState === "visible" && r();
 		};
 		document.addEventListener("visibilitychange", s);
@@ -3518,45 +4276,45 @@ function Bt({ bridge: e, start: t, top: n }) {
 		...g,
 		canBack: r.length > 1
 	};
-	return /* @__PURE__ */ U(Re.Provider, {
+	return /* @__PURE__ */ H(Be.Provider, {
 		value: m,
-		children: /* @__PURE__ */ U(Be.Provider, {
+		children: /* @__PURE__ */ H(He.Provider, {
 			value: b,
-			children: /* @__PURE__ */ U("div", {
+			children: /* @__PURE__ */ H("div", {
 				lang: m.lang,
 				class: u ? "is-working" : void 0,
 				inert: u > 0,
 				"aria-busy": u > 0,
 				children: [
-					u > 0 && /* @__PURE__ */ U("div", {
+					u > 0 && /* @__PURE__ */ H("div", {
 						class: "working-bar",
 						role: "progressbar",
 						"aria-label": m.t("common.loading"),
-						children: /* @__PURE__ */ U("i", {})
+						children: /* @__PURE__ */ H("i", {})
 					}),
 					n?.(b, _?.p),
-					o && /* @__PURE__ */ U("div", {
+					o && /* @__PURE__ */ H("div", {
 						class: "w",
 						style: "padding-bottom:0",
-						children: /* @__PURE__ */ U(Y, {
+						children: /* @__PURE__ */ H(J, {
 							kind: "bad",
 							children: o
 						})
 					}),
-					_ ? r.map((e, t) => /* @__PURE__ */ U("div", {
+					_ ? r.map((e, t) => /* @__PURE__ */ H("div", {
 						hidden: t !== r.length - 1,
-						children: /* @__PURE__ */ U(Lt, { p: e.p })
-					}, e.key)) : /* @__PURE__ */ U("div", {
+						children: /* @__PURE__ */ H(hn, { p: e.p })
+					}, e.key)) : /* @__PURE__ */ H("div", {
 						class: "w",
 						"aria-busy": "true",
 						"aria-label": m.t("common.loading"),
 						children: [
-							/* @__PURE__ */ U("div", {
+							/* @__PURE__ */ H("div", {
 								class: "skel",
 								style: "width:55%;height:18px"
 							}),
-							/* @__PURE__ */ U("div", { class: "skel" }),
-							/* @__PURE__ */ U("div", { class: "skel" })
+							/* @__PURE__ */ H("div", { class: "skel" }),
+							/* @__PURE__ */ H("div", { class: "skel" })
 						]
 					})
 				]
@@ -3565,7 +4323,7 @@ function Bt({ bridge: e, start: t, top: n }) {
 	});
 }
 // ui/panel.tsx
-function Vt(e) {
+function yn(e) {
 	if (!e) return {};
 	let t = e, n = t.run ?? t.step;
 	return {
@@ -3575,7 +4333,7 @@ function Vt(e) {
 		pendingId: $(e)
 	};
 }
-var Ht = class {
+var bn = class {
 	runtime;
 	tabs;
 	surface = "panel";
@@ -3604,7 +4362,7 @@ var Ht = class {
 		let n = {
 			kind: "ask_claude",
 			text: e,
-			...Vt(this.current),
+			...yn(this.current),
 			...t ? { context: t } : {}
 		};
 		return {
@@ -3622,7 +4380,7 @@ var Ht = class {
 				kind: "context",
 				text: this.context,
 				silent: !0,
-				...Vt(this.current)
+				...yn(this.current)
 			};
 			this.context = void 0, this.runtime.sendMessage({
 				bw: "user.action",
@@ -3636,6 +4394,61 @@ var Ht = class {
 	async download(e, t, n) {
 		let r = URL.createObjectURL(new Blob([n], { type: t })), i = document.createElement("a");
 		i.href = r, i.download = e, document.body.appendChild(i), i.click(), i.remove(), setTimeout(() => URL.revokeObjectURL(r), 1e4);
+	}
+	async ask(e) {
+		try {
+			return await this.runtime.sendMessage(e);
+		} catch {
+			return;
+		}
+	}
+	async chatState() {
+		let e = await this.ask({ bw: "chat.state" });
+		return [
+			"none",
+			"listening",
+			"working",
+			"idle",
+			"connected"
+		].includes(e?.state) ? e.state : void 0;
+	}
+	async chatLog() {
+		let e = await this.ask({ bw: "chat.log" });
+		return Array.isArray(e?.entries) ? e.entries : void 0;
+	}
+	async mentions(e) {
+		let t = await this.ask({
+			bw: "chat.mentions",
+			query: e
+		});
+		if (t && (Array.isArray(t.workflows) || Array.isArray(t.runs) || Array.isArray(t.tabs))) return {
+			workflows: t.workflows ?? [],
+			runs: t.runs ?? [],
+			tabs: t.tabs ?? []
+		};
+	}
+	async chatSend(e, t) {
+		let n = await this.ask({
+			bw: "chat.send",
+			text: e,
+			mentions: t
+		});
+		if (n && typeof n == "object" && "delivered" in n) return {
+			delivered: !!n.delivered,
+			fallback: !1
+		};
+		let r = {
+			kind: "chat",
+			text: e,
+			...t.length ? { mentions: t } : {}
+		};
+		return {
+			delivered: !!(await this.ask({
+				bw: "user.action",
+				action: r
+			}))?.delivered,
+			fallback: !0
+		};
 	}
 	onPayload() {}
 	hostLocale() {
@@ -3654,8 +4467,8 @@ var Ht = class {
 		this.current = e;
 	}
 };
-function Ut({ nav: e, current: t }) {
-	let { t: n } = H(), [r, i] = R([]);
+function xn({ nav: e, current: t }) {
+	let { t: n } = V(), [r, i] = R([]);
 	z(() => {
 		let t = !1, n = async () => {
 			try {
@@ -3670,53 +4483,57 @@ function Ut({ nav: e, current: t }) {
 		};
 	}, [e.bridge]);
 	let a = t?.view === "library", o = $(t), s = r.filter((e) => e.pendingId !== o);
-	return /* @__PURE__ */ U("div", {
+	return /* @__PURE__ */ H("div", {
 		class: "w panel-top",
 		style: "padding-bottom:0",
-		children: [/* @__PURE__ */ U("div", {
-			style: "display:flex;justify-content:space-between;align-items:center",
-			children: [a ? /* @__PURE__ */ U("span", {}) : /* @__PURE__ */ U("button", {
-				class: "back",
-				onClick: () => e.open("list_workflows", {}, "reset"),
-				children: n("panel.home")
-			}), t?.view !== "account" && /* @__PURE__ */ U("button", {
-				class: "link",
-				onClick: () => e.open("show_account", {}, "push"),
-				children: n("panel.account")
-			})]
-		}), s.length > 0 && /* @__PURE__ */ U("div", {
-			class: "note warn",
-			role: "status",
-			style: "align-items:center",
-			children: [
-				K.alert(),
-				/* @__PURE__ */ U("div", {
-					class: "row-main",
-					children: [/* @__PURE__ */ U("div", {
-						class: "row-title",
-						children: n("panel.waiting")
-					}), /* @__PURE__ */ U("div", {
-						class: "row-sub",
-						children: s.length === 1 ? s[0].name : n("panel.waitingSub", { n: s.length })
-					})]
-				}),
-				/* @__PURE__ */ U("button", {
-					class: "btn primary",
-					onClick: () => e.open("ui_proposal", { pendingId: s[0].pendingId }, "push"),
-					children: n("panel.review")
-				})
-			]
-		})]
+		children: [
+			/* @__PURE__ */ H("div", {
+				style: "display:flex;justify-content:space-between;align-items:center",
+				children: [a ? /* @__PURE__ */ H("span", {}) : /* @__PURE__ */ H("button", {
+					class: "back",
+					onClick: () => e.open("list_workflows", {}, "reset"),
+					children: n("panel.home")
+				}), t?.view !== "account" && /* @__PURE__ */ H("button", {
+					class: "link",
+					onClick: () => e.open("show_account", {}, "push"),
+					children: n("panel.account")
+				})]
+			}),
+			a && /* @__PURE__ */ H(qt, { nav: e }),
+			s.length > 0 && /* @__PURE__ */ H("div", {
+				class: "note warn",
+				role: "status",
+				style: "align-items:center",
+				children: [
+					G.alert(),
+					/* @__PURE__ */ H("div", {
+						class: "row-main",
+						children: [/* @__PURE__ */ H("div", {
+							class: "row-title",
+							children: n("panel.waiting")
+						}), /* @__PURE__ */ H("div", {
+							class: "row-sub",
+							children: s.length === 1 ? s[0].name : n("panel.waitingSub", { n: s.length })
+						})]
+					}),
+					/* @__PURE__ */ H("button", {
+						class: "btn primary",
+						onClick: () => e.open("ui_proposal", { pendingId: s[0].pendingId }, "push"),
+						children: n("panel.review")
+					})
+				]
+			})
+		]
 	});
 }
-function Wt(e, t = new Ht()) {
-	de(/* @__PURE__ */ U(Bt, {
+function Sn(e, t = new bn()) {
+	de(/* @__PURE__ */ H(vn, {
 		bridge: t,
 		start: { tool: "list_workflows" },
-		top: (e, t) => /* @__PURE__ */ U(Ut, {
+		top: (e, t) => /* @__PURE__ */ H(xn, {
 			nav: e,
 			current: t
 		})
 	}), e);
 }
-export { Ht as PanelBridge, Wt as mountPanel };
+export { bn as PanelBridge, Sn as mountPanel };
