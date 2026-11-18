@@ -1,0 +1,714 @@
+// Widget strings in English and Vietnamese.
+// `vi` is typed against `en`, so a missing or misspelled key fails `npm run typecheck`.
+// Syntax: {name} inserts a param; {n|row|rows} picks singular/plural by the number param n.
+// {ai} is the chat app the widget is shown in ("Claude", "ChatGPT"), filled in for every string.
+import { createContext } from 'preact';
+import { useContext } from 'preact/hooks';
+import type { Lang, LangPref } from './types.js';
+
+export const en = {
+  // common
+  'common.back': '‹ Back',
+  'common.cancel': 'Cancel',
+  'common.save': 'Save',
+  'common.moreActions': 'More actions',
+  'common.showAll': 'Show all ({n})',
+  'common.details': 'Details',
+  'common.output': 'Output',
+  'common.loading': 'Loading…',
+  'common.justNow': 'just now',
+
+  // run status
+  'status.running': 'Running',
+  'status.waiting_manual': 'Needs you',
+  'status.success': 'Done',
+  'status.failure': 'Failed',
+  'status.stopped': 'Stopped',
+  'status.never': 'Never run',
+
+  // step types
+  'stepType.navigate': 'Navigate',
+  'stepType.delay': 'Delay',
+  'stepType.executeXpathCommand': 'Element action',
+  'stepType.javascript': 'JavaScript',
+  'stepType.extractData': 'Extract data',
+  'stepType.if': 'If',
+  'stepType.switch': 'Switch',
+  'stepType.manual': 'Manual step',
+  'stepType.download': 'Download file',
+
+  // browser modes
+
+  // ask Claude
+  'ask.button': 'Ask {ai}',
+  'ask.fix': 'Fix with {ai}',
+  'ask.sent': 'Sent to {ai}. Its proposal will appear in the chat.',
+  'ask.again': 'Ask again',
+  'ask.phEdit': 'What should change in this step?',
+  'ask.phFailed': 'Optional: what did you expect?',
+  'ask.wfTitle': 'Change this workflow',
+  'ask.phWorkflow': 'What should it do differently?',
+  'ask.draftTitle': 'Change this draft',
+  'ask.phDraft': 'What should change before saving?',
+  'ask.runTitle': 'About this run',
+  'ask.phRun': 'What is wrong or missing?',
+  'sug.stableSelector': 'Use a more stable selector',
+  'sug.waitFirst': 'Wait for the element first',
+  'sug.waitLonger': 'Wait longer',
+  'sug.alsoLink': 'Also extract the link',
+  'sug.skipEmpty': 'Skip empty items',
+  'sug.otherUrl': 'Use a different URL',
+  'sug.waitElement': 'Wait for an element instead',
+  'sug.explainJs': 'Explain what this does',
+  'sug.explainIf': 'Explain this condition',
+  'sug.explainSwitch': 'Explain these branches',
+  'sug.automate': 'Try to automate this step',
+  'sug.fileName': 'Change the file name',
+  'sug.otherFile': 'Save a different file',
+  'sug.rowsMissing': 'Some items are missing',
+  'sug.addField': 'Add a field',
+  'sug.wrongThing': 'This did the wrong thing',
+
+  // messages the widget posts into the chat (as the user)
+  'msg.editStep': 'Change step "{stepId}" of workflow {id}: {text}',
+  'msg.editWorkflow': 'Change workflow {id}: {text}',
+  'msg.editDraft': 'Change the draft workflow: {text}',
+  'msg.aboutRun': 'About run {runId}: {text}',
+  'msg.stepOk': 'About step "{stepId}" in run {runId}: {text}',
+  'msg.stepFailed': 'Fix step "{stepId}" in run {runId}. {text}',
+  'msg.fixRun': 'Fix the failed run {runId}.',
+  'msg.importFix': 'Fix the workflow file "{file}" that failed to import.',
+  'msg.describe': 'Create a browser workflow: {text}',
+  'msg.setupDone': 'Setup is done.',
+
+  // library
+  'lib.title': 'Workflows',
+  'lib.saved': '{n} saved',
+  'lib.matching': 'Matching “{q}”',
+  'lib.empty': 'No workflows yet. Import a file or describe one in chat.',
+  'lib.filter': 'Filter',
+  'lib.noMatch': 'No match.',
+  'lib.import': 'Import workflow',
+  'lib.tooBig': 'File is larger than 2 MB.',
+  'lib.neverRun': 'never run',
+  'lib.example': 'Example',
+  'lib.steps': '{n} {n|step|steps}',
+
+  // workflow
+  'wf.stepsTab': 'Steps ({n})',
+  'wf.runsTab': 'Runs',
+  'wf.run': 'Run',
+  'wf.export': 'Export file',
+  'wf.history': 'Version history',
+  'wf.hostFromInputs': 'URL from inputs',
+  'wf.saved': 'Saved · v{v}',
+  'wf.restored': 'Restored v{from} as v{v}',
+  'wf.discarded': 'Change discarded · still v{v}',
+
+  // import
+  'imp.title': 'Import “{name}”',
+  'imp.cantTitle': 'Can’t import this file',
+  'imp.site': 'Site',
+  'imp.steps': 'Steps',
+  'imp.allValid': '{n} · all valid',
+  'imp.asksFor': 'Asks for',
+  'imp.exists': '“{id}” already exists (v{v}). Saving adds it as v{next}.',
+  'imp.save': 'Save workflow',
+  'imp.cancelled': 'Import cancelled.',
+  'imp.more': '+{n} more',
+  'imp.err.invalid_json': 'Not valid JSON',
+  'imp.err.not_object': 'Expected a workflow object',
+  'imp.err.missing_field': 'Required field is missing',
+  'imp.err.empty_steps': 'Needs at least one step',
+  'imp.err.missing_id': 'Step has no id',
+  'imp.err.bad_type': 'Unknown step type “{arg}”',
+  'imp.err.missing_ref': 'Points to a missing step “{arg}”',
+  'imp.err.duplicate_id': 'Step id “{arg}” is used twice',
+  'imp.err.invalid': 'Invalid value: {arg}',
+
+  // draft
+  'draft.sub': 'New workflow · {host} · {n} {n|step|steps}',
+  'draft.inputs': 'Inputs:',
+  'draft.name': 'Name',
+  'draft.save': 'Save',
+  'draft.testRun': 'Test run',
+  'draft.testAgain': 'Test again',
+  'draft.startTest': 'Start test',
+  'draft.testing': 'Test · not saved',
+  'draft.saveHint': 'Not saved yet. Save it whenever the run looks right.',
+
+  // run setup
+  'setupRun.title': 'Run {name}',
+  'setupRun.sub': 'v{v} · {n} {n|step|steps}',
+  'setupRun.optional': '(optional)',
+  'setupRun.more': 'More options ({n})',
+  'setupRun.required': 'Required',
+  'setupRun.start': 'Start run',
+
+  // run progress
+  'run.progress': '{done} / {total} steps',
+  'run.testing': 'testing change',
+  'run.testStop': 'test stop',
+  'run.manual': '{instruction} in the Browser Workflow tab in Chrome, then press Resume.',
+  'run.resume': 'Resume',
+  'run.stop': 'Stop',
+  'run.stopRun': 'Stop run',
+  'run.done': 'Done · {n} {n|step|steps}',
+  'run.items': '{n} {n|item|items} extracted',
+  'run.changeWorks': 'Change works up to step {n}',
+  'run.runFull': 'Run full workflow',
+  'run.runAgain': 'Run again',
+  'run.viewData': 'View data',
+  'run.stoppedAt': 'Stopped at step {n}',
+  'run.earlier': '{n} earlier {n|step|steps}',
+  'run.steps': 'Steps ({n})',
+
+  // failure
+  'fail.title': 'Failed at step {n} of {total}',
+  'fail.url': 'URL',
+  'fail.error': 'Error',
+  'fail.console': 'Console',
+  'fail.noErrors': 'No errors',
+  'fail.sent': 'Sent to {ai}. The proposed fix will appear in the chat.',
+  'fail.inspecting': '{ai} is looking at this failure. The proposed fix will appear below.',
+  'fail.expand': 'Expand screenshot',
+  'fail.collapse': 'Collapse screenshot',
+  'fail.shotAlt': 'Page when step {n} failed',
+  'err.notFound': 'Element not found: {target} (waited {s}s)',
+  'err.timeout': 'Timed out after {s}s',
+  'err.runLimit': 'The run passed its {m}-minute limit and was stopped.',
+
+  // proposed change
+  'chg.fixTitle': 'Proposed fix',
+  'chg.changeTitle': 'Proposed change',
+  'chg.update': 'changed',
+  'chg.add': 'new',
+  'chg.remove': 'removed',
+  'chg.discard': 'Discard',
+  'chg.apply': 'Apply & test',
+  'chg.discardedFix': 'Fix discarded. {name} stays on v{v}.',
+  'chg.discardedChange': 'Change discarded. {name} stays on v{v}.',
+  'chg.before': 'Before',
+  'chg.after': 'After',
+
+  // data
+  'data.items': '{n} {n|item|items}',
+  'data.extraCols': '+{n} columns in the download',
+  'data.csv': 'Download CSV',
+  'data.json': 'JSON',
+
+  // history
+  'hist.title': 'Version history',
+  'hist.current': 'Current',
+  'hist.restore': 'Restore v{v}',
+  'hist.onlyOne': 'Only one version so far. Changes add new versions.',
+  'hist.who.you': 'You',
+  'hist.who.claude': 'AI',
+  'hist.who.import': 'Import',
+  'hist.ev.initial': 'First version',
+  'hist.ev.create': 'Created by AI',
+  'hist.ev.import': 'Imported from {file}',
+  'hist.ev.importNoFile': 'Imported',
+  'hist.ev.update': 'Changed “{name}”',
+  'hist.ev.add': 'Added “{name}”',
+  'hist.ev.remove': 'Removed “{name}”',
+  'hist.ev.more': ' and {n} more',
+  'hist.ev.restore': 'Restored v{from}',
+
+  // browser settings
+  'br.seePlans': 'See plans',
+
+  // account
+  'acct.title': 'Account',
+  'acct.free': 'Free',
+  'acct.pro': 'Pro',
+  'acct.until': 'Pro until {date}',
+  'acct.runs.day': 'Runs today',
+  'acct.runs.month': 'Runs this month',
+  'acct.runs.year': 'Runs this year',
+  'acct.steps.day': 'Steps run today',
+  'acct.steps.month': 'Steps run this month',
+  'acct.steps.year': 'Steps run this year',
+  'acct.anonymous': 'No account yet',
+  'acct.createTitle': 'Create a free account',
+  'acct.createHint': 'Pick a username and password to get more runs and workflows. Everything you’ve made stays with the account.',
+  'acct.create': 'Create account',
+  'acct.trying': 'You are trying it without an account',
+  'acct.tryingHint': 'Create a free account to keep your workflows and run more each day.',
+  'acct.createOrLogin': 'Create account or log in',
+  'acct.details': 'Account details',
+  'acct.planFree': 'Free plan',
+  'acct.planLife': 'Pro, for life',
+  'acct.createOpened': 'The page opened in your browser. Come back here when you’re done.',
+  'acct.createAgain': 'Open the page again',
+  'need.runs': 'You’ve used today’s runs. Create a free account to keep going; your workflows and runs stay with it.',
+  'need.steps': 'You’ve used today’s steps. Create a free account to keep going; your workflows and runs stay with it.',
+  'need.workflows': 'You’ve saved all the workflows you can before signing up. Create a free account to save more; nothing is lost.',
+  'need.continue': 'Continue',
+  'need.message': 'I created my account. Please try that again.',
+  'acct.workflows': 'Workflows',
+  'acct.storedIn': 'Data stored in',
+  'acct.storage.computer': 'In Chrome, on this computer',
+  'acct.storage.computerNote': 'Workflows, runs and results stay in Chrome, in Browser Workflow. Nothing is sent to a server.',
+  'acct.keepRuns': 'The last {n} runs of each workflow are kept',
+  'acct.localUsed': '{mb} MB in {n} runs now',
+  'acct.localWarn': 'Saved runs are taking a lot of space on your computer. Nothing is deleted automatically: delete workflows you no longer need to free space.',
+  'acct.upgrade': 'Upgrade',
+  'acct.limitUpgrade': 'Upgrade to Pro to keep going.',
+  'acct.tryAgain': 'Try again',
+  'acct.manage': 'Manage plan',
+  'acct.copy': 'Copy',
+  'acct.copied': 'Copied',
+  'acct.retention': 'Runs are kept {n} days',
+
+  // language
+  'lang.label': 'Language',
+  'lang.auto': 'Auto',
+  'lang.en': 'English',
+  'lang.vi': 'Tiếng Việt',
+
+  // runs
+  'runs.title': 'Runs',
+  'runs.none': 'No runs yet.',
+  'runs.done': 'Done · {n} {n|step|steps}',
+  'runs.failedAt': 'Failed at step {n} · {name}',
+  'runs.stoppedAt': 'Stopped at step {n}',
+  'runs.waiting': 'Waiting for you',
+  'runs.runningAt': 'Running step {n}',
+  'runs.testPassed': 'Test passed up to step {n}',
+  'runs.test': 'test',
+
+  // step in a run
+  'sr.notReached': 'Not reached',
+  'sr.skipped': 'Skipped',
+  'sr.waiting': 'Waiting',
+  'sr.running': 'Running',
+  'sr.didntRun': 'This step didn’t run.',
+  'sr.stepId': 'Step id',
+  'sr.alt': 'Page after step {n}',
+  'sr.requests': 'Network requests ({n})',
+
+  // errors
+  'error.expired': 'This proposal has expired. Ask {ai} to prepare it again.',
+  'error.not_found': 'Not found. It may have been deleted.',
+  'error.limit_runs_day': 'You’ve used all {arg} runs of your plan for today. The count starts again at 00:00 UTC.',
+  'error.limit_runs_year': 'You’ve used all {arg} runs of your plan for this year.',
+  'error.limit_steps_day': 'Your runs have gone through all {arg} steps of your plan for today. The count starts again at 00:00 UTC.',
+  'error.limit_steps_year': 'Your runs have gone through all {arg} steps of your plan for this year.',
+  'error.limit_workflows': 'Your plan allows {arg} saved workflows. Delete one, or upgrade.',
+  'error.limit_steps': 'Your plan runs workflows of {arg} steps at most. Make this one shorter, or upgrade.',
+
+  // setup
+  'setup.title': 'Set up Browser Workflow',
+  'setup.stepOf': 'Step {n} of {total}',
+  'setup.continue': 'Continue',
+  'setup.firstTitle': 'Add your first workflow',
+  'setup.importFile': 'Import a file',
+  'setup.importHint': 'A workflow .json shared with you or exported from Browser Workflow',
+  'setup.example': 'Try an example',
+  'setup.exampleHint': 'Pick one of the sample workflows and run it',
+  'setup.describe': 'Describe one',
+  'setup.describeHint': 'Tell {ai} what to automate',
+  'setup.describePh': 'e.g. List today’s trending GitHub repos',
+  'setup.finish': 'Finish',
+  'setup.ready': 'You’re set up.',
+  'setup.extTitle': 'Add Browser Workflow to Chrome',
+  'setup.extNote': 'Workflows run in your own Chrome, in a tab group of their own, so you can keep using Chrome meanwhile.',
+  'setup.extOpen': 'Open Chrome. If Browser Workflow isn’t in Chrome yet, add it from the Chrome Web Store, then check again.',
+  'setup.extGet': 'Add to Chrome',
+  'setup.extCheck': 'Check again',
+  'setup.extOk': 'Browser Workflow is ready in Chrome.',
+  'error.not_running': 'Open Chrome to continue: Browser Workflow runs there.',
+  'dl.saving': 'Saving {name}…',
+  'dl.saved': 'Saved {name}',
+  'dl.show': 'Show in folder',
+  'dl.gone': 'This file is no longer in your Downloads folder.',
+  'panel.waiting': 'Waiting for your approval',
+  'panel.waitingSub': '{n|proposal|proposals} from {ai}',
+  'panel.review': 'Review',
+  'panel.home': 'Home',
+  'panel.run': 'Run',
+  'panel.sent': 'Sent to {ai}. Switch to {ai} to see it.',
+  'panel.noAi': 'Open {ai} and ask it to fix this workflow. Copy this and paste it in the chat:',
+  'panel.copy': 'Copy',
+  'panel.copied': 'Copied',
+  'panel.empty': 'No workflows yet. Ask {ai} to make one: describe what to do on a website.',
+};
+
+export type Key = keyof typeof en;
+
+export const vi: Record<Key, string> = {
+  'common.back': '‹ Quay lại',
+  'common.cancel': 'Huỷ',
+  'common.save': 'Lưu',
+  'common.moreActions': 'Thao tác khác',
+  'common.showAll': 'Xem tất cả ({n})',
+  'common.details': 'Chi tiết',
+  'common.output': 'Kết quả',
+  'common.loading': 'Đang tải…',
+  'common.justNow': 'vừa xong',
+
+  'status.running': 'Đang chạy',
+  'status.waiting_manual': 'Cần bạn',
+  'status.success': 'Xong',
+  'status.failure': 'Lỗi',
+  'status.stopped': 'Đã dừng',
+  'status.never': 'Chưa chạy',
+
+  'stepType.navigate': 'Mở trang',
+  'stepType.delay': 'Chờ',
+  'stepType.executeXpathCommand': 'Thao tác phần tử',
+  'stepType.javascript': 'JavaScript',
+  'stepType.extractData': 'Trích xuất dữ liệu',
+  'stepType.if': 'Điều kiện',
+  'stepType.switch': 'Rẽ nhánh',
+  'stepType.manual': 'Bước thủ công',
+  'stepType.download': 'Tải tệp',
+
+
+  'ask.button': 'Hỏi {ai}',
+  'ask.fix': 'Nhờ {ai} sửa',
+  'ask.sent': 'Đã gửi cho {ai}. Đề xuất sẽ hiện trong cuộc trò chuyện.',
+  'ask.again': 'Hỏi lại',
+  'ask.phEdit': 'Bước này cần thay đổi gì?',
+  'ask.phFailed': 'Không bắt buộc: bạn mong đợi điều gì?',
+  'ask.wfTitle': 'Thay đổi workflow này',
+  'ask.phWorkflow': 'Cần làm khác đi thế nào?',
+  'ask.draftTitle': 'Thay đổi bản nháp này',
+  'ask.phDraft': 'Cần thay đổi gì trước khi lưu?',
+  'ask.runTitle': 'Về lần chạy này',
+  'ask.phRun': 'Sai hoặc thiếu gì?',
+  'sug.stableSelector': 'Dùng selector ổn định hơn',
+  'sug.waitFirst': 'Chờ phần tử xuất hiện trước',
+  'sug.waitLonger': 'Chờ lâu hơn',
+  'sug.alsoLink': 'Lấy thêm đường dẫn',
+  'sug.skipEmpty': 'Bỏ qua mục trống',
+  'sug.otherUrl': 'Dùng URL khác',
+  'sug.waitElement': 'Chờ phần tử thay vì chờ cố định',
+  'sug.explainJs': 'Giải thích đoạn này làm gì',
+  'sug.explainIf': 'Giải thích điều kiện này',
+  'sug.explainSwitch': 'Giải thích các nhánh',
+  'sug.automate': 'Thử tự động hoá bước này',
+  'sug.fileName': 'Đổi tên tệp',
+  'sug.otherFile': 'Lưu một tệp khác',
+  'sug.rowsMissing': 'Bị thiếu một số mục',
+  'sug.addField': 'Thêm một trường',
+  'sug.wrongThing': 'Bước này làm sai',
+
+  'msg.editStep': 'Sửa bước "{stepId}" của workflow {id}: {text}',
+  'msg.editWorkflow': 'Sửa workflow {id}: {text}',
+  'msg.editDraft': 'Sửa bản nháp workflow: {text}',
+  'msg.aboutRun': 'Về lần chạy {runId}: {text}',
+  'msg.stepOk': 'Về bước "{stepId}" trong lần chạy {runId}: {text}',
+  'msg.stepFailed': 'Sửa bước "{stepId}" trong lần chạy {runId}. {text}',
+  'msg.fixRun': 'Sửa lần chạy bị lỗi {runId}.',
+  'msg.importFix': 'Sửa tệp workflow "{file}" bị lỗi khi nhập.',
+  'msg.describe': 'Tạo một workflow trình duyệt: {text}',
+  'msg.setupDone': 'Tôi đã thiết lập xong.',
+
+  'lib.title': 'Workflow',
+  'lib.saved': 'Đã lưu {n}',
+  'lib.matching': 'Khớp với “{q}”',
+  'lib.empty': 'Chưa có workflow nào. Hãy nhập tệp hoặc mô tả trong cuộc trò chuyện.',
+  'lib.filter': 'Lọc',
+  'lib.noMatch': 'Không có kết quả.',
+  'lib.import': 'Nhập workflow',
+  'lib.tooBig': 'Tệp lớn hơn 2 MB.',
+  'lib.neverRun': 'chưa chạy',
+  'lib.example': 'Mẫu',
+  'lib.steps': '{n} bước',
+
+  'wf.stepsTab': 'Các bước ({n})',
+  'wf.runsTab': 'Lần chạy',
+  'wf.run': 'Chạy',
+  'wf.export': 'Xuất tệp',
+  'wf.history': 'Lịch sử phiên bản',
+  'wf.hostFromInputs': 'URL lấy từ dữ liệu vào',
+  'wf.saved': 'Đã lưu · v{v}',
+  'wf.restored': 'Đã khôi phục v{from} thành v{v}',
+  'wf.discarded': 'Đã bỏ thay đổi · vẫn là v{v}',
+
+  'imp.title': 'Nhập “{name}”',
+  'imp.cantTitle': 'Không nhập được tệp này',
+  'imp.site': 'Trang web',
+  'imp.steps': 'Số bước',
+  'imp.allValid': '{n} · đều hợp lệ',
+  'imp.asksFor': 'Cần nhập',
+  'imp.exists': '“{id}” đã tồn tại (v{v}). Lưu sẽ thêm thành v{next}.',
+  'imp.save': 'Lưu workflow',
+  'imp.cancelled': 'Đã huỷ nhập.',
+  'imp.more': '+{n} lỗi khác',
+  'imp.err.invalid_json': 'Không phải JSON hợp lệ',
+  'imp.err.not_object': 'Cần một đối tượng workflow',
+  'imp.err.missing_field': 'Thiếu trường bắt buộc',
+  'imp.err.empty_steps': 'Cần ít nhất một bước',
+  'imp.err.missing_id': 'Bước không có id',
+  'imp.err.bad_type': 'Loại bước không hợp lệ “{arg}”',
+  'imp.err.missing_ref': 'Trỏ tới bước không tồn tại “{arg}”',
+  'imp.err.duplicate_id': 'Id bước “{arg}” bị trùng',
+  'imp.err.invalid': 'Giá trị không hợp lệ: {arg}',
+
+  'draft.sub': 'Workflow mới · {host} · {n} bước',
+  'draft.inputs': 'Dữ liệu vào:',
+  'draft.name': 'Tên',
+  'draft.save': 'Lưu',
+  'draft.testRun': 'Chạy thử',
+  'draft.testAgain': 'Chạy thử lại',
+  'draft.startTest': 'Bắt đầu chạy thử',
+  'draft.testing': 'Chạy thử · chưa lưu',
+  'draft.saveHint': 'Chưa lưu. Lưu bất cứ lúc nào bạn thấy lần chạy ổn.',
+
+  'setupRun.title': 'Chạy {name}',
+  'setupRun.sub': 'v{v} · {n} bước',
+  'setupRun.optional': '(không bắt buộc)',
+  'setupRun.more': 'Tuỳ chọn khác ({n})',
+  'setupRun.required': 'Bắt buộc',
+  'setupRun.start': 'Bắt đầu chạy',
+
+  'run.progress': '{done} / {total} bước',
+  'run.testing': 'đang thử thay đổi',
+  'run.testStop': 'dừng thử',
+  'run.manual': '{instruction} trong thẻ Browser Workflow trên Chrome, rồi bấm Tiếp tục.',
+  'run.resume': 'Tiếp tục',
+  'run.stop': 'Dừng',
+  'run.stopRun': 'Dừng chạy',
+  'run.done': 'Xong · {n} bước',
+  'run.items': 'đã trích xuất {n} mục',
+  'run.changeWorks': 'Thay đổi chạy tốt tới bước {n}',
+  'run.runFull': 'Chạy toàn bộ workflow',
+  'run.runAgain': 'Chạy lại',
+  'run.viewData': 'Xem dữ liệu',
+  'run.stoppedAt': 'Đã dừng ở bước {n}',
+  'run.earlier': '{n} bước trước',
+  'run.steps': 'Các bước ({n})',
+
+  'fail.title': 'Lỗi ở bước {n}/{total}',
+  'fail.url': 'URL',
+  'fail.error': 'Lỗi',
+  'fail.console': 'Console',
+  'fail.noErrors': 'Không có lỗi',
+  'fail.sent': 'Đã gửi cho {ai}. Cách sửa đề xuất sẽ hiện trong cuộc trò chuyện.',
+  'fail.inspecting': '{ai} đang xem lỗi này. Cách sửa đề xuất sẽ hiện bên dưới.',
+  'fail.expand': 'Phóng to ảnh chụp',
+  'fail.collapse': 'Thu nhỏ ảnh chụp',
+  'fail.shotAlt': 'Trang lúc bước {n} bị lỗi',
+  'err.notFound': 'Không tìm thấy phần tử: {target} (đã chờ {s} giây)',
+  'err.timeout': 'Hết thời gian chờ sau {s} giây',
+  'err.runLimit': 'Lần chạy đã vượt giới hạn {m} phút và bị dừng.',
+
+  'chg.fixTitle': 'Đề xuất sửa lỗi',
+  'chg.changeTitle': 'Đề xuất thay đổi',
+  'chg.update': 'đã sửa',
+  'chg.add': 'mới',
+  'chg.remove': 'đã xoá',
+  'chg.discard': 'Bỏ qua',
+  'chg.apply': 'Áp dụng & chạy thử',
+  'chg.discardedFix': 'Đã bỏ cách sửa. {name} vẫn là v{v}.',
+  'chg.discardedChange': 'Đã bỏ thay đổi. {name} vẫn là v{v}.',
+  'chg.before': 'Trước',
+  'chg.after': 'Sau',
+
+  'data.items': '{n} mục',
+  'data.extraCols': '+{n} cột khác trong tệp tải về',
+  'data.csv': 'Tải CSV',
+  'data.json': 'JSON',
+
+  'hist.title': 'Lịch sử phiên bản',
+  'hist.current': 'Hiện tại',
+  'hist.restore': 'Khôi phục v{v}',
+  'hist.onlyOne': 'Mới có một phiên bản. Mỗi thay đổi sẽ tạo phiên bản mới.',
+  'hist.who.you': 'Bạn',
+  'hist.who.claude': 'AI',
+  'hist.who.import': 'Nhập tệp',
+  'hist.ev.initial': 'Phiên bản đầu tiên',
+  'hist.ev.create': 'AI tạo',
+  'hist.ev.import': 'Nhập từ {file}',
+  'hist.ev.importNoFile': 'Đã nhập',
+  'hist.ev.update': 'Sửa “{name}”',
+  'hist.ev.add': 'Thêm “{name}”',
+  'hist.ev.remove': 'Xoá “{name}”',
+  'hist.ev.more': ' và {n} thay đổi khác',
+  'hist.ev.restore': 'Khôi phục v{from}',
+
+  'br.seePlans': 'Xem các gói',
+
+  'acct.title': 'Tài khoản',
+  'acct.free': 'Miễn phí',
+  'acct.pro': 'Pro',
+  'acct.until': 'Pro đến {date}',
+  'acct.runs.day': 'Lần chạy hôm nay',
+  'acct.runs.month': 'Lần chạy tháng này',
+  'acct.runs.year': 'Lần chạy năm nay',
+  'acct.steps.day': 'Số bước đã chạy hôm nay',
+  'acct.steps.month': 'Số bước đã chạy tháng này',
+  'acct.steps.year': 'Số bước đã chạy năm nay',
+  'acct.anonymous': 'Chưa có tài khoản',
+  'acct.createTitle': 'Tạo tài khoản miễn phí',
+  'acct.createHint': 'Chọn tên đăng nhập và mật khẩu để có thêm lần chạy và workflow. Mọi thứ bạn đã tạo vẫn thuộc về tài khoản.',
+  'acct.create': 'Tạo tài khoản',
+  'acct.trying': 'Bạn đang dùng thử, chưa có tài khoản',
+  'acct.tryingHint': 'Tạo tài khoản miễn phí để giữ các workflow và chạy được nhiều hơn mỗi ngày.',
+  'acct.createOrLogin': 'Tạo tài khoản hoặc đăng nhập',
+  'acct.details': 'Chi tiết tài khoản',
+  'acct.planFree': 'Gói Miễn phí',
+  'acct.planLife': 'Pro, trọn đời',
+  'acct.createOpened': 'Trang đã mở trong trình duyệt. Quay lại đây khi bạn làm xong.',
+  'acct.createAgain': 'Mở lại trang',
+  'need.runs': 'Bạn đã dùng hết lần chạy của hôm nay. Hãy tạo tài khoản miễn phí để tiếp tục; workflow và các lần chạy vẫn được giữ.',
+  'need.steps': 'Bạn đã dùng hết số bước của hôm nay. Hãy tạo tài khoản miễn phí để tiếp tục; workflow và các lần chạy vẫn được giữ.',
+  'need.workflows': 'Bạn đã lưu hết số workflow được phép trước khi đăng ký. Hãy tạo tài khoản miễn phí để lưu thêm; không mất gì cả.',
+  'need.continue': 'Tiếp tục',
+  'need.message': 'Tôi đã tạo tài khoản. Hãy thử lại giúp tôi.',
+  'acct.workflows': 'Workflow',
+  'acct.storedIn': 'Dữ liệu lưu tại',
+  'acct.storage.computer': 'Trong Chrome, trên máy tính này',
+  'acct.storage.computerNote': 'Workflow, lần chạy và kết quả được giữ trong Chrome, trong Browser Workflow. Không gửi gì lên máy chủ.',
+  'acct.keepRuns': 'Giữ {n} lần chạy gần nhất của mỗi workflow',
+  'acct.localUsed': 'Hiện có {mb} MB trong {n} lần chạy',
+  'acct.localWarn': 'Các lần chạy đã lưu đang chiếm nhiều dung lượng trên máy của bạn. Không có gì bị xoá tự động: hãy xoá những workflow không còn dùng để giải phóng dung lượng.',
+  'acct.upgrade': 'Nâng cấp',
+  'acct.limitUpgrade': 'Nâng cấp lên Pro để tiếp tục.',
+  'acct.tryAgain': 'Thử lại',
+  'acct.manage': 'Quản lý gói',
+  'acct.copy': 'Sao chép',
+  'acct.copied': 'Đã sao chép',
+  'acct.retention': 'Lần chạy được giữ {n} ngày',
+
+  'lang.label': 'Ngôn ngữ',
+  'lang.auto': 'Tự động',
+  'lang.en': 'English',
+  'lang.vi': 'Tiếng Việt',
+
+  'runs.title': 'Lần chạy',
+  'runs.none': 'Chưa có lần chạy nào.',
+  'runs.done': 'Xong · {n} bước',
+  'runs.failedAt': 'Lỗi ở bước {n} · {name}',
+  'runs.stoppedAt': 'Dừng ở bước {n}',
+  'runs.waiting': 'Đang chờ bạn',
+  'runs.runningAt': 'Đang chạy bước {n}',
+  'runs.testPassed': 'Chạy thử tốt tới bước {n}',
+  'runs.test': 'chạy thử',
+
+  'sr.notReached': 'Chưa tới',
+  'sr.skipped': 'Bỏ qua',
+  'sr.waiting': 'Đang chờ',
+  'sr.running': 'Đang chạy',
+  'sr.didntRun': 'Bước này chưa chạy.',
+  'sr.stepId': 'Id bước',
+  'sr.alt': 'Trang sau bước {n}',
+  'sr.requests': 'Yêu cầu mạng ({n})',
+
+  'error.expired': 'Đề xuất này đã hết hạn. Hãy nhờ {ai} chuẩn bị lại.',
+  'error.not_found': 'Không tìm thấy. Có thể đã bị xoá.',
+  'error.limit_runs_day': 'Bạn đã dùng hết {arg} lần chạy của gói trong hôm nay. Số lần chạy được tính lại lúc 00:00 UTC.',
+  'error.limit_runs_year': 'Bạn đã dùng hết {arg} lần chạy của gói trong năm nay.',
+  'error.limit_steps_day': 'Các lần chạy của bạn đã đi hết {arg} bước của gói trong hôm nay. Số bước được tính lại lúc 00:00 UTC.',
+  'error.limit_steps_year': 'Các lần chạy của bạn đã đi hết {arg} bước của gói trong năm nay.',
+  'error.limit_workflows': 'Gói của bạn cho phép {arg} workflow đã lưu. Hãy xoá bớt, hoặc nâng cấp.',
+  'error.limit_steps': 'Gói của bạn chạy workflow tối đa {arg} bước. Hãy rút gọn workflow này, hoặc nâng cấp.',
+
+  'setup.title': 'Thiết lập Browser Workflow',
+  'setup.stepOf': 'Bước {n}/{total}',
+  'setup.continue': 'Tiếp tục',
+  'setup.firstTitle': 'Thêm workflow đầu tiên',
+  'setup.importFile': 'Nhập từ tệp',
+  'setup.importHint': 'Tệp workflow .json được chia sẻ hoặc xuất từ Browser Workflow',
+  'setup.example': 'Dùng thử ví dụ',
+  'setup.exampleHint': 'Chọn một workflow mẫu rồi chạy thử',
+  'setup.describe': 'Mô tả workflow',
+  'setup.describeHint': 'Nói với {ai} việc cần tự động hoá',
+  'setup.describePh': 'VD: Lấy các repo GitHub đang thịnh hành hôm nay',
+  'setup.finish': 'Hoàn tất',
+  'setup.ready': 'Đã thiết lập xong.',
+  'setup.extTitle': 'Thêm Browser Workflow vào Chrome',
+  'setup.extNote': 'Workflow chạy trong Chrome của bạn, trong một nhóm thẻ riêng, nên bạn vẫn dùng Chrome bình thường trong lúc chạy.',
+  'setup.extOpen': 'Hãy mở Chrome. Nếu Chrome chưa có Browser Workflow, hãy thêm từ Chrome Web Store rồi kiểm tra lại.',
+  'setup.extGet': 'Thêm vào Chrome',
+  'setup.extCheck': 'Kiểm tra lại',
+  'setup.extOk': 'Browser Workflow đã sẵn sàng trong Chrome.',
+  'error.not_running': 'Hãy mở Chrome để tiếp tục: Browser Workflow chạy trong Chrome.',
+  'dl.saving': 'Đang lưu {name}…',
+  'dl.saved': 'Đã lưu {name}',
+  'dl.show': 'Mở thư mục',
+  'dl.gone': 'Tệp này không còn trong thư mục Tải về.',
+  'panel.waiting': 'Đang chờ bạn duyệt',
+  'panel.waitingSub': '{n} đề xuất từ {ai}',
+  'panel.review': 'Xem',
+  'panel.home': 'Trang chính',
+  'panel.run': 'Chạy',
+  'panel.sent': 'Đã gửi cho {ai}. Hãy chuyển sang {ai} để xem.',
+  'panel.noAi': 'Hãy mở {ai} và nhờ sửa workflow này. Sao chép đoạn này rồi dán vào cuộc trò chuyện:',
+  'panel.copy': 'Sao chép',
+  'panel.copied': 'Đã sao chép',
+  'panel.empty': 'Chưa có workflow nào. Hãy nhờ {ai} tạo: mô tả việc cần làm trên một trang web.',
+};
+
+const DICTS: Record<Lang, Record<Key, string>> = { en, vi };
+
+export type Params = Record<string, string | number | undefined>;
+export type T = (key: Key, params?: Params) => string;
+
+/** Which chat app the widget is in. `claude` is the only one the app's install file opens in. */
+export interface Host { kind: 'claude' | 'other' | 'unknown'; ai: string }
+
+/** From the name the chat app gave for itself. An app that gave none, or one not known here, is "your AI app". */
+export function hostFrom(name: string | undefined, lang: Lang = 'en'): Host {
+  const n = (name ?? '').toLowerCase();
+  if (n.includes('claude')) return { kind: 'claude', ai: 'Claude' };
+  if (/chatgpt|codex|openai/.test(n)) return { kind: 'other', ai: 'ChatGPT' };
+  if (n.includes('antigravity')) return { kind: 'other', ai: 'Antigravity' };
+  if (n.includes('gemini')) return { kind: 'other', ai: 'Gemini' };
+  return { kind: 'unknown', ai: lang === 'vi' ? 'AI của bạn' : 'your AI app' };
+}
+
+export function makeT(lang: Lang, ai = hostFrom(undefined, lang).ai): T {
+  const dict = DICTS[lang];
+  return (key, params = {}) =>
+    (dict[key] ?? en[key]).replace(/\{(\w+)(?:\|([^|}]*)\|([^}]*))?\}/g, (_, name: string, one?: string, many?: string) => {
+      const v = name === 'ai' && params.ai === undefined ? ai : params[name];
+      if (one !== undefined) return Number(v) === 1 ? one : many ?? '';
+      return v === undefined ? '' : String(v);
+    });
+}
+
+/** User preference wins; 'auto' follows the host locale, then the browser. */
+export function resolveLang(pref: LangPref | undefined, hostLocale?: string): Lang {
+  if (pref === 'en' || pref === 'vi') return pref;
+  const loc = (hostLocale || (typeof navigator !== 'undefined' ? navigator.language : '') || 'en').toLowerCase();
+  return loc.startsWith('vi') ? 'vi' : 'en';
+}
+
+export interface I18n {
+  lang: Lang;
+  host: Host;
+  t: T;
+  ago(iso: string): string;
+  dur(ms?: number): string;
+}
+
+export function makeI18n(lang: Lang, hostName?: string): I18n {
+  const host = hostFrom(hostName, lang);
+  const t = makeT(lang, host.ai);
+  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style: 'short' });
+  const nf = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
+  return {
+    lang,
+    host,
+    t,
+    ago(iso) {
+      const s = Math.round((Date.parse(iso) - Date.now()) / 1000);
+      const a = Math.abs(s);
+      if (a < 60) return t('common.justNow');
+      if (a < 3600) return rtf.format(Math.round(s / 60), 'minute');
+      if (a < 86400) return rtf.format(Math.round(s / 3600), 'hour');
+      return rtf.format(Math.round(s / 86400), 'day');
+    },
+    dur(ms) {
+      if (ms === undefined) return '';
+      return ms < 1000 ? `${ms} ms` : `${nf.format(ms / 1000)} s`;
+    },
+  };
+}
+
+export const I18nContext = createContext<I18n>(makeI18n('en'));
+export const useI18n = () => useContext(I18nContext);
