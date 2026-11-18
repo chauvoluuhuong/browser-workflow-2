@@ -1,0 +1,33 @@
+{
+  "manifest_version": "0.3",
+  "name": "browser-workflow-2",
+  "display_name": "Browser Workflow",
+  "version": "__VERSION__",
+  "description": "Claude builds, runs and fixes browser workflows in your own Chrome, with the Browser Workflow extension.",
+  "long_description": "Browser Workflow lets you describe a task on a website and have Claude turn it into a workflow that runs again any time, without Claude. The workflows run in your own Chrome, in a tab group of their own, through the Browser Workflow extension; what they collect stays in Chrome. This app is the part that lets Claude talk to that extension.",
+  "author": { "name": "chauvoluuhuong", "url": "https://github.com/chauvoluuhuong" },
+  "homepage": "https://browser-workflow.web.app",
+  "documentation": "https://github.com/chauvoluuhuong/browser-workflow-2#readme",
+  "support": "https://github.com/chauvoluuhuong/browser-workflow-2/issues",
+  "repository": { "type": "git", "url": "https://github.com/chauvoluuhuong/browser-workflow-2" },
+  "license": "AGPL-3.0-only",
+  "icon": "icon.png",
+  "keywords": ["browser", "automation", "chrome", "workflow"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/server.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/server.mjs"]
+    }
+  },
+  "tools": [
+    { "name": "extension_status", "description": "Whether Browser Workflow is ready in Chrome, and what to do when it is not." }
+  ],
+  "tools_generated": true,
+  "privacy_policies": ["https://browser-workflow.web.app/v2/privacy"],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=22.0.0" }
+  }
+}

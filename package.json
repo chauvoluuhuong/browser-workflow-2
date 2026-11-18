@@ -5,8 +5,30 @@
   "type": "module",
   "description": "Claude plugin for Browser Workflow 2: Claude builds, runs and fixes browser workflows through the Browser Workflow Chrome extension.",
   "license": "AGPL-3.0-only",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "test": "node --test"
+    "build": "node scripts/build.mjs",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "test": "node --test test/",
+    "check": "npm test && node scripts/build.mjs --check",
+    "e2e": "node --test --test-concurrency=1 e2e/"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.1.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2",
+    "@modelcontextprotocol/client": "2.1.0",
+    "@modelcontextprotocol/ext-apps": "2.0.0",
+    "@preact/preset-vite": "2.10.6",
+    "esbuild": "^0.28.2",
+    "playwright-core": "1.63.0",
+    "preact": "10.29.8",
+    "typescript": "6.0.3",
+    "vite": "8.3.1",
+    "vite-plugin-singlefile": "2.3.3"
   }
 }

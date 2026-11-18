@@ -1,0 +1,13 @@
+{
+  "name": "browser-workflow-2-spikes",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Package S spikes: throwaway code that proves the native-messaging channel, blocking waits, background CDP and sign-in. Never imported by product code.",
+  "license": "AGPL-3.0-only",
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.1.0",
+    "zod": "4.6.5"
+  }
+}

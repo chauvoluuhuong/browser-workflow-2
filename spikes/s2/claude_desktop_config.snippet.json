@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "bw2-spike": {
+      "command": "<absolute path to node, e.g. the output of: which node>",
+      "args": ["<absolute path of this repo>/spikes/mcp/server.js"],
+      "env": { "BW2_SPIKE_MCP_LOG": "<your home folder>/.browser-workflow-2/mcp-desktop.log" }
+    }
+  }
+}
