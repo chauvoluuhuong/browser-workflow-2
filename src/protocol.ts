@@ -26,12 +26,35 @@ export type ReplyMessage<M extends MethodName = MethodName> =
   | { id: string | number; ok: true; result: Methods[M]['result'] }
   | { id: string | number; ok: false; error: { code: ErrorCode; message: string } };
 
-/** From the extension, broadcast by the host to every client. */
+/**
+ * From the extension, broadcast by the host to every client; with `to`, only to that client (the host drops `to`
+ * before sending it on). An older host ignores `to` and sends it to every client.
+ */
 export interface EventMessage<N extends EventName = EventName> {
   type: 'event';
   name: N;
   data: Events[N];
+  /** The client (the host's connection number, as in a call's `client`) the event is for. */
+  to?: number;
 }
+
+/** Something the user named in a side-panel chat message (`@` in the panel). Tab titles are page text. */
+export interface Mention {
+  type: 'workflow' | 'run' | 'tab';
+  /** Workflow id or run id; missing for a tab. */
+  id?: string;
+  /** What the user saw: the workflow's name, a run's label, a tab's title. */
+  name: string;
+  /** A tab's address. */
+  url?: string;
+  /** A run's status; for a run, `name` names its workflow too. */
+  status?: string;
+  /** A run's workflow. */
+  workflowId?: string;
+}
+
+/** Where a Claude is, as its plugin tells the extension (`claude.state`). */
+export type ClaudeState = 'listening' | 'working' | 'idle';
 
 /** Host → extension only, for a message over 1 MiB: its JSON text in 512 KiB pieces, joined by `cid`. */
 export interface ChunkFrame {
@@ -71,6 +94,8 @@ export interface Events {
     context?: string;
     /** Something Claude should know without being woken: it goes with the next action. */
     silent?: boolean;
+    /** `kind: "chat"`: what the user named with `@` in the message. */
+    mentions?: Mention[];
   };
   /** A proposal (import, draft, change) appeared or was decided, in the chat or the side panel. */
   'proposal.update': {
@@ -159,6 +184,13 @@ export interface Methods {
   'inspect.console': { params?: { types?: string[] }; result: InspectAnswer };
   'inspect.network': { params?: { resourceTypes?: string[] }; result: InspectAnswer };
   'inspect.request': { params: { reqid: number }; result: InspectAnswer };
+
+  // The side-panel chat (Use with Claude). Both are sent by the plugin's wait_for_user; an older extension answers
+  // `unsupported` and the plugin goes on without them.
+  /** Where the calling Claude is: `listening` (a wait_for_user started), `working` (one returned with an action), `idle` (stopped). */
+  'claude.state': { params: { state: ClaudeState }; result: Record<string, never> };
+  /** Claude's answer to the user, shown in the side panel's chat (plain text, newlines kept, at most 4000 characters). */
+  'claude.reply': { params: { text: string }; result: Record<string, never> };
 }
 
 export type MethodName = keyof Methods;

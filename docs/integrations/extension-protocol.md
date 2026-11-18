@@ -34,7 +34,8 @@ Error codes: `bad_request` (missing or wrong params), `not_found`, `busy` (a run
 tried and did not work), `unsupported` (an unknown method: an older extension), `too_old` (the plugin is below
 the extension's `minPlugin`).
 
-Event (extension → host → every client):
+Event (extension → host → every client; with `"to": <client>`, only to that client, and the host drops `to`
+before sending it on):
 ```json
 { "type": "event", "name": "run.update", "data": { "runId": "run_m3k2a01", "workflowId": "hs-search", "status": "success" } }
 { "type": "event", "name": "user.action", "data": { "kind": "ask_claude", "text": "Fix the failed run run_m3k2a01.", "view": "failure", "workflowId": "hs-search", "runId": "run_m3k2a01", "context": "Run run_m3k2a01 … failed at step 3 …" } }
@@ -45,7 +46,10 @@ Event (extension → host → every client):
   *Ask Claude*, *Fix with Claude*); the plugin's `wait_for_user` returns with it, or with the next one when none
   was waiting. `text` is the request in a sentence; optional: `view` (the view it came from), `workflowId`,
   `runId`, `pendingId`, `context` (details for Claude, in English), and `silent: true` for something Claude should
-  know without being woken (it goes with the next action).
+  know without being woken (it goes with the next action). `kind: "chat"` is a message the user wrote in the side
+  panel's chat: `text` is their words, and `mentions` what they named with `@`: `{ type: "workflow" | "run" | "tab",
+  id?, name, url?, status?, workflowId? }` (a tab's `name` is its title, text from the page). A chat message goes
+  `to` the Claude that is listening (below), never to every client.
 - `proposal.update`: a proposal (import, draft or change) appeared or was decided, in the chat or the side panel.
   `state`: `pending`, `saved` (an import or a draft), `applied` / `discarded` (a change), `expired`; with
   `version` and `runId` when the decision saved a version or started a run. The widget reads the outcome with
@@ -54,6 +58,28 @@ Event (extension → host → every client):
 The same events reach the extension's open side panels through `chrome.runtime` messages
 (`{ bw: "event", name, data }`); the panel calls the service worker with `{ bw: "tools.call", name, args }` and
 `{ bw: "user.action", action }` (answered `{ delivered }`: whether a plugin that said `hello` is connected).
+
+### The side-panel chat (Use with Claude)
+The side panel opens a new Claude chat with a prompt that asks Claude to listen (`claude://claude.ai/new?q=…`,
+or `claude://code/new?q=…`); the user presses Send. From then on:
+- **Listening.** The plugin's `wait_for_user` calls `claude.state` with `listening` when it starts waiting,
+  `working` when it returns with an action, and `idle` when the app stops it. The extension also counts every
+  other call from that client as a sign of life. A client with no wait going and no call for 3 minutes, or one
+  that left (`client.left`), is not listening. The Claude that listens or works most recently is the *chat's
+  Claude*: the panel's chat messages, and its *Ask Claude* actions, go `to` it; with none, actions go to every
+  client as before, and the chat says Claude is not listening.
+- **Answers.** `wait_for_user` takes an optional `reply`: the plugin sends it with `claude.reply` before it
+  waits, and the panel shows it in the chat. In the Claude desktop app's chat a tool call is cut after 80 s, so
+  there `wait_for_user` answers "still waiting" after at most 55 s (Claude Code waits as long as asked).
+- **Older versions.** An older extension answers `claude.state` / `claude.reply` with `unsupported`, and the
+  plugin goes on without them. With an older plugin no state ever arrives: the extension treats a client that
+  said `hello` as connected (v1's behaviour) and sends to every client.
+- **Panel ↔ service worker** (`chrome.runtime`, the extension's own pages only): `{ bw: "chat.state" }` →
+  `{ state: "none" | "listening" | "working" | "idle" | "connected" }`; `{ bw: "chat.log" }` → `{ entries }`;
+  `{ bw: "chat.mentions", query }` → `{ workflows, runs, tabs }`; `{ bw: "chat.send", text, mentions }` →
+  `{ delivered }`; and the event `{ bw: "event", name: "chat.update", data: { state, entries } }` on every change.
+  The log lives in `chrome.storage.session` (cleared when Chrome closes), at most 200 entries:
+  `{ at, from: "you" | "claude" | "event", text, mentions?, card? }`.
 
 Chunk frame (host → extension only):
 ```json
@@ -90,6 +116,8 @@ clients, whether the extension is connected).
 | `runs.step` | `runId`, `executionId` or `stepId` | `{ step: StepRun, screenshot? }` (base64 JPEG) |
 | `runs.data` | `runId` | `{ columns, rows, total }` |
 | `runs.failure` | `runId` | `{ failure: FailureInfo, screenshot?, domExcerpt? }` |
+| `claude.state` | `state`: `listening` \| `working` \| `idle` | `{}` (the side-panel chat, above) |
+| `claude.reply` | `text` (≤ 4000 characters) | `{}`: shown in the side panel's chat |
 | `inspect.listPages`, `inspect.selectPage {pageIdx}`, `inspect.newPage {url}`, `inspect.navigate {url \| type}`, `inspect.snapshot`, `inspect.screenshot`, `inspect.click {uid}`, `inspect.fill {uid, value}`, `inspect.pressKey {key}`, `inspect.evaluate {function, args?}`, `inspect.waitFor {text, timeoutMs?}`, `inspect.console`, `inspect.network`, `inspect.request {reqid}` | as chrome-devtools-mcp's tools of the same names | `{ text, image? }`, as those tools answer |
 
 The view types (`WorkflowSummary`, `RunState`, …) are browser-workflow v1's (`src/shared/types.ts`). The
