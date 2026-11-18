@@ -59,7 +59,7 @@ export function describeAction(d) {
 
 /**
  * @param {{ open(): Promise<void>, on(name: string, fn: (d: any) => void): () => void, call?: (m: string, p: any, t?: number) => Promise<any> }} link
- * @param {{ minutes?: number, reply?: string }} args
+ * @param {{ minutes?: number, reply?: string, stop?: boolean }} args `stop`: send the reply and stop listening, without waiting
  * @param {any} ctx the MCP handler's context (progress token, notify, abort signal)
  * @param {{ progressEveryMs?: number, capMs?: number, listeningEveryMs?: number }} [o] `capMs`: answer "still waiting" after this long at most
  * @returns {Promise<{ text: string, isError?: boolean }>}
@@ -74,6 +74,11 @@ export async function waitForUser(link, args, ctx, o = {}) {
   }
   const reply = typeof args?.reply === 'string' ? args.reply.trim() : '';
   if (reply) tell(link, 'claude.reply', { text: reply.slice(0, MAX_REPLY) });
+  if (args?.stop) {
+    // The user said stop: the last answer goes to the side panel, which shows at once that Claude stopped listening.
+    tell(link, 'claude.state', { state: 'idle' });
+    return { text: 'Stopped listening: the side panel shows that Claude no longer listens. Messages written there now wait until someone listens again.' };
+  }
   tell(link, 'claude.state', { state: 'listening' });
   const token = ctx?.mcpReq?._meta?.progressToken;
   const started = Date.now();

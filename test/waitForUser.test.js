@@ -111,3 +111,13 @@ test('says it still listens while a long wait goes', async () => {
   await new Promise((r) => setTimeout(r, 60));
   assert.equal(link.calls.length, n, 'nothing more after the wait ended');
 });
+
+test('stop: the last reply goes, Claude is idle at once, no wait', async () => {
+  const link = chatLink();
+  const t = Date.now();
+  const r = await waitForUser(link, { minutes: 5, reply: 'Okay, stopped.', stop: true }, {});
+  assert.ok(Date.now() - t < 200);
+  assert.match(r.text, /^Stopped listening/);
+  assert.deepEqual(link.calls, [['claude.reply', { text: 'Okay, stopped.' }], ['claude.state', { state: 'idle' }]]);
+  assert.equal(link.count, 0);
+});

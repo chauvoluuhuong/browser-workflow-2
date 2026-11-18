@@ -71,6 +71,8 @@ or `claude://code/new?q=…`); the user presses Send. From then on:
 - **Answers.** `wait_for_user` takes an optional `reply`: the plugin sends it with `claude.reply` before it
   waits, and the panel shows it in the chat. In the Claude desktop app's chat a tool call is cut after 80 s, so
   there `wait_for_user` answers "still waiting" after at most 55 s (Claude Code waits as long as asked).
+  While a wait goes, the plugin re-sends `claude.state: listening` every 60 s. `wait_for_user { reply, stop: true }`
+  sends the last answer and `claude.state: idle`, and returns without waiting (the user said stop).
 - **Older versions.** An older extension answers `claude.state` / `claude.reply` with `unsupported`, and the
   plugin goes on without them. With an older plugin no state ever arrives: the extension treats a client that
   said `hello` as connected (v1's behaviour) and sends to every client.
