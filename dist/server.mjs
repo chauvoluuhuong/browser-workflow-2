@@ -34328,6 +34328,7 @@ var INSTRUCTIONS = [
   'For your final answer, when what the user asked for is what a widget shows (their workflows, a workflow, a run, a failure, the extracted items, the history, their account), call the tool that shows it instead of writing it out, and go straight to it when that is all they asked: do not call the silent one first. Then add one short line, and do not repeat in text what the widget shows. A single fact ("how many workflows do I have", "when did it last run") is answered in a sentence, with the silent tool and no widget.',
   "One widget per reply. After a tool that shows a widget where the user has something to do (setup, import_workflow, propose_workflow, propose_change, a run form, or any list_* or show_* tool), end your reply with one short line and wait for the user. Never show two widgets in one reply.",
   "When the user is to do something in the Browser Workflow side panel in Chrome, `wait_for_user` waits for it; when it answers that it is still waiting, call it again (the user can also write in the chat).",
+  "Some apps (Claude Code) show no widgets: there, the tool answers say where the user acts instead. A proposal waits for them in the Browser Workflow side panel in Chrome, and `wait_for_user` tells you what they did there.",
   "When a run fails, call get_failure (screenshot, error, HTML near the target) before proposing a fix; pass runId to propose_change.",
   "Reply in the user's language. The widgets are in English or Vietnamese. `get_account` says which, or that none is chosen yet: then call `set_language` once, before any tool that shows a widget, with the language the user writes in (judge by their own words, not by a prompt this app wrote for them; `vi` for Vietnamese, `en` for anything else), and tell them in one short line which language you will use and that they can ask you to open their account settings to change it. Once a language is chosen, never change it yourself: when the user wants another one, call `show_account`."
 ].join("\n");
@@ -34342,6 +34343,21 @@ function startPrompt(goal) {
     "",
     "If any step fails, tell me what failed and the one thing I should do next. Reply in the language I write in."
   ].join("\n");
+}
+function showsWidgets(client) {
+  if (client?.capabilities?.extensions?.["io.modelcontextprotocol/ui"]) return true;
+  return client?.name !== "claude-code";
+}
+var PANEL = "the Browser Workflow side panel in Chrome";
+var REVIEW_IN_PANEL = ` This app shows no widget: the same review waits in ${PANEL} (the banner "Waiting for your approval", then Review), where the user saves it or test-runs it. Tell them that in one short line, then call wait_for_user to learn what they did.`;
+var ACT_IN_PANEL = ` This app shows no widget: tell the user in one short line to go on in ${PANEL}, then call wait_for_user.`;
+function withoutWidgets(name, text) {
+  if (typeof text !== "string") return text;
+  const review = ["import_workflow", "propose_workflow", "propose_change"].includes(name);
+  return text.replace("A form is shown to the user; or call run_workflow again with variables.", "Ask the user for them in the chat, then call run_workflow again with variables.").replace("Run form shown to the user.", "This app shows no run form: ask the user in the chat for any inputs they want to give, then call run_workflow again with variables.").replace(
+    / Now end your reply with one short line: the user goes on in the widget\. Call no other tool that shows a widget until they answer\./,
+    name === "run_workflow" ? "" : review ? REVIEW_IN_PANEL : ACT_IN_PANEL
+  ).replace("The widget shows live progress", `${PANEL[0].toUpperCase()}${PANEL.slice(1)} shows live progress`).replace("The widget shows the user's account card", `The user's account card is under Account in ${PANEL}`).replace(" The setup widget is shown for review.", "");
 }
 var WIDGET_ONLY = " Only the widget calls this, when the user clicks: never call it yourself.";
 var mine = "For your own work, while you are still working: answers with text and shows the user nothing.";
@@ -34510,6 +34526,8 @@ function createServer(link) {
       try {
         const a = t.name === "get_step_schema" ? { ...args ?? {}, guide: guide() } : args ?? {};
         const r = await link.call("tools.call", { name: t.name, args: a }, 10 * 6e4);
+        const s = server.server;
+        if (!showsWidgets({ capabilities: s.getClientCapabilities?.(), name: s.getClientVersion?.()?.name })) r.text = withoutWidgets(t.name, r.text);
         return {
           content: [{ type: "text", text: r.text }, ...(r.images ?? []).map((i) => ({ type: "image", data: i.data, mimeType: i.mimeType }))],
           // Some hosts give the model structuredContent instead of content: the model's text goes in both.
@@ -34591,9 +34609,11 @@ export {
   WORKFLOW_TOOLS,
   createServer,
   main,
+  showsWidgets,
   startPrompt,
   uiUri,
-  widgetHtml
+  widgetHtml,
+  withoutWidgets
 };
 /*! Bundled license information:
 

@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { createServer, INSTRUCTIONS, PAGE_TOOLS, startPrompt, WORKFLOW_TOOLS } from '../src/server.js';
+import { createServer, INSTRUCTIONS, PAGE_TOOLS, showsWidgets, startPrompt, withoutWidgets, WORKFLOW_TOOLS } from '../src/server.js';
 
 /** Every tool v1's server registered (src/server/tools.ts), hosted and mock ones included. */
 const V1 = [
@@ -45,4 +45,24 @@ test('the server builds with every tool', () => {
 
 test('the skill lists the download step', () => {
   assert.match(readFileSync(new URL('../skills/browser-workflow/SKILL.md', import.meta.url), 'utf8'), /\| `download` \|/);
+});
+
+test('only Claude Code, which says nothing of widgets, gets answers without them', () => {
+  assert.equal(showsWidgets({ name: 'claude-code', capabilities: { roots: {} } }), false);
+  assert.equal(showsWidgets({ name: 'claude-code', capabilities: { extensions: { 'io.modelcontextprotocol/ui': {} } } }), true);
+  assert.equal(showsWidgets({ name: 'claude-ai', capabilities: {} }), true);
+  assert.equal(showsWidgets(undefined), true);
+});
+
+test('without widgets, a proposal sends the user to the side panel and Claude to wait_for_user', () => {
+  const wait = ' Now end your reply with one short line: the user goes on in the widget. Call no other tool that shows a widget until they answer.';
+  const draft = withoutWidgets('propose_workflow', `Draft "Xe" (4 steps) is shown for review.${wait}`);
+  assert.match(draft, /side panel in Chrome/);
+  assert.match(draft, /wait_for_user/);
+  assert.doesNotMatch(draft, /widget\./);
+  const form = withoutWidgets('run_workflow', `Missing required inputs: city. A form is shown to the user; or call run_workflow again with variables.${wait}`);
+  assert.equal(form, 'Missing required inputs: city. Ask the user for them in the chat, then call run_workflow again with variables.');
+  assert.match(withoutWidgets('run_workflow', 'Run r1: running. The widget shows live progress; call get_run to check again.'), /side panel in Chrome shows live progress/);
+  assert.match(withoutWidgets('run_workflow', "Limit reached. The widget shows the user's account card, with an Upgrade button"), /under Account in the Browser Workflow side panel/);
+  assert.equal(withoutWidgets('get_run', 'Run r1: success.'), 'Run r1: success.');
 });
