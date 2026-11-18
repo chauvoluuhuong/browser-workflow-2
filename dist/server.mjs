@@ -34255,6 +34255,7 @@ var DEFAULT_MINUTES = 10;
 var MAX_MINUTES = 30;
 var CAPPED_WAIT_MS = 55e3;
 var MAX_REPLY = 4e3;
+var LISTENING_EVERY_MS = 6e4;
 function tell(link, method, params) {
   if (typeof link?.call !== "function") return;
   try {
@@ -34298,6 +34299,7 @@ async function waitForUser(link, args, ctx, o = {}) {
     const finish = (r) => {
       clearTimeout(timer);
       clearInterval(beat);
+      clearInterval(alive);
       off();
       ctx?.mcpReq?.signal?.removeEventListener?.("abort", onAbort);
       resolve(r);
@@ -34310,6 +34312,7 @@ async function waitForUser(link, args, ctx, o = {}) {
       ctx.mcpReq.notify({ method: "notifications/progress", params: { progressToken: token, progress: s, total: Math.round(waitMs / 1e3), message: `Waiting for the user (${s} s)` } }).catch(() => {
       });
     }, o.progressEveryMs ?? 3e4);
+    const alive = setInterval(() => tell(link, "claude.state", { state: "listening" }), o.listeningEveryMs ?? LISTENING_EVERY_MS);
     const onAbort = () => finish({ how: "cancelled" });
     ctx?.mcpReq?.signal?.addEventListener?.("abort", onAbort);
   });

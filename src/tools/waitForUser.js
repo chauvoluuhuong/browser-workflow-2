@@ -15,6 +15,11 @@ export const MAX_MINUTES = 30;
 export const CAPPED_WAIT_MS = 55_000;
 /** The longest reply shown in the side panel. */
 export const MAX_REPLY = 4000;
+/**
+ * While a wait goes, `claude.state: listening` is sent again this often: the extension takes a Claude with no call
+ * for 3 minutes as gone (its chat was closed or its reply ended), and a wait in Claude Code may last 30 minutes.
+ */
+export const LISTENING_EVERY_MS = 60_000;
 
 /**
  * Tells the extension something for the side-panel chat. An older extension answers `unsupported`, and Chrome may
@@ -56,7 +61,7 @@ export function describeAction(d) {
  * @param {{ open(): Promise<void>, on(name: string, fn: (d: any) => void): () => void, call?: (m: string, p: any, t?: number) => Promise<any> }} link
  * @param {{ minutes?: number, reply?: string }} args
  * @param {any} ctx the MCP handler's context (progress token, notify, abort signal)
- * @param {{ progressEveryMs?: number, capMs?: number }} [o] `capMs`: answer "still waiting" after this long at most
+ * @param {{ progressEveryMs?: number, capMs?: number, listeningEveryMs?: number }} [o] `capMs`: answer "still waiting" after this long at most
  * @returns {Promise<{ text: string, isError?: boolean }>}
  */
 export async function waitForUser(link, args, ctx, o = {}) {
@@ -76,6 +81,7 @@ export async function waitForUser(link, args, ctx, o = {}) {
     const finish = (r) => {
       clearTimeout(timer);
       clearInterval(beat);
+      clearInterval(alive);
       off();
       ctx?.mcpReq?.signal?.removeEventListener?.('abort', onAbort);
       resolve(r);
@@ -87,6 +93,7 @@ export async function waitForUser(link, args, ctx, o = {}) {
       const s = Math.round((Date.now() - started) / 1000);
       ctx.mcpReq.notify({ method: 'notifications/progress', params: { progressToken: token, progress: s, total: Math.round(waitMs / 1000), message: `Waiting for the user (${s} s)` } }).catch(() => {});
     }, o.progressEveryMs ?? 30_000);
+    const alive = setInterval(() => tell(link, 'claude.state', { state: 'listening' }), o.listeningEveryMs ?? LISTENING_EVERY_MS);
     const onAbort = () => finish({ how: 'cancelled' });
     ctx?.mcpReq?.signal?.addEventListener?.('abort', onAbort);
   });
