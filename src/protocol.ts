@@ -63,7 +63,25 @@ export interface Events {
    * The user did something in the extension's side panel that Claude should know (a button such as Approve or
    * "Ask Claude"); `wait_for_user` returns with it. `text` says it in a sentence for Claude.
    */
-  'user.action': { kind: string; text: string; workflowId?: string; runId?: string; pendingId?: string };
+  'user.action': {
+    kind: string; text: string; workflowId?: string; runId?: string; pendingId?: string;
+    /** The view the user acted in (`failure`, `draft`, …). */
+    view?: string;
+    /** Details for Claude, in English (never shown to the user). */
+    context?: string;
+    /** Something Claude should know without being woken: it goes with the next action. */
+    silent?: boolean;
+  };
+  /** A proposal (import, draft, change) appeared or was decided, in the chat or the side panel. */
+  'proposal.update': {
+    pendingId: string; kind: 'import' | 'draft' | 'change';
+    state: 'pending' | 'saved' | 'applied' | 'discarded' | 'expired';
+    workflowId: string; name: string;
+    /** The version the decision saved. */
+    version?: number;
+    /** The run the decision started (a change is tested at once; a draft may be saved and run). */
+    runId?: string;
+  };
 }
 export type EventName = keyof Events;
 

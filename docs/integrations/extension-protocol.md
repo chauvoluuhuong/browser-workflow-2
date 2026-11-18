@@ -37,10 +37,23 @@ the extension's `minPlugin`).
 Event (extension → host → every client):
 ```json
 { "type": "event", "name": "run.update", "data": { "runId": "run_m3k2a01", "workflowId": "hs-search", "status": "success" } }
-{ "type": "event", "name": "user.action", "data": { "kind": "approve", "text": "The user approved the change.", "pendingId": "change_m3k2b" } }
+{ "type": "event", "name": "user.action", "data": { "kind": "ask_claude", "text": "Fix the failed run run_m3k2a01.", "view": "failure", "workflowId": "hs-search", "runId": "run_m3k2a01", "context": "Run run_m3k2a01 … failed at step 3 …" } }
+{ "type": "event", "name": "proposal.update", "data": { "pendingId": "change_m3k2b", "kind": "change", "state": "applied", "workflowId": "hs-search", "name": "HS code search", "version": 4, "runId": "run_m3k2c" } }
 ```
-`run.update`: a run changed. `user.action`: the user did something in the extension's side panel that Claude should
-know; the plugin's `wait_for_user` returns with it.
+- `run.update`: a run changed.
+- `user.action`: the user did something in the extension's side panel that Claude should know (the side panel's
+  *Ask Claude*, *Fix with Claude*); the plugin's `wait_for_user` returns with it, or with the next one when none
+  was waiting. `text` is the request in a sentence; optional: `view` (the view it came from), `workflowId`,
+  `runId`, `pendingId`, `context` (details for Claude, in English), and `silent: true` for something Claude should
+  know without being woken (it goes with the next action).
+- `proposal.update`: a proposal (import, draft or change) appeared or was decided, in the chat or the side panel.
+  `state`: `pending`, `saved` (an import or a draft), `applied` / `discarded` (a change), `expired`; with
+  `version` and `runId` when the decision saved a version or started a run. The widget reads the outcome with
+  the widget-only tool `ui_proposal`.
+
+The same events reach the extension's open side panels through `chrome.runtime` messages
+(`{ bw: "event", name, data }`); the panel calls the service worker with `{ bw: "tools.call", name, args }` and
+`{ bw: "user.action", action }` (answered `{ delivered }`: whether a plugin that said `hello` is connected).
 
 Chunk frame (host → extension only):
 ```json
