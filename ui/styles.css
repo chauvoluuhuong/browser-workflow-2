@@ -256,3 +256,5 @@ svg.is-bad { color: var(--bad); }
 .tool:hover, .tool.on { background: var(--bg-2); color: var(--fg); }
 .tool:disabled { opacity: .5; cursor: default; }
 .msg.me .mchip svg.is-bad { color: inherit; }
+button.ev-link { border: 0; background: none; padding: 0; font: inherit; font-size: 12px; cursor: pointer; }
+button.ev-link:hover { color: var(--fg); text-decoration: underline; }

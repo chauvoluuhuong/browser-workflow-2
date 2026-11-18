@@ -741,7 +741,16 @@ var Pe = {
 	"chat.pickRuns": "Runs",
 	"chat.pickTabs": "Open tabs",
 	"chat.pickNone": "Nothing matches",
-	"chat.cardWaiting": "Waiting for your approval"
+	"chat.cardWaiting": "Waiting for your approval",
+	"chat.cardSaved": "You saved “{name}”",
+	"chat.cardApplied": "You applied the change to “{name}”",
+	"chat.cardDiscarded": "You discarded the proposal for “{name}”",
+	"chat.cardExpired": "The proposal for “{name}” expired",
+	"chat.cardRunOk": "“{name}” finished",
+	"chat.cardRunOkItems": "“{name}” finished · {n} {n|item|items}",
+	"chat.cardRunFailed": "“{name}” failed",
+	"chat.cardRunStopped": "“{name}” was stopped",
+	"chat.cardRunOther": "“{name}”: {status}"
 }, Fe = {
 	en: Pe,
 	vi: {
@@ -1075,7 +1084,16 @@ var Pe = {
 		"chat.pickRuns": "Lần chạy",
 		"chat.pickTabs": "Tab đang mở",
 		"chat.pickNone": "Không có kết quả",
-		"chat.cardWaiting": "Đang chờ bạn duyệt"
+		"chat.cardWaiting": "Đang chờ bạn duyệt",
+		"chat.cardSaved": "Bạn đã lưu “{name}”",
+		"chat.cardApplied": "Bạn đã áp dụng thay đổi cho “{name}”",
+		"chat.cardDiscarded": "Bạn đã bỏ đề xuất cho “{name}”",
+		"chat.cardExpired": "Đề xuất cho “{name}” đã hết hạn",
+		"chat.cardRunOk": "“{name}” đã chạy xong",
+		"chat.cardRunOkItems": "“{name}” đã chạy xong · {n} mục",
+		"chat.cardRunFailed": "“{name}” bị lỗi",
+		"chat.cardRunStopped": "“{name}” đã bị dừng",
+		"chat.cardRunOther": "“{name}”: {status}"
 	}
 };
 function Ie(e, t = "en") {
@@ -3685,17 +3703,14 @@ function Qt({ m: e }) {
 	});
 }
 function $t(e, t = []) {
-	let n = t.map((e) => ({
-		m: e,
-		s: `@${e.name}`
-	})).sort((e, t) => t.s.length - e.s.length), r = [], i = /* @__PURE__ */ new Set(), a = "";
-	for (let t = 0; t < e.length;) {
-		let o = e[t] === "@" ? n.find((n) => e.startsWith(n.s, t)) : void 0;
-		o ? (a && r.push(a), a = "", r.push(/* @__PURE__ */ H(Qt, { m: o.m })), i.add(o.m), t += o.s.length) : (a += e[t], t += 1);
+	let n = [], r = /* @__PURE__ */ new Set(), i = 0, a = "";
+	for (let o = 0; o < e.length;) {
+		let s = -1;
+		e[o] === "＠" && (s = i < t.length && e.startsWith("＠" + t[i].name, o) ? i : t.findIndex((t, n) => !r.has(n) && e.startsWith("＠" + t.name, o))), s >= 0 ? (a && n.push(a), a = "", n.push(/* @__PURE__ */ H(Qt, { m: t[s] })), r.add(s), s === i && (i += 1), o += 1 + t[s].name.length) : (a += e[o], o += 1);
 	}
-	a && r.push(a);
-	for (let e of t) i.has(e) || r.push(" ", /* @__PURE__ */ H(Qt, { m: e }));
-	return r;
+	return a && n.push(a), t.forEach((e, t) => {
+		r.has(t) || n.push(" ", /* @__PURE__ */ H(Qt, { m: e }));
+	}), n;
 }
 var en = (e) => e && [
 	"running",
@@ -3711,8 +3726,8 @@ function tn(e, t) {
 		return n ? t(n) : e.status;
 	}
 }
-var nn = 5, rn = (e, t) => e.type === t.type && (e.id ?? e.url ?? e.name) === (t.id ?? t.url ?? t.name);
-function an(e, t) {
+var nn = 5;
+function rn(e, t) {
 	let n = t.toLowerCase(), r = (e = []) => e.filter((e) => !n || `${e.name} ${e.url ?? ""}`.toLowerCase().includes(n)).slice(0, nn);
 	return {
 		workflows: r(e?.workflows),
@@ -3720,7 +3735,7 @@ function an(e, t) {
 		tabs: r(e?.tabs)
 	};
 }
-function on(e) {
+function an(e) {
 	let t = getSelection();
 	if (!e || !t || !t.rangeCount || !t.isCollapsed) return null;
 	let n = t.anchorNode;
@@ -3733,8 +3748,8 @@ function on(e) {
 		query: i[1]
 	} : null;
 }
-function sn({ enabled: e, chat: t }) {
-	let { t: n } = V(), r = B(null), i = B(/* @__PURE__ */ new Map()), a = B(0), [o, s] = R(!0), [c, l] = R(!1), [u, d] = R(null), f = B(null), p = B(0), m = Te(() => an(u?.cands, u?.query ?? ""), [u]), h = [
+function on({ enabled: e, chat: t }) {
+	let { t: n } = V(), r = B(null), i = B(/* @__PURE__ */ new Map()), a = B(0), [o, s] = R(!0), [c, l] = R(!1), [u, d] = R(null), f = B(null), p = B(0), m = Te(() => rn(u?.cands, u?.query ?? ""), [u]), h = [
 		...m.workflows,
 		...m.runs,
 		...m.tabs
@@ -3749,7 +3764,7 @@ function sn({ enabled: e, chat: t }) {
 				let a = r.dataset.k;
 				if (a) {
 					let n = i.current.get(a);
-					n && (e += `@${n.name}`, t.some((e) => rn(e, n)) || t.push(n));
+					n && (e += `＠${n.name}`, t.push(n));
 				} else r.tagName === "BR" ? e += "\n" : (r.tagName === "DIV" && e && !e.endsWith("\n") && (e += "\n"), n(r));
 			});
 		};
@@ -3775,7 +3790,7 @@ function sn({ enabled: e, chat: t }) {
 		});
 	}, v = () => {
 		s(!g().text && !r.current?.querySelector("[data-k]"));
-		let e = on(r.current), t = f.current;
+		let e = an(r.current), t = f.current;
 		e || (f.current = null), e && !(t && t.node === e.node && t.start === e.start) ? _(e.query) : d(null);
 	}, y = (e) => {
 		let t = r.current;
@@ -3784,7 +3799,7 @@ function sn({ enabled: e, chat: t }) {
 		i.current.set(n, e);
 		let o = document.createElement("span");
 		o.className = "mchip", o.contentEditable = "false", o.dataset.k = n, o.title = e.url ?? e.name, o.append(Zt(e), document.createTextNode(e.name));
-		let c = document.createTextNode("\xA0"), l = on(t);
+		let c = document.createTextNode("\xA0"), l = an(t);
 		if (l) {
 			let e = l.node.splitText(l.start);
 			e.textContent = (e.textContent ?? "").slice(l.end - l.start), e.before(o, c);
@@ -3828,7 +3843,7 @@ function sn({ enabled: e, chat: t }) {
 				}
 				if (e.key === "Escape") {
 					e.preventDefault();
-					let t = on(r.current);
+					let t = an(r.current);
 					f.current = t ? {
 						node: t.node,
 						start: t.start
@@ -3913,9 +3928,38 @@ function sn({ enabled: e, chat: t }) {
 		]
 	});
 }
+function sn(e, t) {
+	let n = e.name ?? "";
+	if (e.kind === "proposal") return e.state === "saved" ? {
+		text: t("chat.cardSaved", { name: n }),
+		dot: "ok"
+	} : e.state === "applied" ? {
+		text: t("chat.cardApplied", { name: n }),
+		dot: "ok"
+	} : e.state === "discarded" ? { text: t("chat.cardDiscarded", { name: n }) } : e.state === "expired" ? { text: t("chat.cardExpired", { name: n }) } : void 0;
+	if (e.kind === "run") {
+		if (e.status === "success") return {
+			text: typeof e.items == "number" ? t("chat.cardRunOkItems", {
+				name: n,
+				n: e.items
+			}) : t("chat.cardRunOk", { name: n }),
+			dot: "ok"
+		};
+		if (e.status === "failure") return {
+			text: t("chat.cardRunFailed", { name: n }),
+			dot: "bad"
+		};
+		if (e.status === "stopped") return { text: t("chat.cardRunStopped", { name: n }) };
+		let r = en(e.status);
+		return { text: t("chat.cardRunOther", {
+			name: n,
+			status: r ? t(r) : e.status
+		}) };
+	}
+}
 function cn({ e }) {
 	let t = U(), { t: n } = V(), r = e.card;
-	return r.kind === "proposal" && r.pendingId && (!r.state || r.state === "pending") ? /* @__PURE__ */ H("div", {
+	if (r.kind === "proposal" && r.pendingId && (!r.state || r.state === "pending")) return /* @__PURE__ */ H("div", {
 		class: "card-mini",
 		children: [
 			/* @__PURE__ */ H("span", {
@@ -3929,7 +3973,7 @@ function cn({ e }) {
 					children: n("chat.cardWaiting")
 				}), /* @__PURE__ */ H("div", {
 					class: "row-sub",
-					children: r.name ?? e.text
+					children: r.name || e.text
 				})]
 			}),
 			/* @__PURE__ */ H("button", {
@@ -3938,9 +3982,15 @@ function cn({ e }) {
 				children: n("panel.review")
 			})
 		]
+	});
+	let i = sn(r, n) ?? { text: e.text }, a = r.runId;
+	return a ? /* @__PURE__ */ H("button", {
+		class: "ev ev-link",
+		onClick: () => t.open("show_run", { runId: a }, "push"),
+		children: [/* @__PURE__ */ H(Q, { kind: i.dot }), i.text]
 	}) : /* @__PURE__ */ H("div", {
 		class: "ev",
-		children: [/* @__PURE__ */ H(Q, { kind: r.status === "success" || r.state === "saved" || r.state === "applied" ? "ok" : r.status === "failure" ? "bad" : void 0 }), e.text]
+		children: [/* @__PURE__ */ H(Q, { kind: i.dot }), i.text]
 	});
 }
 function ln({ chat: e }) {
@@ -4076,7 +4126,7 @@ function dn() {
 				}), a]
 			}),
 			/* @__PURE__ */ H(ln, { chat: n }),
-			/* @__PURE__ */ H(sn, {
+			/* @__PURE__ */ H(on, {
 				enabled: n.canSend,
 				chat: n
 			})

@@ -384,6 +384,15 @@ export const en = {
   'chat.pickTabs': 'Open tabs',
   'chat.pickNone': 'Nothing matches',
   'chat.cardWaiting': 'Waiting for your approval',
+  'chat.cardSaved': 'You saved “{name}”',
+  'chat.cardApplied': 'You applied the change to “{name}”',
+  'chat.cardDiscarded': 'You discarded the proposal for “{name}”',
+  'chat.cardExpired': 'The proposal for “{name}” expired',
+  'chat.cardRunOk': '“{name}” finished',
+  'chat.cardRunOkItems': '“{name}” finished · {n} {n|item|items}',
+  'chat.cardRunFailed': '“{name}” failed',
+  'chat.cardRunStopped': '“{name}” was stopped',
+  'chat.cardRunOther': '“{name}”: {status}',
 };
 
 export type Key = keyof typeof en;
@@ -743,6 +752,15 @@ export const vi: Record<Key, string> = {
   'chat.pickTabs': 'Tab đang mở',
   'chat.pickNone': 'Không có kết quả',
   'chat.cardWaiting': 'Đang chờ bạn duyệt',
+  'chat.cardSaved': 'Bạn đã lưu “{name}”',
+  'chat.cardApplied': 'Bạn đã áp dụng thay đổi cho “{name}”',
+  'chat.cardDiscarded': 'Bạn đã bỏ đề xuất cho “{name}”',
+  'chat.cardExpired': 'Đề xuất cho “{name}” đã hết hạn',
+  'chat.cardRunOk': '“{name}” đã chạy xong',
+  'chat.cardRunOkItems': '“{name}” đã chạy xong · {n} mục',
+  'chat.cardRunFailed': '“{name}” bị lỗi',
+  'chat.cardRunStopped': '“{name}” đã bị dừng',
+  'chat.cardRunOther': '“{name}”: {status}',
 };
 
 const DICTS: Record<Lang, Record<Key, string>> = { en, vi };

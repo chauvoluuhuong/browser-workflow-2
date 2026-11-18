@@ -27,17 +27,14 @@ export type RemoteState = 'none' | 'listening' | 'working' | 'idle' | 'connected
 /** What the panel shows: `opening` is the panel's own, from Use with Claude until Claude listens. */
 export type ChatState = RemoteState | 'opening';
 
-/** A card in the log: a proposal (Review while it waits) or a run that finished. */
-export interface ChatCard {
-  kind: 'proposal' | 'run';
-  pendingId?: string;
-  runId?: string;
-  workflowId?: string;
-  name?: string;
-  state?: string;
-  status?: string;
-  items?: number;
-}
+/**
+ * A card in the log (the extension writes it from proposal.update and finished run.update): a proposal (Review
+ * while it waits) or a run that finished. The panel words it in its own language; the entry's `text` is only an
+ * English fallback for a kind it does not know.
+ */
+export type ChatCard =
+  | { kind: 'proposal'; pendingId: string; name: string; state: 'pending' | 'saved' | 'applied' | 'discarded' | 'expired'; runId?: string }
+  | { kind: 'run'; runId: string; workflowId?: string; name: string; status: string; items?: number };
 
 export interface ChatEntry {
   at: string | number;
@@ -291,27 +288,38 @@ function MentionChip({ m }: { m: Mention }) {
   return <span class="mchip" title={m.url ?? m.name}><MentionIcon m={m} />{m.name}</span>;
 }
 
-/** A message's text with each `@name` it mentions drawn as a chip; mentions not in the text follow it. */
+/** Where a chip was in a message's text: `＠` (fullwidth, U+FF20) and the mention's name. A typed `@` stays text. */
+export const MARK = '\uff20';
+
+/**
+ * A message's text with each `＠name` drawn as a chip: matched in order to `mentions` (which follow the text's
+ * order), else to any mention of that name; mentions not found follow the text.
+ */
 export function withChips(text: string, mentions: Mention[] = []): ComponentChildren[] {
-  const tokens = mentions.map((m) => ({ m, s: `@${m.name}` })).sort((a, b) => b.s.length - a.s.length);
   const out: ComponentChildren[] = [];
-  const used = new Set<Mention>();
+  const used = new Set<number>();
+  let next = 0;
   let plain = '';
   for (let i = 0; i < text.length;) {
-    const hit = text[i] === '@' ? tokens.find((k) => text.startsWith(k.s, i)) : undefined;
-    if (hit) {
+    let hit = -1;
+    if (text[i] === MARK) {
+      if (next < mentions.length && text.startsWith(MARK + mentions[next]!.name, i)) hit = next;
+      else hit = mentions.findIndex((m, k) => !used.has(k) && text.startsWith(MARK + m.name, i));
+    }
+    if (hit >= 0) {
       if (plain) out.push(plain);
       plain = '';
-      out.push(<MentionChip m={hit.m} />);
-      used.add(hit.m);
-      i += hit.s.length;
+      out.push(<MentionChip m={mentions[hit]!} />);
+      used.add(hit);
+      if (hit === next) next += 1;
+      i += 1 + mentions[hit]!.name.length;
     } else {
       plain += text[i];
       i += 1;
     }
   }
   if (plain) out.push(plain);
-  for (const m of mentions) if (!used.has(m)) out.push(' ', <MentionChip m={m} />);
+  mentions.forEach((m, k) => { if (!used.has(k)) out.push(' ', <MentionChip m={m} />); });
   return out;
 }
 
@@ -326,7 +334,6 @@ function mentionSub(m: Mention, t: T) {
 // ---------- the composer ----------
 
 const GROUP_MAX = 5;
-const sameMention = (a: Mention, b: Mention) => a.type === b.type && (a.id ?? a.url ?? a.name) === (b.id ?? b.url ?? b.name);
 
 function filterCands(c: Candidates | undefined, query: string) {
   const q = query.toLowerCase();
@@ -372,8 +379,9 @@ function Composer({ enabled, chat }: { enabled: boolean; chat: Chat }) {
         if (k) {
           const m = chips.current.get(k);
           if (m) {
-            text += `@${m.name}`;
-            if (!mentions.some((x) => sameMention(x, m))) mentions.push(m);
+            // The protocol's mark for a chip; `mentions` follow the text's order, one per chip.
+            text += `${MARK}${m.name}`;
+            mentions.push(m);
           }
         } else if (c.tagName === 'BR') {
           text += '\n';
@@ -561,6 +569,26 @@ function Composer({ enabled, chat }: { enabled: boolean; chat: Chat }) {
 
 // ---------- the chat screen ----------
 
+/** A card's line in the panel's language; `undefined` for a kind this panel does not know (a newer extension). */
+function cardLine(c: ChatCard, t: T): { text: string; dot?: 'ok' | 'bad' } | undefined {
+  const name = c.name ?? '';
+  if (c.kind === 'proposal') {
+    if (c.state === 'saved') return { text: t('chat.cardSaved', { name }), dot: 'ok' };
+    if (c.state === 'applied') return { text: t('chat.cardApplied', { name }), dot: 'ok' };
+    if (c.state === 'discarded') return { text: t('chat.cardDiscarded', { name }) };
+    if (c.state === 'expired') return { text: t('chat.cardExpired', { name }) };
+    return undefined;
+  }
+  if (c.kind === 'run') {
+    if (c.status === 'success') return { text: typeof c.items === 'number' ? t('chat.cardRunOkItems', { name, n: c.items }) : t('chat.cardRunOk', { name }), dot: 'ok' };
+    if (c.status === 'failure') return { text: t('chat.cardRunFailed', { name }), dot: 'bad' };
+    if (c.status === 'stopped') return { text: t('chat.cardRunStopped', { name }) };
+    const k = statusKey(c.status);
+    return { text: t('chat.cardRunOther', { name, status: k ? t(k) : c.status }) };
+  }
+  return undefined;
+}
+
 function Card({ e }: { e: ChatEntry }) {
   const nav = useNav();
   const { t } = useI18n();
@@ -571,14 +599,17 @@ function Card({ e }: { e: ChatEntry }) {
         <span class="is-warn">{Icon.alert()}</span>
         <div class="row-main">
           <div class="row-title">{t('chat.cardWaiting')}</div>
-          <div class="row-sub">{c.name ?? e.text}</div>
+          <div class="row-sub">{c.name || e.text}</div>
         </div>
         <button class="btn sm primary" onClick={() => nav.open('ui_proposal', { pendingId: c.pendingId }, 'push')}>{t('panel.review')}</button>
       </div>
     );
   }
-  const kind = c.status === 'success' || c.state === 'saved' || c.state === 'applied' ? 'ok' : c.status === 'failure' ? 'bad' : undefined;
-  return <div class="ev"><Dot kind={kind} />{e.text}</div>;
+  const line = cardLine(c, t) ?? { text: e.text };
+  const runId = (c as { runId?: string }).runId;
+  // A run (or a decision that started one) opens that run.
+  if (runId) return <button class="ev ev-link" onClick={() => nav.open('show_run', { runId }, 'push')}><Dot kind={line.dot} />{line.text}</button>;
+  return <div class="ev"><Dot kind={line.dot} />{line.text}</div>;
 }
 
 function Log({ chat }: { chat: Chat }) {
