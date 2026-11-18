@@ -59,6 +59,11 @@ export interface HostStatus {
 export interface Events {
   /** A run changed (each step, the end). */
   'run.update': { runId: string; workflowId: string; status: RunStatus };
+  /**
+   * The user did something in the extension's side panel that Claude should know (a button such as Approve or
+   * "Ask Claude"); `wait_for_user` returns with it. `text` says it in a sentence for Claude.
+   */
+  'user.action': { kind: string; text: string; workflowId?: string; runId?: string; pendingId?: string };
 }
 export type EventName = keyof Events;
 
@@ -74,6 +79,15 @@ export type View<Name extends string> = Record<string, unknown> & { readonly __v
 /** A workflow in v1's JSON format (the extension validates it). */
 export type WorkflowJson = Record<string, unknown>;
 
+/** What a workflow tool answers (browser-workflow v1's ToolOutput): text for Claude, a payload for the widgets. */
+export interface ToolOutput {
+  text: string;
+  payload: Record<string, unknown>;
+  isError?: boolean;
+  /** Screenshots (base64). */
+  images?: { data: string; mimeType: string }[];
+}
+
 export interface InspectAnswer {
   /** What chrome-devtools-mcp's tool of the same name answers, as text. */
   text: string;
@@ -85,6 +99,12 @@ export interface Methods {
   hello: { params: { plugin: string; protocol: number }; result: { extension: string; protocol: ProtocolVersion; minPlugin: string } };
   status: { params?: Record<string, never>; result: { extension: string; protocol: ProtocolVersion; activeRunId?: string; workflows: number; runs: number; groupTabs: number } };
   'schema.get': { params?: Record<string, never>; result: { step: unknown; workflow: unknown } };
+  /**
+   * One of the workflow tools (browser-workflow v1's names: run_workflow, propose_change, get_failure, …), run by the
+   * extension. A name it doesn't know answers `unsupported`. `get_step_schema` takes the plugin's authoring guide in
+   * `args.guide`.
+   */
+  'tools.call': { params: { name: string; args?: Record<string, unknown> }; result: ToolOutput };
 
   'workflows.list': { params?: Record<string, never>; result: View<'WorkflowSummary'>[] };
   'workflows.get': { params: { id: string; version?: number }; result: { workflow: WorkflowJson; detail: View<'WorkflowDetail'> } };

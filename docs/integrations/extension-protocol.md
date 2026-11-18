@@ -37,7 +37,10 @@ the extension's `minPlugin`).
 Event (extension → host → every client):
 ```json
 { "type": "event", "name": "run.update", "data": { "runId": "run_m3k2a01", "workflowId": "hs-search", "status": "success" } }
+{ "type": "event", "name": "user.action", "data": { "kind": "approve", "text": "The user approved the change.", "pendingId": "change_m3k2b" } }
 ```
+`run.update`: a run changed. `user.action`: the user did something in the extension's side panel that Claude should
+know; the plugin's `wait_for_user` returns with it.
 
 Chunk frame (host → extension only):
 ```json
@@ -60,6 +63,7 @@ clients, whether the extension is connected).
 |---|---|---|
 | `status` | | extension version, protocol, the run going, counts |
 | `schema.get` | | the step and workflow JSON Schemas (v1 `get_step_schema`) |
+| `tools.call` | `name`, `args?` | `{ text, payload, isError?, images? }`: one of v1's workflow tools, run by the extension; an unknown name answers `unsupported`; `get_step_schema` takes the plugin's authoring guide in `args.guide` |
 | `workflows.list` | | `WorkflowSummary[]` |
 | `workflows.get` | `id`, `version?` | `{ workflow, detail: WorkflowDetail }` |
 | `workflows.history` | `id` | `VersionEntry[]` |
