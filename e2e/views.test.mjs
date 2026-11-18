@@ -225,8 +225,8 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
     const okRun = await lastRun('e2e-views-ok');
     const failRun = await lastRun('e2e-views-fail');
     assert.ok(okRun && failRun, 'runs from the cases before');
+    // A proposal with an input: its test run asks for it first (the run form). Not saved: the free plan keeps 3 workflows.
     const form = await tool('propose_workflow', { workflow: { ...okWorkflow('e2e-views-form', 'With an input'), environmentVariableSchema: { type: 'object', properties: { month: { type: 'string', title: 'Month', default: '2026-11' } } } } });
-    await tool('ui_save_draft', { pendingId: form.data.pendingId });
     /** [view, tool, args, text the view shows] */
     const cases = [
       ['setup', 'setup', {}, 'Set up Browser Workflow'],
@@ -234,7 +234,7 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
       ['workflow', 'show_workflow', { id: 'e2e-views-ok' }, 'Save the clip'],
       ['import', 'import_workflow', { json: JSON.stringify(okWorkflow('e2e-views-import', 'Imported clip')), fileName: 'clip.json' }, 'Save workflow'],
       ['draft', 'propose_workflow', { workflow: okWorkflow('e2e-views-draft', 'Draft clip') }, 'Test run'],
-      ['runSetup', 'run_workflow', { id: 'e2e-views-form', form: true }, 'Run With an input'],
+      ['runSetup', 'ui_test_draft', { pendingId: form.data.pendingId }, 'Run With an input'],
       ['run', 'show_run', { runId: okRun }, 'Done · 2 steps'],
       ['failure', 'show_failure', { runId: failRun }, 'Failed at step 1 of 1'],
       ['change', 'propose_change', { workflowId: 'e2e-views-fail', reason: 'The button has another id.', runId: failRun, changes: [{ stepId: 'click', step: { action: { xpathSelector: '//button' } } }] }, 'Proposed fix'],
@@ -255,6 +255,8 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
   });
 
   it('screenshots in dark and in Vietnamese', { skip: !SHOTS }, async () => {
+    // The run view is the earlier run's (the free plan, with no account server here, allows 7 runs a day).
+    const okRun = /- (\S+) /.exec((await tool('read_runs', { workflowId: 'e2e-views-ok' })).text)?.[1];
     for (const [lang, theme] of [['en', 'dark'], ['vi', 'light'], ['vi', 'dark']]) {
       await tool('ui_set_language', { lang });
       const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
@@ -262,7 +264,7 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
       await showInChat(draft, { theme, locale });
       await until(async () => (await widgetText()).length > 50, 10_000, 'the widget');
       await shot(chat, `widget-draft-${lang}-${theme}`);
-      const run = await tool('run_workflow', { id: 'e2e-views-ok' });
+      const run = await tool('show_run', { runId: okRun });
       await showInChat(run, { theme, locale });
       await until(async () => /(Done|Xong)/.test(await widgetText()), 60_000, 'the run');
       await shot(chat, `widget-run-${lang}-${theme}`);
@@ -271,10 +273,10 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
       await until(async () => (await panelText()).includes(lang === 'vi' ? 'Workflow' : 'Workflows'), 10_000, 'the panel Home');
       await until(async () => (await panelText()).match(lang === 'vi' ? /Đang chờ bạn duyệt/ : /Waiting for your approval/), 10_000, 'the badge');
       await shot(panel, `panel-home-badge-${lang}-${theme}`);
-      await panel.getByRole('button', { name: lang === 'vi' ? 'Xem' : 'Review' }).click();
+      await panel.getByRole('button', { name: lang === 'vi' ? 'Xem' : 'Review', exact: true }).click();
       await until(async () => (await panel.locator('input[id^="name-"]').count()) > 0, 10_000, 'the draft in the panel');
       await shot(panel, `panel-draft-${lang}-${theme}`);
-      await tool('ui_save_draft', { pendingId: draft.data.pendingId });
+      // Left unsaved: the free plan keeps 3 workflows.
       await panelHome();
       const row = panel.locator('.row-wrap', { hasText: 'Click the missing button' });
       await row.getByRole('button', { name: /^(Run|Chạy) / }).click();
