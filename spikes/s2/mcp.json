@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "spike": { "command": "node", "args": ["spikes/mcp/server.js"] }
+  }
+}
