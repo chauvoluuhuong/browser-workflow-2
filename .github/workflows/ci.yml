@@ -19,4 +19,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - run: npm test
+          cache: npm
+      - run: npm ci
+      # Unit tests, and dist/ must be the build of src/ (dist/ is committed: the plugin runs it as installed).
+      - run: npm run check
