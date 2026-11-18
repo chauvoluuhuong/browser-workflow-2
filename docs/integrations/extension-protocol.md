@@ -51,7 +51,8 @@ A client's first call is `hello`:
 { "id": 1, "ok": true, "result": { "extension": "0.1.0", "protocol": 1, "minPlugin": "0.0.0" } }
 ```
 A client whose plugin version is below `minPlugin` gets `too_old` on every other call. A client that never sent
-`hello` is treated as the current plugin. `host_status` is answered by the host itself (process, uptime,
+`hello` is treated as the current plugin. When a socket client disconnects, the host may tell the extension
+`{ "type": "client.left", "client": 3 }`, so its `hello` is forgotten. `host_status` is answered by the host itself (process, uptime,
 clients, whether the extension is connected).
 
 ## Methods

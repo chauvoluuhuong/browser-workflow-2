@@ -42,6 +42,12 @@ export interface ChunkFrame {
   data: string;
 }
 
+/** Host → extension: a socket client disconnected, so its `hello` is forgotten. Optional for the host. */
+export interface ClientLeftMessage {
+  type: 'client.left';
+  client: number;
+}
+
 /** Answered by the host itself, never sent to the extension. */
 export interface HostStatus {
   pid: number;
