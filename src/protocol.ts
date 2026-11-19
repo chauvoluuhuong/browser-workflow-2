@@ -71,8 +71,8 @@ export interface ChatView {
  * A `view` entry (from `claude.show`) is `{ at, from: 'claude', text: '', view }`.
  */
 export interface ChatEntry {
-  /** When it was added (ms since 1970). */
-  at: number;
+  /** When it was added (ISO time, as the extension writes it). */
+  at: string;
   from: 'you' | 'claude' | 'event';
   /** A `you` entry: the user's words, with `＠<name>` (fullwidth ＠) where each mention was. `claude`: Markdown. */
   text: string;
