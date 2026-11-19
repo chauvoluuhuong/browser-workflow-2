@@ -1,13 +1,17 @@
 // The side panel's Claude chat (Use with Claude; docs/integrations/extension-protocol.md → "The side-panel chat").
 //   ClaudeStrip  on Home, above the workflows: no Claude (Use with Claude / Use Claude Code instead / Copy the
 //                prompt), waiting for Claude after the button opened it, or one line "Claude is listening" + Chat.
-//   ChatView     the Claude screen: the log (you / Claude / event cards), the status, the composer with the
-//                `@` picker (workflows, recent runs, open tabs) whose picks are chips sent with the message.
-// Panel only: the chat widget never shows it. Everything is drawn as text (never as HTML): Claude's answers and
-// tab titles are not ours.
+//   ChatView     the Claude screen: the log (you / Claude / event cards / screens Claude showed), the status, the
+//                composer with the `@` picker (workflows, recent runs, open tabs) whose picks are chips sent with the
+//                message.
+// Panel only: the chat widget never shows it. Your messages are drawn as text, with chips. Claude's answers are
+// Markdown, cleaned before they are drawn (../markdown.tsx); a page Claude made is drawn in the extension's
+// isolated page. A screen Claude showed (`view`) is the same view as in the Claude chat, drawn in a card.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import type { Bridge } from '../bridge.js';
+import { copyText, Markdown } from '../markdown.js';
+import { Widget } from '../widget.js';
 import type { ViewPayload } from '../types.js';
 import { Icon, useNav, type Nav } from '../components.js';
 import { useI18n, type Key, type T } from '../i18n.js';
@@ -36,12 +40,20 @@ export type ChatCard =
   | { kind: 'proposal'; pendingId: string; name: string; state: 'pending' | 'saved' | 'applied' | 'discarded' | 'expired'; runId?: string }
   | { kind: 'run'; runId: string; workflowId?: string; name: string; status: string; items?: number };
 
+/** A screen a tool showed while Claude answered the side panel (`claude.show`): no payload when it was too large to keep. */
+export interface ChatViewEntry {
+  tool: string;
+  args: Record<string, unknown>;
+  payload?: Record<string, unknown>;
+}
+
 export interface ChatEntry {
   at: string | number;
   from: 'you' | 'claude' | 'event';
   text: string;
   mentions?: Mention[];
   card?: ChatCard;
+  view?: ChatViewEntry;
   /** The panel's own note (an older extension keeps no log): shown as a warning. */
   warn?: boolean;
 }
@@ -87,21 +99,6 @@ function openApp(url: string) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-}
-
-async function copyText(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return;
-  } catch { /* not focused, or not allowed: the old way */ }
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.select();
-  document.execCommand('copy');
-  ta.remove();
 }
 
 export interface Chat {
@@ -612,6 +609,29 @@ function Card({ e }: { e: ChatEntry }) {
   return <div class="ev"><Dot kind={line.dot} />{line.text}</div>;
 }
 
+/**
+ * A screen with no payload kept is asked for again only from a tool that only reads (show_*, list_*): calling
+ * run_workflow or delete_workflow again would do it again.
+ */
+const reopenable = (tool: string) => /^(show|list)_/.test(tool);
+
+/** A screen Claude showed: the same view as in the Claude chat, with its own buttons and navigation; Open shows it full size. */
+function ViewCard({ v }: { v: ChatViewEntry }) {
+  const nav = useNav();
+  const { t } = useI18n();
+  const payload = v.payload && 'view' in v.payload ? (v.payload as unknown as ViewPayload) : undefined;
+  if (!payload && !reopenable(v.tool)) return null;
+  const open = () => (payload ? nav.push(payload) : nav.open(v.tool, v.args ?? {}, 'push'));
+  return (
+    <div class="view-card">
+      <Widget bridge={nav.bridge} initial={payload} start={payload ? undefined : { tool: v.tool, args: v.args ?? {} }} />
+      <div class="view-card-foot">
+        <button class="link" onClick={open}>{t('chat.openView')}</button>
+      </div>
+    </div>
+  );
+}
+
 function Log({ chat }: { chat: Chat }) {
   const { t } = useI18n();
   const ref = useRef<HTMLDivElement>(null);
@@ -635,13 +655,15 @@ function Log({ chat }: { chat: Chat }) {
 
   const out: ComponentChildren[] = [];
   entries.forEach((e, i) => {
-    const prev = entries[i - 1];
     if (e.from === 'event' || e.card) {
       out.push(e.card ? <Card e={e} /> : <div class={`ev${e.warn ? ' warn' : ''}`}>{e.warn ? Icon.alert() : <Dot />}{e.text}</div>);
+    } else if (e.view?.tool) {
+      out.push(<ViewCard key={`view-${e.at}-${e.view.tool}-${JSON.stringify(e.view.args ?? {})}`} v={e.view} />);
+    } else if (e.from === 'you') {
+      // Yours on the right in a bubble; Claude's full width, as Claude draws them, with no names.
+      out.push(<div class="msg me">{withChips(e.text, e.mentions)}</div>);
     } else {
-      const me = e.from === 'you';
-      if (prev?.from !== e.from || prev?.card) out.push(<div class={`who${me ? ' me' : ''}`}>{me ? t('chat.you') : t('chat.claude')}</div>);
-      out.push(<div class={`msg ${me ? 'me' : 'claude'}`}>{me ? withChips(e.text, e.mentions) : e.text}</div>);
+      out.push(<div class="msg claude"><Markdown text={e.text} /></div>);
     }
     if (i === firstAsk) {
       out.push(

@@ -69,7 +69,7 @@ export class PanelBridge implements Bridge, ChatBridge {
   private context?: string;
   private contextTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(private runtime = chrome.runtime, private tabs = chrome.tabs) {}
+  constructor(private runtime = chrome.runtime, private tabs = chrome.tabs, private storage = chrome.storage) {}
 
   async call<T = ViewPayload>(name: string, args: Record<string, unknown> = {}): Promise<CallResult<T>> {
     const r = await this.runtime.sendMessage({ bw: 'tools.call', name, args } satisfies PanelMessage);
@@ -111,6 +111,18 @@ export class PanelBridge implements Bridge, ChatBridge {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  }
+
+  /** The extension's isolated page (sandbox/frame.html) that draws a page Claude made, in an iframe. */
+  frameUrl() {
+    return this.runtime.getURL('sandbox/frame.html');
+  }
+
+  /** A page Claude made, in a tab: kept in storage.session for the extension's preview page, which shows it full size. */
+  async openPreview(html: string, title?: string) {
+    const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    await this.storage.session.set({ [`bw.preview.${id}`]: { html, ...(title ? { title } : {}) } });
+    await this.tabs.create({ url: this.runtime.getURL(`preview/preview.html#${id}`) });
   }
 
   /** A message to the service worker; `undefined` when it does not answer (an older extension) or fails. */

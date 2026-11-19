@@ -34,6 +34,10 @@ export interface Bridge {
   onEvent?(name: string, cb: (data: any) => void): () => void;
   /** The side panel only: the view on top, so what the user sends Claude names its workflow, run or proposal. */
   setCurrent?(p: ViewPayload | undefined): void;
+  /** The side panel only: the address of the extension's isolated page that draws a page Claude made (a ```html block). */
+  frameUrl?(): string;
+  /** The side panel only: opens a page Claude made in a tab of its own. */
+  openPreview?(html: string, title?: string): Promise<void>;
 }
 
 /** What the side panel's sendMessage did: whether a Claude was there to get it, and the text it sent. */

@@ -94,15 +94,37 @@ export interface WidgetProps {
   start?: { tool: string; args?: Record<string, unknown> };
   /** The side panel: drawn above the views (the Home button and the "waiting for your approval" badge). */
   top?: (nav: Nav, current: ViewPayload | undefined) => ComponentChildren;
+  /**
+   * A view to draw at once, with no tool call (a screen in the side panel's chat). Such a widget sits inside
+   * another one: it takes no tool results from the app and does not say which view is on top.
+   */
+  initial?: ViewPayload;
 }
 
-export function Widget({ bridge, start, top: drawTop }: WidgetProps) {
+/** The Claude chat's card for a screen the side panel's chat shows: one line, and Show here draws it in place. */
+function ShownLine({ onShow }: { onShow: () => void }) {
+  const { t } = useI18n();
+  return (
+    <div class="w shown-line">
+      <span class="shown-line-text">
+        {/* A window with its side panel open. */}
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M10 3v10" /></svg>
+        {t('shown.line')}
+      </span>
+      <button class="btn sm" onClick={onShow}>{t('shown.showHere')}</button>
+    </div>
+  );
+}
+
+export function Widget({ bridge, start, top: drawTop, initial }: WidgetProps) {
   // Every pushed view stays mounted (hidden) until you go back past it, so Back restores it exactly
   // as you left it: expanded sections, tabs, scroll, typed text. `key` changes only on push/replace/reset.
-  const [stack, setStack] = useState<{ key: number; p: ViewPayload }[]>([]);
-  const nextKey = useRef(0);
+  const nextKey = useRef(initial ? 1 : 0);
+  const [stack, setStack] = useState<{ key: number; p: ViewPayload }[]>(initial ? [{ key: 0, p: initial }] : []);
+  // A screen the side panel's chat shows (the plugin marked it `shownIn: 'panel'`): one line until Show here.
+  const [folded, setFolded] = useState(false);
   const [error, setError] = useState<string>();
-  const [langPref, setLangPref] = useState<LangPref>('auto');
+  const [langPref, setLangPref] = useState<LangPref>(initial?.lang ?? 'auto');
   // How many of the user's actions are under way. While there is one, the widget takes no clicks.
   const [working, setWorking] = useState(0);
   const busy = useRef(0);
@@ -114,7 +136,14 @@ export function Widget({ bridge, start, top: drawTop }: WidgetProps) {
     setStack((s) => (mode === 'reset' ? [entry] : mode === 'push' ? [...s, entry] : [...s.slice(0, -1), entry]));
   };
 
-  useEffect(() => bridge.onPayload((p) => { setError(undefined); show(p, 'reset'); }), [bridge]);
+  useEffect(() => {
+    if (initial) return;
+    bridge.onPayload((p) => {
+      setError(undefined);
+      setFolded((p as { shownIn?: string }).shownIn === 'panel');
+      show(p, 'reset');
+    });
+  }, [bridge]);
 
   const i18n = useMemo(() => makeI18n(resolveLang(langPref, bridge.hostLocale()), bridge.hostName()), [langPref, bridge]);
 
@@ -174,7 +203,7 @@ export function Widget({ bridge, start, top: drawTop }: WidgetProps) {
   }), [bridge, langPref]);
 
   const top = stack[stack.length - 1];
-  useEffect(() => bridge.setCurrent?.(top?.p), [top?.key]);
+  useEffect(() => { if (!initial) bridge.setCurrent?.(top?.p); }, [top?.key]);
 
   // The side panel opens on its Home.
   useEffect(() => {
@@ -226,7 +255,7 @@ export function Widget({ bridge, start, top: drawTop }: WidgetProps) {
           {working > 0 && <div class="working-bar" role="progressbar" aria-label={i18n.t('common.loading')}><i /></div>}
           {drawTop?.(navValue, top?.p)}
           {error && <div class="w" style="padding-bottom:0"><Note kind="bad">{error}</Note></div>}
-          {top ? stack.map((e, i) => (
+          {folded && top ? <ShownLine onShow={() => setFolded(false)} /> : top ? stack.map((e, i) => (
             <div key={e.key} hidden={i !== stack.length - 1}><View p={e.p} /></div>
           )) : (
             <div class="w" aria-busy="true" aria-label={i18n.t('common.loading')}>

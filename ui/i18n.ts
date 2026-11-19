@@ -393,6 +393,14 @@ export const en = {
   'chat.cardRunFailed': '“{name}” failed',
   'chat.cardRunStopped': '“{name}” was stopped',
   'chat.cardRunOther': '“{name}”: {status}',
+  'chat.openView': 'Open',
+  'shown.line': 'Shown in the side panel',
+  'shown.showHere': 'Show here',
+  'md.preview': 'Preview',
+  'md.code': 'Code',
+  'md.openTab': 'Open in a tab',
+  'md.copy': 'Copy',
+  'md.copied': 'Copied',
 };
 
 export type Key = keyof typeof en;
@@ -761,6 +769,14 @@ export const vi: Record<Key, string> = {
   'chat.cardRunFailed': '“{name}” bị lỗi',
   'chat.cardRunStopped': '“{name}” đã bị dừng',
   'chat.cardRunOther': '“{name}”: {status}',
+  'chat.openView': 'Mở',
+  'shown.line': 'Đã hiện trong bảng bên',
+  'shown.showHere': 'Hiện ở đây',
+  'md.preview': 'Xem trước',
+  'md.code': 'Mã',
+  'md.openTab': 'Mở trong tab mới',
+  'md.copy': 'Sao chép',
+  'md.copied': 'Đã sao chép',
 };
 
 const DICTS: Record<Lang, Record<Key, string>> = { en, vi };

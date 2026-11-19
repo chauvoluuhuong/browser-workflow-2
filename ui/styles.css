@@ -212,11 +212,10 @@ button.row.is-pending, button.row.is-active, button.row.is-failed { cursor: poin
 .pill .dot.ok { background: var(--ok); } .pill .dot.run { background: var(--accent); }
 .log { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 2px 0; }
 .log-empty { padding: 8px 2px; }
-.msg { max-width: 86%; padding: 8px 11px; border-radius: 12px; font-size: 13.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.me { align-self: flex-end; background: var(--accent); color: var(--accent-fg); border-bottom-right-radius: 4px; }
-.msg.claude { align-self: flex-start; background: var(--bg-2); border-bottom-left-radius: 4px; }
-.who { font-size: 11.5px; color: var(--fg-3); margin: 0 4px -6px; }
-.who.me { align-self: flex-end; }
+.msg { font-size: 13.5px; overflow-wrap: anywhere; }
+/* Yours: right, in a soft bubble. Claude's: full width, no bubble (as Claude draws its answers). */
+.msg.me { align-self: flex-end; max-width: 85%; padding: 7px 11px; border-radius: 14px; background: var(--bg-3); white-space: pre-wrap; }
+.msg.claude { align-self: stretch; min-width: 0; display: flex; flex-direction: column; gap: 8px; line-height: 1.5; }
 .ev { align-self: center; max-width: 100%; font-size: 12px; color: var(--fg-2); display: flex; align-items: center; gap: 6px; text-align: center; }
 .ev .dot { width: 7px; height: 7px; }
 .ev.warn { color: var(--warn); }
@@ -232,7 +231,6 @@ button.row.is-pending, button.row.is-active, button.row.is-failed { cursor: poin
 .banner .btn:not(.primary) { color: var(--fg); background: light-dark(#fff, #1e1f22); }
 
 .mchip { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 5px; margin: 0 1px; border-radius: 6px; font-size: 12.5px; font-weight: 500; line-height: 20px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); white-space: nowrap; vertical-align: 1px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; user-select: all; }
-.msg.me .mchip { background: rgb(255 255 255 / .22); color: var(--accent-fg); }
 .mchip svg { flex: none; }
 svg.is-bad { color: var(--bad); }
 
@@ -255,6 +253,44 @@ svg.is-bad { color: var(--bad); }
 .tool { height: 26px; padding: 0 8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--fg-2); font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
 .tool:hover, .tool.on { background: var(--bg-2); color: var(--fg); }
 .tool:disabled { opacity: .5; cursor: default; }
-.msg.me .mchip svg.is-bad { color: inherit; }
 button.ev-link { border: 0; background: none; padding: 0; font: inherit; font-size: 12px; cursor: pointer; }
 button.ev-link:hover { color: var(--fg); text-decoration: underline; }
+
+/* Claude's answers: Markdown (ui/markdown.tsx), sized for a 360 px panel. */
+.md { min-width: 0; }
+.md > :first-child { margin-top: 0; } .md > :last-child { margin-bottom: 0; }
+.md p, .md ul, .md ol, .md blockquote, .md table, .md hr, .md .md-code { margin: 0 0 8px; }
+.md h1, .md h2, .md h3, .md h4, .md h5, .md h6 { margin: 12px 0 6px; line-height: 1.3; font-weight: 600; }
+.md h1 { font-size: 17px; } .md h2 { font-size: 15.5px; } .md h3 { font-size: 14.5px; } .md h4, .md h5, .md h6 { font-size: 13.5px; }
+.md ul, .md ol { padding-left: 20px; } .md li + li { margin-top: 2px; } .md li > ul, .md li > ol { margin: 2px 0 0; }
+.md a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.md blockquote { padding: 0 0 0 10px; border-left: 3px solid var(--line-2); color: var(--fg-2); }
+.md hr { border: 0; border-top: 1px solid var(--line); }
+.md code { font-family: var(--mono); font-size: 12.5px; background: var(--bg-2); border-radius: 4px; padding: 1px 4px; }
+.md pre { margin: 0; padding: 8px 10px; overflow: auto; max-height: 420px; font-size: 12.5px; line-height: 1.45; }
+.md pre code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.md img { max-width: 100%; height: auto; }
+.md table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 12.5px; }
+.md th, .md td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; white-space: nowrap; }
+.md th { background: var(--bg-2); font-weight: 600; }
+.md-code { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2); overflow: hidden; }
+.md-code-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 2px 10px; border-bottom: 1px solid var(--line); font-size: 11.5px; color: var(--fg-3); min-height: 26px; }
+.md-copy { border: 0; background: transparent; color: var(--fg-2); font-size: 11.5px; padding: 3px 6px; border-radius: var(--radius-sm); cursor: pointer; }
+.md-copy:hover { background: var(--bg-3); color: var(--fg); }
+.md-page { display: flex; flex-direction: column; gap: 6px; }
+.md-page-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.md-page-bar .link { font-size: 12.5px; }
+.md-page-view { border: 1px solid var(--line); border-radius: var(--radius); overflow: auto; background: #fff; }
+.md-page-view iframe { display: block; width: 100%; border: 0; }
+.md-page .md-code { margin: 0; }
+
+/* A screen Claude showed, in the side panel's chat: the same view as the Claude chat's, in a card. */
+.view-card { align-self: stretch; flex: none; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.view-card .w { min-width: 0; max-width: none; }
+.view-card-foot { display: flex; justify-content: flex-end; padding: 0 12px 10px; margin-top: -4px; }
+.view-card-foot .link { font-size: 12.5px; }
+
+/* The Claude chat's line for a screen the side panel shows. */
+.w.shown-line { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); }
+.shown-line-text { display: flex; align-items: center; gap: 8px; color: var(--fg-2); font-size: 13px; min-width: 0; }
+.shown-line-text svg { flex: none; }
