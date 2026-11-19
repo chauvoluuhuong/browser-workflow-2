@@ -6912,7 +6912,7 @@ function po({ bridge: e, start: t, top: n, initial: r }) {
 		o((e) => t === "reset" ? [n] : t === "push" ? [...e, n] : [...e.slice(0, -1), n]);
 	};
 	P(() => {
-		r || e.onPayload((e) => {
+		if (!r) return e.onPayload((e) => {
 			u(void 0), c(e.shownIn === "panel"), g(e, "reset");
 		});
 	}, [e]);

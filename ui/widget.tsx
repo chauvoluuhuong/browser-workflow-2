@@ -138,7 +138,7 @@ export function Widget({ bridge, start, top: drawTop, initial }: WidgetProps) {
 
   useEffect(() => {
     if (initial) return;
-    bridge.onPayload((p) => {
+    return bridge.onPayload((p) => {
       setError(undefined);
       setFolded((p as { shownIn?: string }).shownIn === 'panel');
       show(p, 'reset');
