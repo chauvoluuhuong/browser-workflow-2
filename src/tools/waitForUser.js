@@ -7,14 +7,16 @@
 // 80 s (spike A, 2026-11-18). There the server passes `capMs` (55 s), so the wait answers "still waiting" before
 // the app gives up on it; otherwise a dropped wait would stay listening and swallow the user's next message.
 // While waiting it sends progress every 30 s when the call carries a progress token.
+// It also marks the "panel turn" on the link (`panelTurn`): true from the moment it returns with an action until the
+// next wait_for_user call, while Claude answers the side panel; the server then sends screens there (claude.show).
 import { LinkError, OPEN_CHROME } from '../link.js';
 
 export const DEFAULT_MINUTES = 10;
 export const MAX_MINUTES = 30;
 /** A wait in an app that cuts tool calls at 80 s answers after at most this long. */
 export const CAPPED_WAIT_MS = 55_000;
-/** The longest reply shown in the side panel. */
-export const MAX_REPLY = 4000;
+/** The longest reply shown in the side panel (Markdown; a page in a ```html block fits). */
+export const MAX_REPLY = 100_000;
 /**
  * While a wait goes, `claude.state: listening` is sent again this often: the extension takes a Claude with no call
  * for 3 minutes as gone (its chat was closed or its reply ended), and a wait in Claude Code may last 30 minutes.
@@ -58,13 +60,15 @@ export function describeAction(d) {
 }
 
 /**
- * @param {{ open(): Promise<void>, on(name: string, fn: (d: any) => void): () => void, call?: (m: string, p: any, t?: number) => Promise<any> }} link
+ * @param {{ open(): Promise<void>, on(name: string, fn: (d: any) => void): () => void, call?: (m: string, p: any, t?: number) => Promise<any>, panelTurn?: boolean }} link
  * @param {{ minutes?: number, reply?: string, stop?: boolean }} args `stop`: send the reply and stop listening, without waiting
  * @param {any} ctx the MCP handler's context (progress token, notify, abort signal)
  * @param {{ progressEveryMs?: number, capMs?: number, listeningEveryMs?: number }} [o] `capMs`: answer "still waiting" after this long at most
  * @returns {Promise<{ text: string, isError?: boolean }>}
  */
 export async function waitForUser(link, args, ctx, o = {}) {
+  // Claude is back to listening: whatever it answered the side panel is done.
+  if (link && typeof link === 'object') link.panelTurn = false;
   const minutes = Math.min(Math.max(Number(args?.minutes ?? DEFAULT_MINUTES) || 0, 0), MAX_MINUTES);
   const waitMs = Math.min(minutes * 60_000, o.capMs ?? Infinity);
   try {
@@ -103,6 +107,7 @@ export async function waitForUser(link, args, ctx, o = {}) {
     ctx?.mcpReq?.signal?.addEventListener?.('abort', onAbort);
   });
   if (outcome.how === 'action') {
+    link.panelTurn = true;
     tell(link, 'claude.state', { state: 'working' });
     return { text: describeAction(outcome.data ?? {}) };
   }

@@ -121,3 +121,24 @@ test('stop: the last reply goes, Claude is idle at once, no wait', async () => {
   assert.deepEqual(link.calls, [['claude.reply', { text: 'Okay, stopped.' }], ['claude.state', { state: 'idle' }]]);
   assert.equal(link.count, 0);
 });
+
+test('the panel turn: on when an action is handed out, off when wait_for_user is called again', async () => {
+  const link = chatLink();
+  link.panelTurn = true;
+  const p = waitForUser(link, { minutes: 5 }, {});
+  assert.equal(link.panelTurn, false, 'cleared as soon as it is called');
+  await new Promise((r) => setTimeout(r, 20));
+  link.emit({ kind: 'chat', text: 'show me xe' });
+  await p;
+  assert.equal(link.panelTurn, true);
+  await waitForUser(link, { minutes: 0.001 }, {});
+  assert.equal(link.panelTurn, false, 'a wait that only times out leaves it off');
+});
+
+test('a reply of 100 000 characters reaches the side panel whole', async () => {
+  const link = chatLink();
+  const reply = `# Table\n\n${'x'.repeat(100_000 - 9)}`;
+  await waitForUser(link, { minutes: 0.001, reply }, {});
+  assert.equal(link.calls[0][0], 'claude.reply');
+  assert.equal(link.calls[0][1].text.length, 100_000);
+});

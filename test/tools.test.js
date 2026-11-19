@@ -94,3 +94,126 @@ test('wait_for_user answers within the cap in the desktop app, not in Claude Cod
   const code = await run('claude-code');
   assert.match(code.text, /^Still waiting/);
 });
+
+// The panel turn: while Claude answers a side-panel message (or in Claude Code), a screen also goes to the side
+// panel's chat through claude.show.
+async function panelServer(clientName, { show = 'ok', toolAnswer } = {}) {
+  const { InMemoryTransport } = await import('@modelcontextprotocol/server');
+  const { Client } = await import('@modelcontextprotocol/client');
+  const { LinkError } = await import('../src/link.js');
+  const calls = [];
+  const listeners = new Set();
+  const link = {
+    call: async (m, p) => {
+      calls.push([m, p]);
+      if (m === 'tools.call') return toolAnswer?.(p) ?? { text: `Answer of ${p.name}.`, payload: { view: p.name } };
+      if (m === 'claude.show' && show === 'unsupported') throw new LinkError('unsupported', 'Unknown method claude.show.');
+      return m === 'claude.show' ? { ok: true } : {};
+    },
+    on: (name, fn) => { if (name === 'user.action') listeners.add(fn); return () => listeners.delete(fn); },
+    open: async () => {},
+  };
+  const server = createServer(link);
+  const [a, b] = InMemoryTransport.createLinkedPair();
+  await server.connect(a);
+  const client = new Client({ name: clientName, version: '0' });
+  await client.connect(b);
+  return {
+    calls,
+    shows: () => calls.filter((c) => c[0] === 'claude.show'),
+    write: (text) => listeners.forEach((f) => f({ kind: 'chat', text })),
+    tool: (name, args = {}) => client.callTool({ name, arguments: args }),
+    wait: (minutes = 0.001) => client.callTool({ name: 'wait_for_user', arguments: { minutes } }),
+    close: () => client.close(),
+  };
+}
+
+test('panel turn on: a screen goes to the side panel\'s chat, and Claude and the widget are told', async () => {
+  const s = await panelServer('claude-ai');
+  s.write('show me xe');
+  assert.match((await s.wait(5)).content[0].text, /side panel's chat: "show me xe"/);
+  const r = await s.tool('show_workflow', { id: 'xe' });
+  assert.deepEqual(s.shows(), [['claude.show', { tool: 'show_workflow', args: { id: 'xe' }, payload: { view: 'show_workflow' } }]]);
+  assert.equal(r.content[0].text, "Answer of show_workflow. Shown to the user in the Browser Workflow side panel's chat, where they wrote.");
+  assert.equal(r.structuredContent.shownIn, 'panel');
+  assert.equal(r.structuredContent.modelText, r.content[0].text);
+  await s.close();
+});
+
+test('panel turn: proposals, setup, silent and widget-only tools are never sent', async () => {
+  const s = await panelServer('claude-ai');
+  s.write('make one');
+  await s.wait(5);
+  for (const name of ['propose_workflow', 'propose_change', 'import_workflow', 'setup', 'get_workflow', 'ui_proposal']) {
+    const r = await s.tool(name, name === 'propose_workflow' ? { workflow: {} } : name === 'propose_change' ? { workflowId: 'xe', reason: 'r', changes: [{ stepId: 's1' }] } : name === 'import_workflow' ? { json: '{}' } : name === 'get_workflow' ? { id: 'xe' } : {});
+    assert.equal(r.content[0].text, `Answer of ${name}.`, name);
+    assert.equal(r.structuredContent?.shownIn, undefined, name);
+  }
+  assert.equal(s.shows().length, 0);
+  await s.close();
+});
+
+test('panel turn off: no claude.show, the answer is unchanged; the next wait_for_user ends the turn', async () => {
+  const s = await panelServer('claude-ai');
+  let r = await s.tool('list_workflows');
+  assert.equal(r.content[0].text, 'Answer of list_workflows.');
+  assert.equal(s.shows().length, 0);
+  s.write('list them');
+  await s.wait(5);
+  await s.tool('list_workflows');
+  assert.equal(s.shows().length, 1);
+  await s.wait();
+  r = await s.tool('list_workflows');
+  assert.equal(s.shows().length, 1, 'turn over: not sent again');
+  assert.equal(r.content[0].text, 'Answer of list_workflows.');
+  assert.equal(r.structuredContent.shownIn, undefined);
+  await s.close();
+});
+
+test('an older extension (claude.show unknown): the answer is unchanged', async () => {
+  const s = await panelServer('claude-ai', { show: 'unsupported' });
+  s.write('show the run');
+  await s.wait(5);
+  const r = await s.tool('show_run', { runId: 'r1' });
+  assert.equal(s.shows().length, 1);
+  assert.equal(r.isError, undefined);
+  assert.equal(r.content[0].text, 'Answer of show_run.');
+  assert.deepEqual(r.structuredContent, { view: 'show_run', modelText: 'Answer of show_run.' });
+  await s.close();
+});
+
+test('an error answer is not sent to the side panel', async () => {
+  const s = await panelServer('claude-ai', { toolAnswer: (p) => ({ text: `No run ${p.args.runId}.`, payload: { view: 'error' }, isError: true }) });
+  s.write('show run r9');
+  await s.wait(5);
+  const r = await s.tool('show_run', { runId: 'r9' });
+  assert.equal(s.shows().length, 0);
+  assert.equal(r.content[0].text, 'No run r9.');
+  await s.close();
+});
+
+test('Claude Code (no widgets): every screen also goes to the side panel, without a panel turn; proposals never', async () => {
+  const s = await panelServer('claude-code');
+  const r = await s.tool('show_run_data', { runId: 'r1' });
+  assert.deepEqual(s.shows(), [['claude.show', { tool: 'show_run_data', args: { runId: 'r1' }, payload: { view: 'show_run_data' } }]]);
+  assert.equal(r.content[0].text, "Answer of show_run_data. Also shown in the Browser Workflow side panel's chat.");
+  assert.equal(r.structuredContent.shownIn, undefined);
+  await s.tool('propose_workflow', { workflow: {} });
+  assert.equal(s.shows().length, 1);
+  await s.close();
+});
+
+test('wait_for_user takes a Markdown reply of 100 000 characters', async () => {
+  const s = await panelServer('claude-ai');
+  const reply = 'a'.repeat(100_000);
+  const ok = await s.tool('wait_for_user', { minutes: 0.001, reply });
+  assert.notEqual(ok.isError, true, ok.content[0].text);
+  assert.equal(s.calls.find((c) => c[0] === 'claude.reply')[1].text.length, 100_000);
+  const tooLong = await s.tool('wait_for_user', { minutes: 0.001, reply: `${reply}a` });
+  assert.equal(tooLong.isError, true);
+  await s.close();
+});
+
+test('listening: replies are Markdown, pages are self-contained HTML, screens show in the side panel by themselves', () => {
+  assert.match(INSTRUCTIONS, /Listening: .*`reply` \(Markdown, in their language\).*no outside scripts.*```html block.*appear in the side panel by themselves/);
+});
