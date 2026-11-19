@@ -221,6 +221,14 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
   });
 
   it('the widget draws every view kind still in use, from the real tools\' answers', async () => {
+    // "Fix with Claude" above left a panel turn open: a screen goes to the side panel's chat, and the widget folds
+    // it to one line. The next wait_for_user ends the turn, and screens are drawn here again.
+    const inPanel = await tool('list_workflows');
+    assert.equal(inPanel.data.shownIn, 'panel');
+    assert.match(inPanel.text, /Shown to the user in the Browser Workflow side panel's chat/);
+    await showInChat(inPanel);
+    await until(async () => (await widgetText()).includes('Shown in the side panel'), 10_000, 'the one line');
+    await tool('wait_for_user', { minutes: 0.001 });
     const lastRun = async (workflowId) => /- (\S+) /.exec((await tool('read_runs', { workflowId })).text)?.[1];
     const okRun = await lastRun('e2e-views-ok');
     const failRun = await lastRun('e2e-views-fail');
@@ -298,7 +306,7 @@ const CHAT_SHOTS = process.env.BW2_CHAT_SHOTS || SHOTS;
 const PANEL_PAGE = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/panel.css"><style>
   :root { color-scheme: light dark; } body { background: light-dark(#ffffff, #1e1f22); }
 </style></head><body><div id="root"></div><script type="module">
-  window.__sent = []; window.__opened = [];
+  window.__sent = []; window.__opened = []; window.__tabs = []; window.__storage = {};
   const listeners = new Set();
   // A claude:// link is recorded, not followed (there is no Claude app here).
   document.addEventListener('click', (e) => {
@@ -331,8 +339,11 @@ const PANEL_PAGE = `<!doctype html><html><head><meta charset="utf-8"><link rel="
     runtime: {
       sendMessage: async (m) => answer(JSON.parse(JSON.stringify(m))),
       onMessage: { addListener: (f) => listeners.add(f), removeListener: (f) => listeners.delete(f) },
+      // The extension's isolated page for pages Claude made: a stand-in served here (none with noFrame).
+      getURL: (p) => (window.__cfg && window.__cfg.noFrame ? undefined : '/' + p),
     },
-    tabs: { create: async () => {} },
+    tabs: { create: async (o) => { window.__tabs.push(o.url); } },
+    storage: { session: { set: async (o) => { Object.assign(window.__storage, o); } } },
   };
   window.__emit = (name, data) => listeners.forEach((f) => f({ bw: 'event', name, data }));
   window.__update = (patch) => { Object.assign(window.__cfg, patch); window.__emit('chat.update', { state: window.__cfg.state, entries: window.__cfg.entries }); };
@@ -341,6 +352,23 @@ const PANEL_PAGE = `<!doctype html><html><head><meta charset="utf-8"><link rel="
     const { mountPanel } = await import('/panel.js');
     mountPanel(document.getElementById('root'));
   };
+</script></body></html>`;
+
+/**
+ * A stand-in for the extension's sandbox/frame.html (Package B): says it is ready, draws the page it is sent in a
+ * nested frame, and answers its height.
+ */
+const FRAME_PAGE = `<!doctype html><html><body style="margin:0"><script>
+  addEventListener('message', (e) => {
+    const d = e.data;
+    if (!d || d.bw !== 'html') return;
+    const f = document.createElement('iframe');
+    f.style.cssText = 'border:0;width:100%;display:block';
+    f.srcdoc = d.html;
+    document.body.replaceChildren(f);
+    f.onload = () => { const h = f.contentDocument.documentElement.scrollHeight; f.style.height = h + 'px'; parent.postMessage({ bw: 'frame', id: d.id, height: h }, '*'); };
+  });
+  parent.postMessage({ bw: 'frame', id: null, ready: true }, '*');
 </script></body></html>`;
 
 const ago = (min) => new Date(Date.now() - min * 60_000).toISOString();
@@ -427,11 +455,12 @@ describe('the side panel\'s Claude chat from a fake runtime (mockup states 1–8
   const sent = (bw) => page.evaluate((b) => window.__sent.filter((m) => m.bw === b), bw);
 
   before(async () => {
-    const files = { '/panel.js': ['dist/panel/panel.js', 'text/javascript'], '/panel.css': ['dist/panel/panel.css', 'text/css'] };
+    const files = { '/panel.js': ['dist/panel/panel.js', 'text/javascript'], '/panel.css': ['dist/panel/panel.css', 'text/css'], '/widget.html': ['dist/widget.html', 'text/html'] };
+    const pages = { '/sandbox/frame.html': FRAME_PAGE, '/chat': CHAT_PAGE };
     const http = createServer((req, res) => {
       const f = files[req.url];
       res.writeHead(200, { 'content-type': f ? `${f[1]}; charset=utf-8` : 'text/html; charset=utf-8' });
-      res.end(f ? readFileSync(join(ROOT, f[0])) : PANEL_PAGE);
+      res.end(f ? readFileSync(join(ROOT, f[0])) : pages[req.url] ?? PANEL_PAGE);
     });
     await new Promise((r) => http.listen(0, '127.0.0.1', r));
     server = { url: `http://127.0.0.1:${http.address().port}`, close: () => new Promise((r) => http.close(r)) };
@@ -586,6 +615,150 @@ describe('the side panel\'s Claude chat from a fake runtime (mockup states 1–8
         await shotChat(`chat-8-chat-mentions-${tag}`);
       });
     }
+  }
+
+  // ---------- the panel as Claude's surface (Package C): Markdown, pages Claude made, screens Claude showed ----------
+  const SURFACE_SHOTS = process.env.BW2_SURFACE_SHOTS || CHAT_SHOTS;
+  const shotSurface = async (name, target = page) => {
+    if (!SURFACE_SHOTS) return;
+    mkdirSync(SURFACE_SHOTS, { recursive: true });
+    await new Promise((r) => setTimeout(r, 300));
+    await target.screenshot({ path: join(SURFACE_SHOTS, `${name}.png`) });
+    log(`screenshot ${name}.png`);
+  };
+  const SURFACE = {
+    en: { h: 'Newest titles', intro: 'Here is what the run found,', items: '30 items', page: 'the page', ask: 'Show me the newest titles as a table and a chart', ask2: 'Show me the workflow', preview: 'Preview', code: 'Code', openTab: 'Open in a tab', copy: 'Copy', copied: 'Copied', open: 'Open', shown: 'Shown in the side panel', showHere: 'Show here', home: 'Home' },
+    vi: { h: 'Tiêu đề mới nhất', intro: 'Đây là kết quả lần chạy,', items: '30 mục', page: 'trang này', ask: 'Cho tôi xem tiêu đề mới nhất dạng bảng và biểu đồ', ask2: 'Cho tôi xem workflow', preview: 'Xem trước', code: 'Mã', openTab: 'Mở trong tab mới', copy: 'Sao chép', copied: 'Đã sao chép', open: 'Mở', shown: 'Đã hiện trong bảng bên', showHere: 'Hiện ở đây', home: 'Trang chính' },
+  };
+  const PAGE_HTML = '<!doctype html><title>Chart</title><div id="made"></div><script>document.getElementById("made").textContent = "Made by a script";</script><div style="height:40px;width:70%;background:#2f5fd0"></div>';
+  const answerMd = (lang) => {
+    const x = SURFACE[lang];
+    return [
+      `## ${x.h}`,
+      `${x.intro} **${x.items}**:`,
+      '- *VinFast* VF 3', '- Xe điện', '',
+      '1. one', '2. two', '',
+      '> 7:58', '',
+      '| # | Title | Time |', '|---|---|---|', '| 1 | VinFast giảm giá VF 3 cho khách mua trong tháng | 7:58 |', '| 2 | Xe điện mới | 7:30 |', '',
+      `[${x.page}](https://vnexpress.net/oto-xe) · [bad](javascript:window.__xss=3) · \`get_run_data\``, '',
+      '<img src="x" onerror="window.__xss=1"><script>window.__xss=2</script>', '',
+      '```ts', 'const items = rows.filter((r) => r.time);', '```', '',
+      '```html', PAGE_HTML, '```',
+    ].join('\n');
+  };
+  const surfaceEntries = (lang, workflows) => [
+    { at: ago(3), from: 'you', text: SURFACE[lang].ask },
+    { at: ago(2), from: 'claude', text: answerMd(lang) },
+    { at: ago(1), from: 'you', text: SURFACE[lang].ask2 },
+    { at: ago(0.5), from: 'claude', text: '', view: { tool: 'list_workflows', args: {}, payload: { view: 'library', workflows, lang } } },
+  ];
+
+  for (const lang of ['en', 'vi']) {
+    for (const theme of ['light', 'dark']) {
+      it(`Claude's answers in the panel: Markdown, a page Claude made, a screen Claude showed (${lang}, ${theme})`, async () => {
+        const x = SURFACE[lang];
+        const tag = `${lang}-${theme}`;
+        const cfg = chatCfg(lang, { state: 'listening' });
+        cfg.entries = surfaceEntries(lang, cfg.workflows);
+        await start(cfg, theme);
+        await page.getByRole('button', { name: CHAT_TEXT[lang].chat, exact: true }).click();
+        const answer = page.locator('.msg.claude').first();
+        await until(async () => (await answer.locator('h2').count()) === 1, 5_000, 'the Markdown answer');
+        // Markdown: heading, bold, lists, quote, table in its own scroll box, link, inline code; no names over messages.
+        assert.equal(await answer.locator('h2').innerText(), x.h);
+        assert.equal(await answer.locator('strong').innerText(), x.items);
+        assert.equal(await answer.locator('ul > li').count(), 2);
+        assert.equal(await answer.locator('ol > li').count(), 2);
+        assert.equal(await answer.locator('blockquote').count(), 1);
+        assert.equal(await answer.locator('table tr').count(), 3);
+        assert.equal(await answer.locator('table').evaluate((t) => getComputedStyle(t).overflowX), 'auto');
+        assert.equal(await answer.locator('p code').innerText(), 'get_run_data');
+        assert.equal(await page.locator('.who').count(), 0);
+        // Nothing of the answer runs: no script, no handler, no javascript: link.
+        assert.equal(await page.evaluate(() => window.__xss), undefined);
+        assert.equal(await answer.locator('script, [onerror]').count(), 0);
+        assert.equal(await answer.locator('a[href^="javascript"]').count(), 0);
+        // A link opens in a new tab through the panel.
+        await answer.getByRole('link', { name: x.page }).click();
+        assert.deepEqual(await page.evaluate(() => window.__tabs), ['https://vnexpress.net/oto-xe']);
+        // A code block with Copy.
+        const ts = answer.locator('.md-code', { hasText: 'rows.filter' });
+        assert.equal(await ts.locator('.md-code-bar').innerText().then((s) => s.trim().split(/\s+/)[0]), 'ts');
+        await ts.getByRole('button', { name: x.copy }).click();
+        await until(async () => (await ts.getByRole('button', { name: x.copied }).count()) === 1, 3_000, 'Copied');
+        // The page Claude made: live in the isolated page (its script ran), Code shows its code, Open in a tab keeps it for the preview page.
+        const view = answer.locator('.md-page-view iframe');
+        await until(async () => (await view.count()) === 1, 5_000, 'the preview frame');
+        const made = page.frameLocator('.md-page-view iframe').frameLocator('iframe').locator('#made');
+        await until(async () => (await made.count()) === 1 && (await made.innerText()) === 'Made by a script', 10_000, 'the page\'s script to run');
+        await until(async () => (await view.evaluate((f) => f.getBoundingClientRect().height)) > 40, 5_000, 'the frame to take the page\'s height');
+        await answer.locator('.md-page').scrollIntoViewIfNeeded();
+        await shotSurface(`surface-1-markdown-${tag}`);
+        await answer.getByRole('button', { name: x.code, exact: true }).click();
+        assert.ok(await answer.locator('.md-page .md-code pre').innerText().then((s) => s.includes('Made by a script')));
+        assert.ok(!(await answer.locator('.md-page-view').isVisible()));
+        await shotSurface(`surface-2-html-code-${tag}`);
+        await answer.getByRole('button', { name: x.preview, exact: true }).click();
+        await answer.getByRole('button', { name: x.openTab }).click();
+        await until(async () => (await page.evaluate(() => window.__tabs.length)) === 2, 3_000, 'the preview tab');
+        const [tabs, storage] = await page.evaluate(() => [window.__tabs, window.__storage]);
+        const id = /^\/preview\/preview\.html#(.+)$/.exec(tabs[1])?.[1];
+        assert.ok(id, tabs[1]);
+        assert.deepEqual(storage[`bw.preview.${id}`], { html: PAGE_HTML, title: 'Chart' });
+        // The screen Claude showed: the same view in a card, with no tool call; Open shows it full size, Back returns.
+        const card = page.locator('.view-card');
+        await until(async () => (await card.locator('.row-wrap').count()) === 3, 5_000, 'the workflows in the card');
+        await card.scrollIntoViewIfNeeded();
+        await shotSurface(`surface-3-view-card-${tag}`);
+        await card.getByRole('button', { name: x.open, exact: true }).click();
+        await until(async () => !(await page.locator('.w.chat').isVisible()), 5_000, 'the full view');
+        assert.ok((await page.locator('.row-wrap:visible').count()) >= 3);
+      });
+    }
+  }
+
+  it('without the isolated page (the Claude chat widget): a page Claude made is code, with Copy', async () => {
+    const cfg = chatCfg('en', { state: 'listening', noFrame: true });
+    cfg.entries = surfaceEntries('en', cfg.workflows);
+    await start(cfg);
+    await page.getByRole('button', { name: 'Chat', exact: true }).click();
+    const answer = page.locator('.msg.claude').first();
+    await until(async () => (await answer.locator('.md-code').count()) === 2, 5_000, 'two code blocks');
+    assert.equal(await answer.locator('iframe').count(), 0);
+    assert.equal(await answer.getByRole('button', { name: 'Preview' }).count(), 0);
+    const html = answer.locator('.md-code', { hasText: 'Made by a script' });
+    assert.equal(await html.getByRole('button', { name: 'Copy' }).count(), 1);
+  });
+
+  for (const [lang, theme] of [['en', 'light'], ['en', 'dark'], ['vi', 'light'], ['vi', 'dark']]) {
+    it(`the Claude chat: a screen shown in the side panel is one line, Show here draws it (${lang}, ${theme})`, async () => {
+      const x = SURFACE[lang];
+      const cfg = chatCfg(lang);
+      await page.emulateMedia({ colorScheme: theme });
+      // The chat app's page (CHAT_PAGE) with the widget; its tool calls answer nothing here.
+      await page.goto(`${server.url}/chat`);
+      await page.evaluate(([th, lo]) => {
+        window.__ctx = { theme: th, locale: lo };
+        document.body.className = th;
+        window.hostCallTool = async () => ({ content: [{ type: 'text', text: '' }], structuredContent: {}, isError: false });
+        document.getElementById('w').src = '/widget.html';
+        window.__ready = false;
+      }, [theme, lang === 'vi' ? 'vi-VN' : 'en-US']);
+      await until(() => page.evaluate(() => window.__ready), 10_000, 'the widget handshake');
+      const text = 'Answer of list_workflows. Shown to the user in the Browser Workflow side panel\'s chat, where they wrote.';
+      await page.evaluate((r) => window.showResult(r), { content: [{ type: 'text', text }], structuredContent: { view: 'library', workflows: cfg.workflows, lang, shownIn: 'panel', modelText: text } });
+      const w = page.frameLocator('#w');
+      await until(async () => (await w.locator('body').innerText()).includes(x.shown), 10_000, 'the one line');
+      assert.equal(await w.locator('.row-wrap').count(), 0, 'the view is not drawn yet');
+      await shotSurface(`surface-4-shown-line-${lang}-${theme}`, page.locator('#w'));
+      await w.getByRole('button', { name: x.showHere }).click();
+      // The library view, drawn here from the same payload (its rows come from the widget's own tool, not answered here).
+      await until(async () => (await w.locator('.shown-line').count()) === 0 && (await w.locator('.hd .title').count()) > 0, 5_000, 'the view, drawn here');
+      // A result with no shownIn is drawn at once, as before.
+      await page.evaluate((r) => window.showResult(r), { content: [{ type: 'text', text: 'x' }], structuredContent: { view: 'error', message: 'A plain result', lang } });
+      await until(async () => (await w.locator('body').innerText()).includes('A plain result'), 5_000, 'a plain result');
+      assert.equal(await w.locator('.shown-line').count(), 0);
+    });
   }
 
   it('an extension without the chat: the strip stays "not connected", Send goes as a user.action', async () => {
