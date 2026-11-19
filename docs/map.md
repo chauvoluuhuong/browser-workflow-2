@@ -26,7 +26,7 @@ Browser Workflow extension (separate repository): engine, driver, storage, side 
 | `src/ids.js` | The host name, the extension ids allowed to connect, the Web Store address, and the socket path. |
 | `src/protocol.ts` | The protocol's types (the extension keeps a copy). |
 | `src/tools/` | `extension_status` and `wait_for_user` (also the side-panel chat's way back: its `reply`, the `claude.state` it reports, and the 55 s answer for apps that drop longer calls). |
-| `ui/` | The views (Preact), shared by the chat widget and the extension's side panel: `widget.tsx` (navigation, proposal re-reads), `views/*`, `i18n.ts` (English and Vietnamese), `bridge.ts` (the chat host), `panel.tsx` (the side panel's bridge, Home, badge and Account), `views/chat.tsx` (Use with Claude: the strip on Home, the Claude chat screen and its @-mentions; side panel only). |
+| `ui/` | The views (Preact), shared by the chat widget and the extension's side panel: `widget.tsx` (navigation, proposal re-reads), `views/*`, `i18n.ts` (English and Vietnamese), `bridge.ts` (the chat host), `panel.tsx` (the side panel's bridge, Home, badge and Account), `views/chat.tsx` (Use with Claude: the strip on Home, the Claude chat screen and its @-mentions, screens Claude showed as cards; side panel only), `markdown.tsx` (Claude's answers as Markdown, cleaned; ```html blocks drawn live in the extension's sandbox page). |
 | `skills/browser-workflow/SKILL.md` | How Claude builds and fixes workflows; `get_step_schema` passes it to the extension. |
 | `dist/` | Built and committed: `server.mjs`, `host.mjs`, `widget.html` (one file), and `panel/` (the extension copies it with `npm run sync-ui`). |
 | `mcpb/` | The desktop app bundle's manifest and icon (`npm run build:mcpb` → `dist/browser-workflow-2.mcpb`, not committed). |
@@ -55,3 +55,10 @@ The side panel opens a new Claude chat with a prompt that asks Claude to listen 
 written in the panel comes back from it, and Claude's answer goes back in its `reply`. The extension knows which
 Claude listens (`claude.state`) and sends the panel's messages to that one only (events with `to`, routed by the
 host). Details: `docs/integrations/extension-protocol.md` → "The side-panel chat".
+
+Screens go where the user wrote: while Claude answers a side-panel message (a *panel turn*: from `wait_for_user`
+returning an action until the next `wait_for_user`), and always in apps without widgets (Claude Code), the tools
+that show a screen also call `claude.show`; the extension keeps it in the chat log and the panel draws it as a card.
+The Claude chat's own card then folds to "Shown in the side panel" with Show here (`structuredContent.shownIn`).
+Claude's `reply` is Markdown (up to 100 000 characters); a ```html block is a page drawn live by the extension's
+sandbox page (`sandbox/frame.html`: no extension access, no network, no outside scripts).
