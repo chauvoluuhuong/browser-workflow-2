@@ -56,6 +56,35 @@ export interface Mention {
 /** Where a Claude is, as its plugin tells the extension (`claude.state`). */
 export type ClaudeState = 'listening' | 'working' | 'idle';
 
+/**
+ * A screen in the side panel's chat: the tool that showed it, its arguments, and the payload its view is drawn
+ * from (missing when too large to keep: the panel then calls the tool again with `args`).
+ */
+export interface ChatView {
+  tool: string;
+  args: Record<string, unknown>;
+  payload?: Record<string, unknown>;
+}
+
+/**
+ * An entry of the side panel's chat log (kept by the extension, drawn by the panel): docs/integrations/extension-protocol.md.
+ * A `view` entry (from `claude.show`) is `{ at, from: 'claude', text: '', view }`.
+ */
+export interface ChatEntry {
+  /** When it was added (ms since 1970). */
+  at: number;
+  from: 'you' | 'claude' | 'event';
+  /** A `you` entry: the user's words, with `＠<name>` (fullwidth ＠) where each mention was. `claude`: Markdown. */
+  text: string;
+  mentions?: Mention[];
+  /** An `event` entry: a proposal or a finished run, drawn by the panel in its own language. */
+  card?:
+    | { kind: 'proposal'; pendingId: string; name: string; state: string; runId?: string }
+    | { kind: 'run'; runId: string; workflowId?: string; name: string; status: string; items?: number };
+  /** A screen Claude showed while answering the side panel (`claude.show`). */
+  view?: ChatView;
+}
+
 /** Host → extension only, for a message over 1 MiB: its JSON text in 512 KiB pieces, joined by `cid`. */
 export interface ChunkFrame {
   type: 'chunk';
@@ -185,12 +214,21 @@ export interface Methods {
   'inspect.network': { params?: { resourceTypes?: string[] }; result: InspectAnswer };
   'inspect.request': { params: { reqid: number }; result: InspectAnswer };
 
-  // The side-panel chat (Use with Claude). Both are sent by the plugin's wait_for_user; an older extension answers
-  // `unsupported` and the plugin goes on without them.
+  // The side-panel chat (Use with Claude). Sent by the plugin (claude.state and claude.reply by wait_for_user,
+  // claude.show by the tools that show a screen); an older extension answers `unsupported` and the plugin goes on
+  // without them.
   /** Where the calling Claude is: `listening` (a wait_for_user started), `working` (one returned with an action), `idle` (stopped). */
   'claude.state': { params: { state: ClaudeState }; result: Record<string, never> };
-  /** Claude's answer to the user, shown in the side panel's chat (plain text, newlines kept, at most 4000 characters). */
+  /**
+   * Claude's answer to the user, shown in the side panel's chat: Markdown, at most 100 000 characters. A ```html
+   * block is drawn by the panel as a live preview.
+   */
   'claude.reply': { params: { text: string }; result: Record<string, never> };
+  /**
+   * A screen a tool showed, added to the side panel's chat as a view entry (`ChatEntry.view`). Sent during a panel
+   * turn (Claude answers a side-panel message), and always from an app that draws no widgets (Claude Code).
+   */
+  'claude.show': { params: ChatView; result: { ok: true } };
 }
 
 export type MethodName = keyof Methods;

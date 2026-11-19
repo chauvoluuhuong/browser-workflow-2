@@ -69,19 +69,33 @@ or `claude://code/new?q=…`); the user presses Send. From then on:
   Claude*: the panel's chat messages, and its *Ask Claude* actions, go `to` it; with none, actions go to every
   client as before, and the chat says Claude is not listening.
 - **Answers.** `wait_for_user` takes an optional `reply`: the plugin sends it with `claude.reply` before it
-  waits, and the panel shows it in the chat. In the Claude desktop app's chat a tool call is cut after 80 s, so
+  waits, and the panel shows it in the chat. `reply` is Markdown, at most 100 000 characters (was 4000); a
+  ` ```html ` block in it is drawn by the panel as a live preview (self-contained HTML: inline CSS and scripts,
+  no outside scripts or network). In the Claude desktop app's chat a tool call is cut after 80 s, so
   there `wait_for_user` answers "still waiting" after at most 55 s (Claude Code waits as long as asked).
   While a wait goes, the plugin re-sends `claude.state: listening` every 60 s. `wait_for_user { reply, stop: true }`
   sends the last answer and `claude.state: idle`, and returns without waiting (the user said stop).
-- **Older versions.** An older extension answers `claude.state` / `claude.reply` with `unsupported`, and the
-  plugin goes on without them. With an older plugin no state ever arrives: the extension treats a client that
+- **Panel turn.** From the moment `wait_for_user` returns with a (not silent) action until Claude calls
+  `wait_for_user` again, Claude is answering the side panel: a *panel turn*. During a panel turn every
+  model-visible tool that shows a screen (`show_*`, `list_workflows`, `list_runs`, `run_workflow`,
+  `delete_workflow`; not `setup` and not the proposals `propose_workflow`, `propose_change`, `import_workflow`,
+  whose Review card the extension already puts in the chat) also calls `claude.show { tool, args, payload? }`
+  (5 s timeout) → `{ ok: true }`; the extension adds a view entry to the chat log. On success the tool's text to
+  Claude gains "Shown to the user in the Browser Workflow side panel's chat, where they wrote." and its
+  `structuredContent` gains `shownIn: "panel"`. In an app that draws no widgets (Claude Code) the same tools call
+  `claude.show` every time, panel turn or not ("Also shown in the Browser Workflow side panel's chat."). A tool
+  answer that is an error is not shown.
+- **Older versions.** An older extension answers `claude.state` / `claude.reply` / `claude.show` with
+  `unsupported`, and the plugin goes on without them (the tool's answer is left unchanged). With an older plugin no state ever arrives: the extension treats a client that
   said `hello` as connected (v1's behaviour) and sends to every client.
 - **Panel ↔ service worker** (`chrome.runtime`, the extension's own pages only): `{ bw: "chat.state" }` →
   `{ state: "none" | "listening" | "working" | "idle" | "connected" }`; `{ bw: "chat.log" }` → `{ entries }`;
   `{ bw: "chat.mentions", query }` → `{ workflows, runs, tabs }`; `{ bw: "chat.send", text, mentions }` →
   `{ delivered }`; and the event `{ bw: "event", name: "chat.update", data: { state, entries } }` on every change.
   The log lives in `chrome.storage.session` (cleared when Chrome closes), at most 200 entries:
-  `{ at, from: "you" | "claude" | "event", text, mentions?, card? }`. A `you` entry's `text` holds `＠<name>`
+  `{ at, from: "you" | "claude" | "event", text, mentions?, card?, view? }` (`ChatEntry` in `src/protocol.ts`).
+  A `claude` entry's `text` is Markdown. A view entry (from `claude.show`) is
+  `{ at, from: "claude", text: "", view: { tool, args, payload? } }`. A `you` entry's `text` holds `＠<name>`
   (fullwidth ＠) where the user put each mention, in the order of `mentions`. `card` (an `event` entry):
   `{ kind: "proposal", pendingId, name, state, runId? }` (from `proposal.update`) or
   `{ kind: "run", runId, workflowId?, name, status, items? }` (from a finished `run.update`). The panel draws a
@@ -123,7 +137,8 @@ clients, whether the extension is connected).
 | `runs.data` | `runId` | `{ columns, rows, total }` |
 | `runs.failure` | `runId` | `{ failure: FailureInfo, screenshot?, domExcerpt? }` |
 | `claude.state` | `state`: `listening` \| `working` \| `idle` | `{}` (the side-panel chat, above) |
-| `claude.reply` | `text` (≤ 4000 characters) | `{}`: shown in the side panel's chat |
+| `claude.reply` | `text` (Markdown, ≤ 100 000 characters) | `{}`: shown in the side panel's chat |
+| `claude.show` | `tool`, `args`, `payload?` | `{ ok: true }`: a view entry in the side panel's chat (panel turn, above) |
 | `inspect.listPages`, `inspect.selectPage {pageIdx}`, `inspect.newPage {url}`, `inspect.navigate {url \| type}`, `inspect.snapshot`, `inspect.screenshot`, `inspect.click {uid}`, `inspect.fill {uid, value}`, `inspect.pressKey {key}`, `inspect.evaluate {function, args?}`, `inspect.waitFor {text, timeoutMs?}`, `inspect.console`, `inspect.network`, `inspect.request {reqid}` | as chrome-devtools-mcp's tools of the same names | `{ text, image? }`, as those tools answer |
 
 The view types (`WorkflowSummary`, `RunState`, …) are browser-workflow v1's (`src/shared/types.ts`). The
