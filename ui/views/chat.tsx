@@ -320,7 +320,7 @@ export function withChips(text: string, mentions: Mention[] = []): ComponentChil
   return out;
 }
 
-const statusKey = (s?: string) => (s && ['running', 'waiting_manual', 'success', 'failure', 'stopped'].includes(s) ? (`status.${s}` as Key) : undefined);
+const statusKey = (s?: string) => (s && ['running', 'waiting_manual', 'waiting_agent', 'success', 'failure', 'stopped'].includes(s) ? (`status.${s}` as Key) : undefined);
 
 function mentionSub(m: Mention, t: T) {
   if (m.type === 'tab') return m.url?.replace(/^https?:\/\//, '');

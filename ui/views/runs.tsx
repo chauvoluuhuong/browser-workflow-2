@@ -16,7 +16,8 @@ export function RunList({ runs }: { runs: RunSummary[] }) {
     r.status === 'success' ? (r.testUntilStep ? t('runs.testPassed', { n: r.testUntilStep }) : t('runs.done', { n: r.stepCount })) :
     r.status === 'failure' ? t('runs.failedAt', { n: r.atStep, name: r.atStepName }) :
     r.status === 'stopped' ? t('runs.stoppedAt', { n: r.atStep }) :
-    r.status === 'waiting_manual' ? t('runs.waiting') : t('runs.runningAt', { n: r.atStep });
+    r.status === 'waiting_manual' ? t('runs.waiting') :
+    r.status === 'waiting_agent' ? t('runs.waitingClaude') : t('runs.runningAt', { n: r.atStep });
   return (
     <div class="list">
       {shown.map((r) => (

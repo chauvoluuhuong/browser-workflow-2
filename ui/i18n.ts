@@ -24,6 +24,7 @@ export const en = {
   'status.success': 'Done',
   'status.failure': 'Failed',
   'status.stopped': 'Stopped',
+  'status.waiting_agent': 'Waiting for Claude',
   'status.never': 'Never run',
 
   // step types
@@ -36,6 +37,7 @@ export const en = {
   'stepType.switch': 'Switch',
   'stepType.manual': 'Manual step',
   'stepType.download': 'Download file',
+  'stepType.agent': 'Ask Claude',
 
   // browser modes
 
@@ -63,6 +65,7 @@ export const en = {
   'sug.explainIf': 'Explain this condition',
   'sug.explainSwitch': 'Explain these branches',
   'sug.automate': 'Try to automate this step',
+  'sug.otherQuestion': 'Ask Claude something else',
   'sug.fileName': 'Change the file name',
   'sug.otherFile': 'Save a different file',
   'sug.rowsMissing': 'Some items are missing',
@@ -144,12 +147,25 @@ export const en = {
   'setupRun.more': 'More options ({n})',
   'setupRun.required': 'Required',
   'setupRun.start': 'Start run',
+  'setupRun.canChange': 'During this run, may Claude change this workflow on its own?',
+  'setupRun.yes': 'Yes',
+  'setupRun.yesHint': 'Claude saves its fix as a new version, which you can undo from History',
+  'setupRun.no': 'No',
+  'setupRun.noHint': "Claude's fix waits for your approval",
+  'setupRun.pick': 'Choose Yes or No to start',
 
   // run progress
   'run.progress': '{done} / {total} steps',
   'run.testing': 'testing change',
   'run.testStop': 'test stop',
   'run.manual': '{instruction} in the Browser Workflow tab in Chrome, then press Resume.',
+  'run.waitingClaude': 'Waiting for Claude: {question}',
+  'run.waitingClaudeAfter': 'Waiting for Claude, after “{name}” failed: {question}',
+  'ask.inRun': 'Claude in this run',
+  'ask.after': 'After “{name}” failed',
+  'ask.waiting': 'Waiting for an answer…',
+  'ask.answered': 'Claude answered.',
+  'ask.stopped': 'The run was stopped before Claude answered.',
   'run.resume': 'Resume',
   'run.stop': 'Stop',
   'run.stopRun': 'Stop run',
@@ -165,6 +181,7 @@ export const en = {
 
   // failure
   'fail.title': 'Failed at step {n} of {total}',
+  'fail.askTitle': 'Failed while asking Claude',
   'fail.url': 'URL',
   'fail.error': 'Error',
   'fail.console': 'Console',
@@ -177,6 +194,9 @@ export const en = {
   'err.notFound': 'Element not found: {target} (waited {s}s)',
   'err.timeout': 'Timed out after {s}s',
   'err.runLimit': 'The run passed its {m}-minute limit and was stopped.',
+  'err.claudeUnavailable': 'Ask Claude could not run: Claude is not connected.',
+  'err.agentTimeout': 'Claude did not answer in time.',
+  'err.endedByClaude': 'Claude ended the run: {note}',
 
   // proposed change
   'chg.fixTitle': 'Proposed fix',
@@ -274,6 +294,7 @@ export const en = {
   'runs.failedAt': 'Failed at step {n} · {name}',
   'runs.stoppedAt': 'Stopped at step {n}',
   'runs.waiting': 'Waiting for you',
+  'runs.waitingClaude': 'Waiting for Claude',
   'runs.runningAt': 'Running step {n}',
   'runs.testPassed': 'Test passed up to step {n}',
   'runs.test': 'test',
@@ -421,6 +442,7 @@ export const vi: Record<Key, string> = {
   'status.success': 'Xong',
   'status.failure': 'Lỗi',
   'status.stopped': 'Đã dừng',
+  'status.waiting_agent': 'Đang chờ Claude',
   'status.never': 'Chưa chạy',
 
   'stepType.navigate': 'Mở trang',
@@ -432,6 +454,7 @@ export const vi: Record<Key, string> = {
   'stepType.switch': 'Rẽ nhánh',
   'stepType.manual': 'Bước thủ công',
   'stepType.download': 'Tải tệp',
+  'stepType.agent': 'Hỏi Claude',
 
 
   'ask.button': 'Hỏi {ai}',
@@ -457,6 +480,7 @@ export const vi: Record<Key, string> = {
   'sug.explainIf': 'Giải thích điều kiện này',
   'sug.explainSwitch': 'Giải thích các nhánh',
   'sug.automate': 'Thử tự động hoá bước này',
+  'sug.otherQuestion': 'Hỏi Claude điều khác',
   'sug.fileName': 'Đổi tên tệp',
   'sug.otherFile': 'Lưu một tệp khác',
   'sug.rowsMissing': 'Bị thiếu một số mục',
@@ -532,11 +556,24 @@ export const vi: Record<Key, string> = {
   'setupRun.more': 'Tuỳ chọn khác ({n})',
   'setupRun.required': 'Bắt buộc',
   'setupRun.start': 'Bắt đầu chạy',
+  'setupRun.canChange': 'Trong lần chạy này, Claude có được tự sửa workflow không?',
+  'setupRun.yes': 'Có',
+  'setupRun.yesHint': 'Claude lưu cách sửa thành phiên bản mới, bạn có thể hoàn tác trong Lịch sử phiên bản',
+  'setupRun.no': 'Không',
+  'setupRun.noHint': 'Cách sửa của Claude chờ bạn duyệt',
+  'setupRun.pick': 'Chọn Có hoặc Không để bắt đầu',
 
   'run.progress': '{done} / {total} bước',
   'run.testing': 'đang thử thay đổi',
   'run.testStop': 'dừng thử',
   'run.manual': '{instruction} trong thẻ Browser Workflow trên Chrome, rồi bấm Tiếp tục.',
+  'run.waitingClaude': 'Đang chờ Claude: {question}',
+  'run.waitingClaudeAfter': 'Đang chờ Claude, sau khi bước “{name}” bị lỗi: {question}',
+  'ask.inRun': 'Claude trong lần chạy này',
+  'ask.after': 'Sau khi bước “{name}” bị lỗi',
+  'ask.waiting': 'Đang chờ trả lời…',
+  'ask.answered': 'Claude đã trả lời.',
+  'ask.stopped': 'Lần chạy đã dừng trước khi Claude trả lời.',
   'run.resume': 'Tiếp tục',
   'run.stop': 'Dừng',
   'run.stopRun': 'Dừng chạy',
@@ -551,6 +588,7 @@ export const vi: Record<Key, string> = {
   'run.steps': 'Các bước ({n})',
 
   'fail.title': 'Lỗi ở bước {n}/{total}',
+  'fail.askTitle': 'Lỗi khi hỏi Claude',
   'fail.url': 'URL',
   'fail.error': 'Lỗi',
   'fail.console': 'Console',
@@ -563,6 +601,9 @@ export const vi: Record<Key, string> = {
   'err.notFound': 'Không tìm thấy phần tử: {target} (đã chờ {s} giây)',
   'err.timeout': 'Hết thời gian chờ sau {s} giây',
   'err.runLimit': 'Lần chạy đã vượt giới hạn {m} phút và bị dừng.',
+  'err.claudeUnavailable': 'Không hỏi được Claude: Claude chưa kết nối.',
+  'err.agentTimeout': 'Claude không trả lời kịp.',
+  'err.endedByClaude': 'Claude đã kết thúc lần chạy: {note}',
 
   'chg.fixTitle': 'Đề xuất sửa lỗi',
   'chg.changeTitle': 'Đề xuất thay đổi',
@@ -653,6 +694,7 @@ export const vi: Record<Key, string> = {
   'runs.failedAt': 'Lỗi ở bước {n} · {name}',
   'runs.stoppedAt': 'Dừng ở bước {n}',
   'runs.waiting': 'Đang chờ bạn',
+  'runs.waitingClaude': 'Đang chờ Claude',
   'runs.runningAt': 'Đang chạy bước {n}',
   'runs.testPassed': 'Chạy thử tốt tới bước {n}',
   'runs.test': 'chạy thử',

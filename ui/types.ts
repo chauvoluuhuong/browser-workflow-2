@@ -9,7 +9,7 @@ export type LangPref = Lang | 'auto';
 
 export type StepType =
   | 'navigate' | 'delay' | 'executeXpathCommand' | 'javascript'
-  | 'extractData' | 'if' | 'switch' | 'manual' | 'download';
+  | 'extractData' | 'if' | 'switch' | 'manual' | 'download' | 'agent';
 
 /** A file a download step saved (or is saving) into the user's Downloads. */
 export interface SavedFile {
@@ -46,7 +46,8 @@ export interface VariableField {
   description?: string;
 }
 
-export type RunStatus = 'running' | 'waiting_manual' | 'success' | 'failure' | 'stopped';
+/** `waiting_agent`: an Ask Claude step waits for Claude's answer (resume_run). */
+export type RunStatus = 'running' | 'waiting_manual' | 'waiting_agent' | 'success' | 'failure' | 'stopped';
 
 export interface WorkflowSummary {
   id: string;
@@ -77,6 +78,22 @@ export interface StepProgress {
   download?: SavedFile;
 }
 
+/** One time a run asked Claude (RunState.asks). */
+export interface AskClaudeEntry {
+  /** The Ask Claude step, or 'ask-claude' for the one a failure started. */
+  stepId: string;
+  stepName: string;
+  /** The failed step that asked, if a failure did. */
+  failedStepName?: string;
+  question: string;
+  state: 'waiting' | 'ok' | 'failed' | 'stopped';
+  errorType?: string;
+  /** Claude's answer: where the run went, the named values, and its note to the user. */
+  then?: string;
+  answer?: Record<string, unknown>;
+  note?: string;
+}
+
 export interface RunState {
   runId: string;
   workflowId: string;
@@ -90,6 +107,15 @@ export interface RunState {
   /** Set when the run was started with stopAfterStepId (testing a fix). */
   stopAfterStepId?: string;
   manual?: { stepName: string; instruction: string };
+  /** The run waits for Claude (status waiting_agent): the question, and the failed step that asked it, if any. */
+  agent?: { stepId: string; stepName: string; question: string; failedStepName?: string; error?: string; untilMs: number };
+  /**
+   * Each time this run asked Claude (an Ask Claude step, or a failed step), oldest first: the question and what came
+   * of it. `state` waiting / ok (answered) / failed (`errorType`: claude_unavailable, agent_timeout, ended_by_claude).
+   */
+  asks?: AskClaudeEntry[];
+  /** The user allowed Claude to change this workflow on its own during this run. */
+  claudeCanChange?: boolean;
   result?: { rows: number };
   failure?: FailureInfo;
   /**
@@ -277,7 +303,14 @@ export type ViewBody =
   | { view: 'draft'; workflow: WorkflowDetail; pendingId: string }
   | { view: 'runSetup'; workflow: WorkflowDetail; browser: BrowserConfig;
     /** The inputs of a test run of a proposal not saved yet: the form starts ui_test_draft. */
-    draft?: { pendingId: string } }
+    draft?: { pendingId: string };
+    /**
+     * The user's answer to "During this run, may Claude change this workflow on its own?": the form shows it as a
+     * choice, preset to this (undefined: never asked, the user must pick before Run). run_workflow takes claudeCanChange.
+     */
+    claudeCanChange?: boolean;
+    /** The run can't start until the user answers the question above (the first run of this workflow). */
+    askClaudeCanChange?: boolean }
   | { view: 'run'; run: RunState }
   /** inspecting: shown by show_failure while Claude works on a fix, so the card doesn't offer Fix with Claude again. */
   | { view: 'failure'; run: RunState; inspecting?: boolean }

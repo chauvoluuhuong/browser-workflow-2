@@ -59,6 +59,8 @@ export const Icon = {
   switch: () => I(<><circle cx="3.5" cy="8" r="1.5" /><path d="M5 8h2.5M7.5 8l5-4M7.5 8h5M7.5 8l5 4" /></>),
   delay: () => I(<><circle cx="8" cy="8" r="5.5" /><path d="M8 5v3.2l2 1.3" /></>),
   download: () => I(<path d="M8 3v7.5M4.5 7L8 10.5 11.5 7M3 13h10" />),
+  // Ask Claude: a speech bubble with a spark.
+  agent: () => I(<><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h7A1.5 1.5 0 0 1 13 4.5v5a1.5 1.5 0 0 1-1.5 1.5H7l-3 2.5V11h0A1 1 0 0 1 3 10z" /><path d="M8 5.2l.5 1.3 1.3.5-1.3.5L8 8.8l-.5-1.3-1.3-.5 1.3-.5z" /></>),
   manual: () => I(<path d="M5.5 8V4.2a1 1 0 0 1 2 0V7.5M7.5 7V3.2a1 1 0 0 1 2 0V7.5M9.5 7.5V4.5a1 1 0 0 1 2 0V9c0 2.5-1.5 4.5-4 4.5-1.8 0-2.7-.8-3.7-2.3L2.6 8.7a1 1 0 0 1 1.6-1.1l1.3 1.4" />),
 };
 
@@ -69,13 +71,13 @@ export function StepTypeIcon({ type }: { type: StepType }) {
 
 export function StatusPill({ status }: { status: RunStatus }) {
   const { t } = useI18n();
-  const cls: Record<RunStatus, string> = { running: 'run', waiting_manual: 'warn', success: 'ok', failure: 'bad', stopped: 'muted' };
+  const cls: Record<RunStatus, string> = { running: 'run', waiting_manual: 'warn', waiting_agent: 'warn', success: 'ok', failure: 'bad', stopped: 'muted' };
   return <span class={`pill ${cls[status]}`}>{t(`status.${status}`)}</span>;
 }
 
 export function StatusDot({ status }: { status?: RunStatus }) {
   const { t } = useI18n();
-  const cls = status === 'success' ? 'ok' : status === 'failure' ? 'bad' : status === 'running' ? 'run' : status === 'waiting_manual' ? 'warn' : '';
+  const cls = status === 'success' ? 'ok' : status === 'failure' ? 'bad' : status === 'running' ? 'run' : status === 'waiting_manual' || status === 'waiting_agent' ? 'warn' : '';
   return <span class={`dot ${cls}`} title={status ? t(`status.${status}`) : t('status.never')} />;
 }
 

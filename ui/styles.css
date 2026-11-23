@@ -294,3 +294,15 @@ button.ev-link:hover { color: var(--fg); text-decoration: underline; }
 .w.shown-line { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); }
 .shown-line-text { display: flex; align-items: center; gap: 8px; color: var(--fg-2); font-size: 13px; min-width: 0; }
 .shown-line-text svg { flex: none; }
+
+/* Ask Claude: the run form's question, and "Claude in this run". */
+fieldset.choices { border: 0; padding: 0; margin: 0; gap: 6px; min-width: 0; }
+.choices legend { font-size: 13px; font-weight: 500; color: var(--fg); padding: 0; margin-bottom: 6px; }
+.choice { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--line-2); border-radius: var(--radius); cursor: pointer; }
+.choice.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.choice input { margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+.choice .row-main, .row.claude-ask .row-main { display: flex; flex-direction: column; gap: 2px; }
+.choice .row-sub, .row.claude-ask .row-sub, .row.claude-ask .row-title { white-space: normal; overflow-wrap: anywhere; }
+.row.claude-ask { align-items: flex-start; }
+.row-sub.bad { color: var(--bad); }
+.section-label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--fg-2); }

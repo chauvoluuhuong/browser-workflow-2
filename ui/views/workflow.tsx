@@ -16,6 +16,7 @@ const EDIT_SUGGESTIONS: Record<StepType, Key[]> = {
   switch: ['sug.explainSwitch'],
   manual: ['sug.automate'],
   download: ['sug.fileName', 'sug.otherFile'],
+  agent: ['sug.otherQuestion'],
 };
 
 export function StepList({ steps, limit = TOP, workflow }: {

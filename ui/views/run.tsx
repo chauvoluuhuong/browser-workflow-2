@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import type { BrowserConfig, FailureInfo, RunState, SavedFile, StepProgress, VariableField, WorkflowDetail, ViewPayload } from '../types.js';
+import type { AskClaudeEntry, BrowserConfig, FailureInfo, RunState, SavedFile, StepProgress, VariableField, WorkflowDetail, ViewPayload } from '../types.js';
 import { askClaude, AskClaude, AsyncButton, Disclosure, Header, Icon, Note, Screenshot, StatusPill, useNav } from '../components.js';
 import { useI18n, type T } from '../i18n.js';
 import { DraftSave } from './importDraft.js';
 
-/** Localized one-line reason; falls back to the engine's raw message for unknown error types. */
-export function failureText(f: { errorType?: string; type?: string; target?: string; timeoutMs?: number; reason?: string; raw?: string }, t: T) {
+/** Localized one-line reason; falls back to the engine's raw message for unknown error types. `note`: Claude's, when it ended the run. */
+export function failureText(f: { errorType?: string; type?: string; target?: string; timeoutMs?: number; reason?: string; raw?: string }, t: T, note?: string) {
   const type = f.errorType ?? f.type;
+  if (type === 'claude_unavailable') return t('err.claudeUnavailable');
+  if (type === 'agent_timeout') return t('err.agentTimeout');
+  if (type === 'ended_by_claude') return t('err.endedByClaude', { note: note ?? f.reason ?? '' }).trim();
   const s = f.timeoutMs ? Math.round(f.timeoutMs / 1000) : undefined;
   if (type === 'cant_get_web_element_xpath' && f.target) return t('err.notFound', { target: f.target, s });
   if (type === 'timeout' && f.target === 'run_limit' && f.timeoutMs) return t('err.runLimit', { m: Math.round(f.timeoutMs / 6000) / 10 });
@@ -16,7 +19,33 @@ export function failureText(f: { errorType?: string; type?: string; target?: str
 
 // ---------- run setup (F4) ----------
 
-export function RunSetupView({ workflow: wf, draft }: { workflow: WorkflowDetail; browser?: BrowserConfig; draft?: { pendingId: string } }) {
+/** "During this run, may Claude change this workflow on its own?": Yes / No, each with what it means. */
+function CanChange({ value, onChange, missing }: { value?: boolean; onChange: (v: boolean) => void; missing: boolean }) {
+  const { t } = useI18n();
+  const opt = (v: boolean) => (
+    <label class={`choice${value === v ? ' on' : ''}`}>
+      <input type="radio" name="can-change" checked={value === v} onChange={() => onChange(v)} />
+      <span class="row-main">
+        <span class="row-title">{t(v ? 'setupRun.yes' : 'setupRun.no')}</span>
+        <span class="row-sub">{t(v ? 'setupRun.yesHint' : 'setupRun.noHint')}</span>
+      </span>
+    </label>
+  );
+  return (
+    <fieldset class="field choices">
+      <legend>{t('setupRun.canChange')}</legend>
+      {opt(true)}
+      {opt(false)}
+      {missing && <span class="err">{t('setupRun.pick')}</span>}
+    </fieldset>
+  );
+}
+
+export function RunSetupView({ workflow: wf, draft, claudeCanChange, askClaudeCanChange }: {
+  workflow: WorkflowDetail; browser?: BrowserConfig; draft?: { pendingId: string };
+  /** The remembered answer to the question above (preset); `askClaudeCanChange`: never asked, Run waits for an answer. */
+  claudeCanChange?: boolean; askClaudeCanChange?: boolean;
+}) {
   const nav = useNav();
   const { t } = useI18n();
   const init = Object.fromEntries(wf.variables.map((v) => [v.name, v.default ?? (v.type === 'boolean' ? false : '')]));
@@ -25,16 +54,21 @@ export function RunSetupView({ workflow: wf, draft }: { workflow: WorkflowDetail
   const required = wf.variables.filter((v) => v.required);
   const optional = wf.variables.filter((v) => !v.required);
   const missing = required.filter((v) => values[v.name] === '' || values[v.name] === undefined);
+  // The question shows when the workflow asks it (the first run) or remembers an answer (changeable here).
+  const asks = askClaudeCanChange || claudeCanChange !== undefined;
+  const [canChange, setCanChange] = useState<boolean | undefined>(claudeCanChange);
+  const unanswered = asks && canChange === undefined;
 
   async function start() {
     setTouched(true);
-    if (missing.length) return;
+    if (missing.length || unanswered) return;
     const vars = Object.fromEntries(Object.entries(values).map(([k, v]) => {
       const f = wf.variables.find((x) => x.name === k);
       return [k, f?.type === 'number' && v !== '' ? Number(v) : v];
     }));
     // A proposal not saved yet is tested as it is; a saved workflow runs its current version.
-    await nav.open(draft ? 'ui_test_draft' : 'run_workflow', draft ? { pendingId: draft.pendingId, variables: vars } : { id: wf.id, variables: vars }, 'replace');
+    const can = asks && canChange !== undefined ? { claudeCanChange: canChange } : {};
+    await nav.open(draft ? 'ui_test_draft' : 'run_workflow', draft ? { pendingId: draft.pendingId, variables: vars, ...can } : { id: wf.id, variables: vars, ...can }, 'replace');
   }
 
   const field = (v: VariableField) =>
@@ -68,9 +102,10 @@ export function RunSetupView({ workflow: wf, draft }: { workflow: WorkflowDetail
             <div class="stack">{optional.map(field)}</div>
           </Disclosure>
         )}
+        {asks && <CanChange value={canChange} onChange={setCanChange} missing={touched && unanswered} />}
       </div>
       <div class="actions">
-        <AsyncButton primary onClick={start}>{Icon.play()}{t(draft ? 'draft.startTest' : 'setupRun.start')}</AsyncButton>
+        <AsyncButton primary disabled={unanswered} onClick={start}>{Icon.play()}{t(draft ? 'draft.startTest' : 'setupRun.start')}</AsyncButton>
       </div>
       {draft && <DraftSave draft={{ pendingId: draft.pendingId, name: wf.name }} />}
     </div>
@@ -159,6 +194,46 @@ function SavedFiles({ run }: { run: RunState }) {
   return <div class="list">{files.map((s) => <div class="row"><SavedFileRow file={s.download!} runId={run.runId} stepId={s.stepId} /></div>)}</div>;
 }
 
+/** One time the run asked Claude: the question (after which failure), then Claude's note, or why it got none. */
+function AskRow({ a }: { a: AskClaudeEntry }) {
+  const { t } = useI18n();
+  const outcome =
+    a.state === 'waiting' ? <span class="row-sub">{t('ask.waiting')}</span> :
+    a.state === 'stopped' ? <span class="row-sub">{t('ask.stopped')}</span> :
+    a.state === 'failed' ? <span class="row-sub bad">{failureText({ errorType: a.errorType }, t, a.note) || a.note}</span> :
+    <span class="row-sub">{a.note || t('ask.answered')}</span>;
+  const values = a.answer && Object.keys(a.answer).length
+    ? Object.entries(a.answer).map(([k, v]) => `${k}: ${typeof v === 'string' ? v : JSON.stringify(v)}`).join(' · ')
+    : '';
+  const icon = a.state === 'ok' ? <span class="st ok">{Icon.check()}</span>
+    : a.state === 'failed' ? <span class="st bad">{Icon.x()}</span>
+    : a.state === 'waiting' ? <span class="st warn">{Icon.pause()}</span>
+    : <span class="st pending">{Icon.skip()}</span>;
+  return (
+    <div class="row claude-ask">
+      {icon}
+      <div class="row-main">
+        {a.failedStepName && <span class="row-sub">{t('ask.after', { name: a.failedStepName })}</span>}
+        <span class="row-title wrap">{a.question}</span>
+        {outcome}
+        {values && <span class="row-sub mono">{values}</span>}
+      </div>
+    </div>
+  );
+}
+
+/** "Claude in this run": each time the run asked Claude, oldest first. */
+function AskList({ run }: { run: RunState }) {
+  const { t } = useI18n();
+  if (!run.asks?.length) return null;
+  return (
+    <div class="stack" style="gap:6px">
+      <div class="section-label">{Icon.agent()}{t('ask.inRun')}</div>
+      <div class="list">{run.asks.map((a) => <AskRow a={a} />)}</div>
+    </div>
+  );
+}
+
 /** Keeps a small window of steps around the active one so the view stays short. */
 function visibleSteps(steps: StepProgress[], expanded: boolean) {
   if (expanded || steps.length <= 7) return steps.map((s, i) => ({ s, i }));
@@ -186,10 +261,10 @@ export function RunView({ run: initial }: { run: RunState }) {
   const [expanded, setExpanded] = useState(false);
   const reported = useRef<string>();
   // Only report runs that finish while this view watches them, not old runs opened from a list.
-  const wasLive = useRef(initial.status === 'running' || initial.status === 'waiting_manual');
+  const wasLive = useRef(initial.status === 'running' || initial.status === 'waiting_manual' || initial.status === 'waiting_agent');
   useEffect(() => setRun(initial), [initial]);
 
-  const live = run.status === 'running' || run.status === 'waiting_manual';
+  const live = run.status === 'running' || run.status === 'waiting_manual' || run.status === 'waiting_agent';
 
   // While the run is going, keep the view current. When the server announces changes (`live.url`), the
   // widget listens there. Each announcement carries the run's status and every step's state, so the
@@ -305,6 +380,7 @@ export function RunView({ run: initial }: { run: RunState }) {
         </div>
         <SavedFiles run={run} />
         <AllSteps run={run} />
+        <AskList run={run} />
         <AskClaude
           key={run.runId}
           heading={t('ask.runTitle')}
@@ -340,6 +416,7 @@ export function RunView({ run: initial }: { run: RunState }) {
           </div>
         </div>
         <AllSteps run={run} />
+        <AskList run={run} />
         <div class="actions"><AsyncButton primary={!run.draft} onClick={again}>{t(run.draft ? 'draft.testAgain' : 'run.runAgain')}</AsyncButton></div>
         {save}
       </div>
@@ -363,11 +440,17 @@ export function RunView({ run: initial }: { run: RunState }) {
         <div class="muted">{t('run.progress', { done, total })}</div>
       </div>
       {run.manual && <Note kind="warn">{t('run.manual', { instruction: run.manual.instruction })}</Note>}
+      {run.status === 'waiting_agent' && run.agent && (
+        <Note kind="warn">{run.agent.failedStepName
+          ? t('run.waitingClaudeAfter', { name: run.agent.failedStepName, question: run.agent.question })
+          : t('run.waitingClaude', { question: run.agent.question })}</Note>
+      )}
       <div class="list">
         {rows[0]?.i > 0 && <div class="row is-pending"><span class="num" /><span class="muted">{t('run.earlier', { n: rows[0].i })}</span></div>}
         {rows.map(({ s, i }) => <StepRow s={s} index={i} runId={run.runId} isStopAfter={s.stepId === run.stopAfterStepId} />)}
         {!expanded && rows.length < run.steps.length && <button class="more" onClick={() => setExpanded(true)}>{t('common.showAll', { n: run.steps.length })}</button>}
       </div>
+      <AskList run={run} />
       <div class="actions">
         {run.manual ? (
           <>
@@ -389,7 +472,7 @@ export function FailureView({ run, inspecting }: { run: RunState; inspecting?: b
   const nav = useNav();
   const { t } = useI18n();
   const f = run.failure as FailureInfo;
-  const reason = failureText(f, t);
+  const reason = failureText(f, t, run.asks?.filter((a) => a.note).at(-1)?.note);
   // A test of a proposal not saved yet: the fix comes as a new proposal, since there is nothing saved to change.
   const context = run.version === 0
     ? `Test run ${run.runId} of the proposed workflow "${run.workflowName}" (id ${run.workflowId}, not saved yet) failed at step ${f.stepIndex + 1} [${f.stepId}] "${f.stepName}". ` +
@@ -404,13 +487,14 @@ export function FailureView({ run, inspecting }: { run: RunState; inspecting?: b
 
   return (
     <div class="w">
-      <Header title={t('fail.title', { n: f.stepIndex + 1, total: run.steps.length })} sub={`${run.workflowName} · ${run.version === 0 ? t('draft.testing') : `v${run.version}`}`} right={<StatusPill status="failure" />} />
+      <Header title={f.stepIndex >= 0 ? t('fail.title', { n: f.stepIndex + 1, total: run.steps.length }) : t('fail.askTitle')} sub={`${run.workflowName} · ${run.version === 0 ? t('draft.testing') : `v${run.version}`}`} right={<StatusPill status="failure" />} />
       <div class="stack" style="gap:4px">
         <div class="row-title">{f.stepName}</div>
         <div style="color:var(--bad);font-size:13px">{reason}</div>
       </div>
       {f.hasScreenshot && <Screenshot runId={run.runId} stepId={f.stepId} alt={t('fail.shotAlt', { n: f.stepIndex + 1 })} />}
       <AllSteps run={run} />
+      <AskList run={run} />
       <Disclosure label={t('common.details')}>
         <dl class="kv">
           <dt>{t('fail.url')}</dt><dd class="mono">{f.url}</dd>
