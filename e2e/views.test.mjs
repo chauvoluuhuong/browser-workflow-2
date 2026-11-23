@@ -103,7 +103,35 @@ const okWorkflow = (id, name) => ({
 });
 const failingWorkflow = () => ({
   id: 'e2e-views-fail', name: 'Click the missing button', pageUrl: `${site.url}/`, description: 'Fails on purpose',
+  // A plain failure, as before Ask Claude: it does not wake Claude.
+  onError: { wake: false },
   steps: [{ id: 'click', stepType: 'executeXpathCommand', stepName: 'Click the missing button', action: { xpathSelector: '//button[@id="missing"]', command: 'click', timeoutMs: 1000 }, nextStepId: null }],
+});
+
+/** A workflow that asks Claude on its first step (Ask Claude), then reads the page. */
+const askWorkflow = () => ({
+  id: 'e2e-views-ask', name: 'Pick the clip', pageUrl: `${site.url}/media`, description: 'Asks Claude which link is the clip',
+  steps: [
+    { id: 'pick', stepType: 'agent', stepName: 'Ask Claude: which clip?', action: { instruction: 'Which link on this page is the clip?', answer: { clip: { type: 'string', description: 'The clip\'s file name' } } }, nextStepId: 'read' },
+    { id: 'read', stepType: 'extractData', stepName: 'Read the links', action: { jsCode: "() => [...document.querySelectorAll('a')].map(a => ({ text: a.textContent.trim(), href: a.href }))" }, nextStepId: null },
+  ],
+});
+/** A finished run (sample payload): Claude answered its Ask Claude step; a later failure could not reach Claude. */
+const askedRun = (lang) => ({
+  view: 'run', lang,
+  run: {
+    runId: 'run_sample', workflowId: 'e2e-views-ask', workflowName: lang === 'vi' ? 'Chọn video' : 'Pick the clip', version: 2, status: 'failure', browser: 'attach', variables: {},
+    steps: [
+      { stepId: 'pick', stepName: 'Ask Claude: which clip?', stepType: 'agent', state: 'ok', durationMs: 42_000 },
+      { stepId: 'read', stepName: 'Read the links', stepType: 'extractData', state: 'ok', durationMs: 300 },
+      { stepId: 'click', stepName: 'Click the missing button', stepType: 'executeXpathCommand', state: 'failed', durationMs: 1000 },
+    ],
+    asks: [
+      { stepId: 'pick', stepName: 'Ask Claude: which clip?', question: 'Which link on this page is the clip?', state: 'ok', then: 'next', answer: { clip: 'clip.mp4' }, note: 'The clip is the second link, “clip.mp4”.' },
+      { stepId: 'ask-claude', stepName: '', failedStepName: 'Click the missing button', question: 'Step “Click the missing button” failed: find out why, get past it or fix it, then resume.', state: 'failed', errorType: 'claude_unavailable' },
+    ],
+    failure: { stepId: 'click', stepName: 'Click the missing button', stepIndex: 2, reason: 'Ask Claude could not run: Claude is not connected', errorType: 'claude_unavailable', stack: '', url: 'http://127.0.0.1/', hasScreenshot: false, variables: {}, consoleErrors: [] },
+  },
 });
 
 describe('the widget and the side panel through the real host', { timeout: 10 * 60_000 }, () => {
@@ -188,7 +216,8 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
   });
 
   it('a run with a download step shows the saved file in the widget', async () => {
-    const started = await tool('run_workflow', { id: 'e2e-views-ok' });
+    // The first run of a workflow carries the answer to "may Claude change it on its own?" (the run form asks it).
+    const started = await tool('run_workflow', { id: 'e2e-views-ok', claudeCanChange: false });
     await showInChat(started);
     await until(async () => /Done · 2 steps/.test(await widgetText()), 60_000, 'the run to finish');
     const t = await widgetText();
@@ -201,6 +230,10 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
   it('"Fix with Claude" in the side panel: a waiting wait_for_user returns the request', async () => {
     const proposed = await tool('propose_workflow', { workflow: failingWorkflow() });
     await tool('ui_save_draft', { pendingId: proposed.data.pendingId });
+    // A first run answers the run form's question, so the side panel's Run starts at once.
+    const first = await tool('run_workflow', { id: 'e2e-views-fail', claudeCanChange: false });
+    assert.equal(first.data.view, 'run', first.text);
+    await until(async () => (await tool('show_run', { runId: first.data.run.runId })).data.run?.status === 'failure', 60_000, 'the first run to fail');
     // Claude waits for the user (as it does after asking them to look at the side panel).
     const waiting = tool('wait_for_user', { minutes: 2 });
     await panel.bringToFront();
@@ -259,6 +292,75 @@ describe('the widget and the side panel through the real host', { timeout: 10 * 
       await showInChat(r);
       await until(async () => (await widgetText()).includes(expect), 10_000, `the ${view} view to show "${expect}"`);
       await shot(chat, `widget-view-${view}`);
+    }
+  });
+
+  it('Ask Claude: the run form asks first, a run waits for Claude, and Claude\'s answer shows', async () => {
+    const proposed = await tool('propose_workflow', { workflow: askWorkflow() });
+    await tool('ui_save_draft', { pendingId: proposed.data.pendingId });
+    const combos = SHOTS ? [['en', 'light'], ['en', 'dark'], ['vi', 'light'], ['vi', 'dark']] : [['en', 'light']];
+    // Never run: run_workflow answers the run form with the question, and Start waits for an answer.
+    for (const [lang, theme] of combos) {
+      await tool('ui_set_language', { lang });
+      const form = await tool('run_workflow', { id: 'e2e-views-ask' });
+      assert.equal(form.data.view, 'runSetup', form.text);
+      assert.equal(form.data.askClaudeCanChange, true);
+      await showInChat(form, { theme, locale: lang === 'vi' ? 'vi-VN' : 'en-US' });
+      const question = lang === 'vi' ? 'Trong lần chạy này, Claude có được tự sửa workflow không?' : 'During this run, may Claude change this workflow on its own?';
+      await until(async () => (await widgetText()).includes(question), 10_000, 'the question');
+      assert.equal(await chat.frameLocator('#w').getByRole('button', { name: lang === 'vi' ? 'Bắt đầu chạy' : 'Start run' }).isDisabled(), true, 'Start waits for an answer');
+      await shot(chat, `widget-runSetup-ask-${lang}-${theme}`);
+    }
+    await tool('ui_set_language', { lang: 'en' });
+    const form = await tool('run_workflow', { id: 'e2e-views-ask' });
+    await showInChat(form);
+    await until(async () => (await widgetText()).includes('During this run'), 10_000, 'the question');
+    const w = chat.frameLocator('#w');
+    await w.getByRole('radio', { name: /^No/ }).check();
+    assert.equal(await w.getByRole('button', { name: 'Start run' }).isDisabled(), false);
+    await w.getByRole('button', { name: 'Start run' }).click();
+    // The run reaches the Ask Claude step: it waits, and the widget says for what.
+    await until(async () => (await widgetText()).includes('Waiting for Claude: Which link on this page is the clip?'), 60_000, 'the run to wait for Claude');
+    assert.match(await widgetText(), /Claude in this run/);
+    await shot(chat, 'widget-run-waiting-claude-en-light');
+    const waiting = (await tool('read_runs', { workflowId: 'e2e-views-ask' })).text;
+    const runId = /- (\S+) /.exec(waiting)?.[1];
+    assert.ok(runId, waiting);
+    if (SHOTS) {
+      for (const [lang, theme] of combos.slice(1)) {
+        await tool('ui_set_language', { lang });
+        await showInChat(await tool('show_run', { runId }), { theme, locale: lang === 'vi' ? 'vi-VN' : 'en-US' });
+        await until(async () => /(Waiting for Claude|Đang chờ Claude):/.test(await widgetText()), 10_000, 'the waiting run');
+        await shot(chat, `widget-run-waiting-claude-${lang}-${theme}`);
+      }
+      await tool('ui_set_language', { lang: 'en' });
+      await showInChat(await tool('show_run', { runId }));
+    }
+    // The wake reached this plugin; Claude answers, and the run goes on with the answer.
+    const wake = await tool('wait_for_user', { minutes: 0.1 });
+    assert.match(wake.text, new RegExp(`^A run woke you: run ${runId} of workflow e2e-views-ask`));
+    await tool('wait_for_user', { minutes: 0.001 });
+    const answered = await tool('resume_run', { runId, then: 'next', answer: { clip: 'clip.mp4' }, note: 'The clip is the second link.' });
+    assert.equal(answered.isError, false, answered.text);
+    await until(async () => /Done · 2 steps/.test(await widgetText()), 60_000, 'the run to finish');
+    const t = await widgetText();
+    assert.match(t, /Claude in this run/);
+    assert.match(t, /The clip is the second link\./);
+    assert.match(t, /clip: clip\.mp4/);
+    await shot(chat, 'widget-run-asked-en-light');
+  });
+
+  it('Ask Claude: a run with an answered ask, then one Claude could not take (not connected)', async () => {
+    for (const [lang, theme] of [['en', 'light'], ['en', 'dark'], ['vi', 'light'], ['vi', 'dark']]) {
+      await showInChat({ raw: { content: [{ type: 'text', text: 'sample' }], structuredContent: askedRun(lang), isError: false } }, { theme, locale: lang === 'vi' ? 'vi-VN' : 'en-US' });
+      const expect = lang === 'vi'
+        ? ['Không hỏi được Claude: Claude chưa kết nối.', 'Claude trong lần chạy này', 'Sau khi bước “Click the missing button” bị lỗi']
+        : ['Ask Claude could not run: Claude is not connected.', 'Claude in this run', 'After “Click the missing button” failed'];
+      await until(async () => (await widgetText()).includes(expect[0]), 10_000, 'the failure text');
+      const t = await widgetText();
+      for (const e of expect) assert.ok(t.includes(e), `${lang}: ${e}`);
+      assert.ok(t.includes('The clip is the second link, “clip.mp4”.'));
+      await shot(chat, `widget-run-asks-${lang}-${theme}`);
     }
   });
 
