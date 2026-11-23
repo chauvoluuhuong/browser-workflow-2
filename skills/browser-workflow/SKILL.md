@@ -46,6 +46,7 @@ Write `reason` in the user's language, as one sentence.
 | `switch` | `{ cases: [{ jsCondition, nextStepId }], defaultNextStepId }` | `{ matchedJsCondition }` |
 | `manual` | `{ description, timeoutMs? }`: pauses until the user presses Resume | `{ status }` |
 | `download` | `{ source: { xpath, attribute? } \| { request: { urlPattern, method? } }, fileName?, folder?, timeoutMs? }`: saves a plain file into the user's Downloads | `{ fileName, folder, bytes, url }` |
+| `agent` | `{ instruction, answer?, timeoutMs? }`: Ask Claude, pauses until you answer with `resume_run` (below) | Claude's `answer` values |
 
 Every step has `id`, `stepName`, `description` and `nextStepId` (`null` ends the chain). The run
 starts at the steps nothing points to. `pageUrl`, if set, is opened before the first step.
@@ -62,6 +63,36 @@ starts at the steps nothing points to. `pageUrl`, if set, is opened before the f
   (deep-merged). `await setVariables({...})` also works, for older workflows.
 - `runtime.lastOutput` / `runtime.lastOutputParsed` hold the previous step's output. `javascript`
   and `extractData` functions receive it as their argument: `(input) => …`.
+
+## Ask Claude step
+
+A step can stop the run and ask you (the Claude listening with `wait_for_user`) to do what a fixed step
+cannot: judge a page, choose, read something odd, get past an unexpected screen.
+
+```json
+{ "id": "check-price", "stepName": "Ask Claude: is the price right?", "description": "…", "stepType": "agent",
+  "action": { "instruction": "Is {{runtime.price}} the price shown for {{environment.product}}? If not, find the right one.",
+              "answer": { "price": { "type": "number", "description": "The price on the page" } },
+              "timeoutMs": 600000 },
+  "nextStepId": "save" }
+```
+
+- `instruction`: the question, with `{{variables}}`. `answer` (optional): the named values you must give back,
+  with their types; they become runtime variables (`{{runtime.price}}`) for the next steps. `timeoutMs`: default
+  10 minutes, at most 30; when it runs out the step fails.
+- **Failures wake you too.** By default any failed step pauses the run and asks you to find out why, get past it
+  or fix it. A workflow turns this off with `"onError": { "wake": false }`, or replaces the question with
+  `"onError": { "instruction": "…" }`. One step can send its failure elsewhere with `onErrorStepId` (a step id,
+  or `null` to just fail).
+- **When you are woken** (`wait_for_user` answers "A run woke you"): read with `get_failure` / `get_run`,
+  find the run's tab with `page_list_pages` and drive it with the `page_*` tools, fix with
+  `propose_change({ runId })` when the workflow is wrong, then always call
+  `resume_run({ runId, then: "retry" | "next" | "end" | <stepId>, answer?, note? })`. Whether your change is
+  saved at once or waits for the user's approval depends on what they allowed for this run.
+- **Before the first run of a workflow**, ask the user: "During this run, may Claude change this workflow on
+  its own?" and pass the answer to `run_workflow` as `claudeCanChange`.
+- If no Claude is listening, an Ask Claude step fails at once. Use it for judgement, not for what a fixed step
+  can do: it needs you to be there.
 
 ## Writing robust steps
 
