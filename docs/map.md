@@ -62,3 +62,16 @@ that show a screen also call `claude.show`; the extension keeps it in the chat l
 The Claude chat's own card then folds to "Shown in the side panel" with Show here (`structuredContent.shownIn`).
 Claude's `reply` is Markdown (up to 100 000 characters); a ```html block is a page drawn live by the extension's
 sandbox page (`sandbox/frame.html`: no extension access, no network, no outside scripts).
+
+## Ask Claude (a run wakes Claude)
+
+A workflow's *Ask Claude* step (`stepType: "agent"`: a stored question, an optional answer shape) and, by default,
+any failed step pause the run in the extension (`waiting_agent`, its tab kept open) and wake one listening Claude:
+`wait_for_user` returns the wake as text (`describeWake` in `src/tools/waitForUser.js`). Claude reads the run
+(`get_failure`, `get_run`), drives the run's tab (`page_list_pages` marks it with the run id), fixes the workflow
+(`propose_change` with the `runId`: saved at once when the user allowed Claude to change it during this run, else
+waiting for approval), then answers with `resume_run` (`retry`, `next`, a step id or `end`; `answer` values become
+runtime variables). Only a plugin whose `hello` lists `features: ["wake"]` gets wakes. With no such Claude
+connected, the step fails at once and the extension shows a notification. Before a workflow's first run the user
+answers "During this run, may Claude change this workflow on its own?" (the run form, or Claude asks in the chat and
+passes `claudeCanChange` to `run_workflow`). Details: `docs/integrations/extension-protocol.md` → "Ask Claude (wake)".
