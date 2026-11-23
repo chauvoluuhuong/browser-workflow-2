@@ -15,11 +15,11 @@ const V1 = [
   'ui_account_page', 'ui_account_link', 'link_computer', 'ui_confirm_link', 'ui_set_plan',
 ];
 const DROPPED = ['link_computer', 'ui_confirm_link', 'ui_new_bridge_token', 'browser_settings', 'ui_check_browser', 'ui_save_browser', 'ui_set_plan'];
-/** The widget's tools v2 adds: a proposal as it is now (approvals sync with the side panel), Show in folder, and Log out. */
-const ADDED = ['ui_proposal', 'ui_show_file', 'ui_sign_out'];
+/** The tools v2 adds: the widget's proposal as it is now (approvals sync with the side panel), Show in folder and Log out; and resume_run (Ask Claude). */
+const ADDED = ['ui_proposal', 'ui_show_file', 'ui_sign_out', 'resume_run'];
 const PAGE = ['list_pages', 'select_page', 'new_page', 'navigate_page', 'take_snapshot', 'take_screenshot', 'click', 'fill', 'press_key', 'evaluate_script', 'wait_for', 'list_console_messages', 'list_network_requests', 'get_network_request'];
 
-test('the workflow tools are v1\'s minus the dropped ones, plus the widget\'s two new ones', () => {
+test('the workflow tools are v1\'s minus the dropped ones, plus the new ones', () => {
   assert.deepEqual(WORKFLOW_TOOLS.map((t) => t.name).sort(), [...V1.filter((n) => !DROPPED.includes(n)), ...ADDED].sort());
 });
 
@@ -216,4 +216,49 @@ test('wait_for_user takes a Markdown reply of 100 000 characters', async () => {
 
 test('listening: replies are Markdown, pages are self-contained HTML, screens show in the side panel by themselves', () => {
   assert.match(INSTRUCTIONS, /Listening: .*`reply` \(Markdown, in their language\).*no outside scripts.*```html block.*appear in the side panel by themselves/);
+});
+
+// Ask Claude: resume_run answers a run that woke Claude; run_workflow carries the user's permission.
+test('resume_run goes to the extension through tools.call with its arguments, and shows nothing', async () => {
+  const s = await panelServer('claude-ai', { toolAnswer: (p) => (p.name === 'resume_run' ? { text: 'Run run_1 continues: retry step_3.', payload: {} } : undefined) });
+  const args = { runId: 'run_1', then: 'retry', note: 'The button moved; I fixed the step.', answer: { price: 12 } };
+  const r = await s.tool('resume_run', args);
+  assert.equal(r.content[0].text, 'Run run_1 continues: retry step_3.');
+  assert.deepEqual(s.calls.find((c) => c[0] === 'tools.call')[1], { name: 'resume_run', args });
+  assert.equal(s.shows().length, 0);
+  const end = await s.tool('resume_run', { runId: 'run_1', then: 'end', status: 'success' });
+  assert.notEqual(end.isError, true);
+  assert.deepEqual(s.calls.filter((c) => c[0] === 'tools.call').at(-1)[1], { name: 'resume_run', args: { runId: 'run_1', then: 'end', status: 'success' } });
+  const bad = await s.tool('resume_run', { runId: 'run_1', then: 'end', status: 'maybe' });
+  assert.equal(bad.isError, true);
+  await s.close();
+});
+
+test('resume_run with an older extension: its refusal is passed on', async () => {
+  const { LinkError } = await import('../src/link.js');
+  const s = await panelServer('claude-ai', { toolAnswer: (p) => { if (p.name === 'resume_run') throw new LinkError('unsupported', 'Unknown tool resume_run.'); } });
+  const r = await s.tool('resume_run', { runId: 'run_1', then: 'next' });
+  assert.equal(r.isError, true);
+  assert.match(r.content[0].text, /older than this plugin.*Unknown tool resume_run\./);
+  await s.close();
+});
+
+test('run_workflow passes claudeCanChange on; propose_change and the instructions speak of wakes', async () => {
+  const s = await panelServer('claude-ai');
+  await s.tool('run_workflow', { id: 'xe', claudeCanChange: true });
+  assert.deepEqual(s.calls.find((c) => c[0] === 'tools.call')[1], { name: 'run_workflow', args: { id: 'xe', claudeCanChange: true } });
+  await s.close();
+  const t = (n) => WORKFLOW_TOOLS.find((x) => x.name === n);
+  assert.match(t('propose_change').description, /During a wake of a run whose user allowed it, the change is saved at once and the run continues with it\./);
+  assert.match(t('run_workflow').description, /ask the user whether you may change it on your own during the run, and pass their answer in claudeCanChange/);
+  assert.equal(t('resume_run').noUi, true);
+  assert.match(INSTRUCTIONS, /A run can wake you \(wait_for_user returns a wake\): read with get_failure\/get_run, drive the run's tab with page_\* \(page_list_pages marks it\), fix with propose_change\(runId\), then always resume_run\. Before run_workflow on a workflow never run, ask the user whether you may change it on your own during the run\./);
+});
+
+test('the skill has the Ask Claude step', () => {
+  const skill = readFileSync(new URL('../skills/browser-workflow/SKILL.md', import.meta.url), 'utf8');
+  assert.match(skill, /## Ask Claude step/);
+  assert.match(skill, /\| `agent` \|/);
+  assert.match(skill, /onErrorStepId/);
+  assert.match(skill, /resume_run/);
 });

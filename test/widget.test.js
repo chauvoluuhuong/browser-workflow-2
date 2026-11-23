@@ -11,7 +11,7 @@ import { createServer, RESOURCE_MIME_TYPE, uiUri, UserActions, widgetHtml, WORKF
 const dist = (f) => new URL(`../dist/${f}`, import.meta.url);
 
 /** v1's tools registered without the widget (noUi). */
-const NO_UI = ['get_step_schema', 'read_workflows', 'get_workflow', 'get_history', 'read_runs', 'get_run', 'get_step', 'get_run_data', 'get_failure', 'get_account', 'set_language'];
+const NO_UI = ['get_step_schema', 'read_workflows', 'get_workflow', 'get_history', 'read_runs', 'get_run', 'get_step', 'get_run_data', 'get_failure', 'get_account', 'set_language', 'resume_run'];
 
 async function connect(link = { call: async () => ({ text: '', payload: {} }), on: () => () => {}, open: async () => {} }) {
   const server = createServer(link);
