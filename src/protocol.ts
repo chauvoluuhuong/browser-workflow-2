@@ -108,6 +108,46 @@ export interface HostStatus {
   extensionConnected: boolean;
 }
 
+/** What a plugin can do beyond the protocol version, sent in `hello`'s `features`. */
+export type Feature = 'wake';
+
+/**
+ * `user.action` with `kind: "wake"`: a run reached an Ask Claude step (planned, or the one a failed step starts) and
+ * waits for Claude, who answers with the `resume_run` tool. Sent only to a plugin whose `hello` listed `wake` in
+ * `features`; `text` says it in a sentence, as for every action.
+ */
+export interface WakeFields {
+  runId: string;
+  workflowId: string;
+  workflowName: string;
+  /** The Ask Claude step (`ask-claude` for the one a failure starts). */
+  stepId: string;
+  /** The step's question (its `{{variables}}` filled in), or the built-in one for a failure. */
+  question: string;
+  /** The step that failed, when a failure woke Claude. */
+  failed?: { stepId: string; stepName: string; error: string };
+  /** The user allowed Claude to change this workflow on its own during the run: `propose_change` is saved at once. */
+  canChange: boolean;
+  /** When the run stops waiting and fails by itself (epoch ms). */
+  untilMs?: number;
+}
+
+/**
+ * The arguments of the `resume_run` tool (through `tools.call`): Claude's answer to a run waiting for it.
+ * `then`: `next` (the step's next step; on a wake, the failed step's), `retry` (the failed step again, on a wake),
+ * `end` (end the run with `status`, default `failure`), or a step id to go to.
+ */
+export interface ResumeRunArgs {
+  runId: string;
+  then: 'next' | 'retry' | 'end' | (string & {});
+  /** Named values, checked against the step's `answer` shape; they become runtime variables. */
+  answer?: Record<string, unknown>;
+  /** What Claude found or did, kept on the Ask Claude execution and shown in the run view. */
+  note?: string;
+  /** Only with `then: "end"`. */
+  status?: 'success' | 'failure';
+}
+
 export interface Events {
   /** A run changed (each step, the end). */
   'run.update': { runId: string; workflowId: string; status: RunStatus };
@@ -125,7 +165,7 @@ export interface Events {
     silent?: boolean;
     /** `kind: "chat"`: what the user named with `@` in the message. */
     mentions?: Mention[];
-  };
+  } & Partial<WakeFields>;
   /** A proposal (import, draft, change) appeared or was decided, in the chat or the side panel. */
   'proposal.update': {
     pendingId: string; kind: 'import' | 'draft' | 'change';
@@ -139,7 +179,8 @@ export interface Events {
 }
 export type EventName = keyof Events;
 
-export type RunStatus = 'running' | 'waiting_manual' | 'success' | 'failure' | 'stopped';
+/** `waiting_agent`: an Ask Claude step waits for Claude's `resume_run` (an older plugin never sees it from an older extension). */
+export type RunStatus = 'running' | 'waiting_manual' | 'waiting_agent' | 'success' | 'failure' | 'stopped';
 
 /**
  * Results named after browser-workflow v1's view types (WorkflowSummary, RunState, …: v1 src/shared/types.ts,
@@ -168,13 +209,14 @@ export interface InspectAnswer {
 }
 
 export interface Methods {
-  hello: { params: { plugin: string; protocol: number }; result: { extension: string; protocol: ProtocolVersion; minPlugin: string } };
+  /** `features`: what this plugin understands beyond `protocol` (an older plugin sends none; an older extension ignores it). */
+  hello: { params: { plugin: string; protocol: number; features?: Feature[] }; result: { extension: string; protocol: ProtocolVersion; minPlugin: string } };
   status: { params?: Record<string, never>; result: { extension: string; protocol: ProtocolVersion; activeRunId?: string; workflows: number; runs: number; groupTabs: number } };
   'schema.get': { params?: Record<string, never>; result: { step: unknown; workflow: unknown } };
   /**
    * One of the workflow tools (browser-workflow v1's names: run_workflow, propose_change, get_failure, …), run by the
    * extension. A name it doesn't know answers `unsupported`. `get_step_schema` takes the plugin's authoring guide in
-   * `args.guide`.
+   * `args.guide`. `resume_run` takes `ResumeRunArgs`; `run_workflow` takes `claudeCanChange?: boolean`.
    */
   'tools.call': { params: { name: string; args?: Record<string, unknown> }; result: ToolOutput };
 

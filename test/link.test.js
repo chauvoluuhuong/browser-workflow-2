@@ -30,14 +30,14 @@ function fakeHost(sock, answer) {
   return new Promise((res) => server.listen(sock, () => res({ server, seen, emit: (name, data) => conns.forEach((c) => c.write(`${JSON.stringify({ type: 'event', name, data })}\n`)), close: () => new Promise((r) => { conns.forEach((c) => c.destroy()); server.close(() => r()); }) })));
 }
 
-test('says hello, then calls; refusals come back as LinkError; events reach listeners', async () => {
+test('says hello (with the features this plugin understands: wake), then calls; refusals come back as LinkError; events reach listeners', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'bw2-link-'));
   const host = await fakeHost(join(dir, 's'), (m) => (m.method === 'hello' ? { ok: true, result: { extension: '0.1.0', protocol: 1, minPlugin: '0.0.0' } }
     : m.method === 'status' ? { ok: true, result: { up: true } } : { ok: false, error: { code: 'busy', message: 'A run goes.' } }));
   const link = new Link({ plugin: '0.2.0', socket: join(dir, 's') });
   try {
     assert.deepEqual(await link.call('status'), { up: true });
-    assert.deepEqual(host.seen[0], { id: 1, type: 'call', method: 'hello', params: { plugin: '0.2.0', protocol: 1 } });
+    assert.deepEqual(host.seen[0], { id: 1, type: 'call', method: 'hello', params: { plugin: '0.2.0', protocol: 1, features: ['wake'] } });
     assert.equal(link.extension.extension, '0.1.0');
     await assert.rejects(link.call('runs.start', {}), (e) => e instanceof LinkError && e.code === 'busy' && e.message === 'A run goes.');
     const got = [];

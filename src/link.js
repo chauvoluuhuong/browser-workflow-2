@@ -7,6 +7,8 @@ import { socketPath } from './ids.js';
 
 export const OPEN_CHROME = 'Open Chrome to continue.';
 export const PROTOCOL = 1;
+/** What this plugin understands beyond PROTOCOL, sent in `hello` (an older extension ignores it): `wake` = user.action kind "wake" and resume_run. */
+export const FEATURES = ['wake'];
 
 /** An answer from the extension that is a refusal, with the protocol's code. */
 export class LinkError extends Error {
@@ -102,7 +104,7 @@ export class Link {
       this.waits.clear();
     });
     conn.on('error', () => {});
-    const hello = await this.send('hello', { plugin: this.plugin, protocol: PROTOCOL }, 10_000);
+    const hello = await this.send('hello', { plugin: this.plugin, protocol: PROTOCOL, features: FEATURES }, 10_000);
     if (hello.ok) {
       this.extension = hello.result;
       this.tooOld = undefined;

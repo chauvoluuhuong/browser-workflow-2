@@ -49,7 +49,8 @@ before sending it on):
   know without being woken (it goes with the next action). `kind: "chat"` is a message the user wrote in the side
   panel's chat: `text` is their words, and `mentions` what they named with `@`: `{ type: "workflow" | "run" | "tab",
   id?, name, url?, status?, workflowId? }` (a tab's `name` is its title, text from the page). A chat message goes
-  `to` the Claude that is listening (below), never to every client.
+  `to` the Claude that is listening (below), never to every client. `kind: "wake"` is a run waiting for Claude
+  (*Ask Claude*, below).
 - `proposal.update`: a proposal (import, draft or change) appeared or was decided, in the chat or the side panel.
   `state`: `pending`, `saved` (an import or a draft), `applied` / `discarded` (a change), `expired`; with
   `version` and `runId` when the decision saved a version or started a run. The widget reads the outcome with
@@ -101,6 +102,33 @@ or `claude://code/new?q=…`); the user presses Send. From then on:
   `{ kind: "run", runId, workflowId?, name, status, items? }` (from a finished `run.update`). The panel draws a
   card from its fields in its own language; `text` is an English fallback for a card kind it does not know.
 
+### Ask Claude (wake)
+A workflow's *Ask Claude* step (`stepType: "agent"`), and by default any failed step, pauses the run (status
+`waiting_agent`, its tab kept open) and wakes the listening Claude:
+```json
+{ "type": "event", "name": "user.action", "to": 3, "data": { "kind": "wake", "text": "Run run_m3k2a01 of HS code search waits for Claude.", "runId": "run_m3k2a01", "workflowId": "hs-search", "workflowName": "HS code search", "stepId": "ask-claude", "question": "Step 3 failed with …: find out why, get past it or fix it, then resume.", "failed": { "stepId": "step_3", "stepName": "Click Search", "error": "No element matches …" }, "canChange": false, "untilMs": 1795000000000 } }
+```
+- **Who gets it.** Only a client whose `hello` listed `"wake"` in `features` (the chat's Claude first, as for the
+  panel's actions). With none, the step fails at once ("Ask Claude could not run: Claude is not connected"). An
+  older plugin never sends `features`, so it never gets a wake.
+- **Fields** (`WakeFields` in `src/protocol.ts`): `runId`, `workflowId`, `workflowName`, `stepId` (`ask-claude` for
+  the one a failure starts), `question` (variables filled in), `failed?: { stepId, stepName, error }` (when a
+  failure woke Claude), `canChange` (the user allowed Claude to change this workflow on its own during the run:
+  then `propose_change` with the `runId` is saved at once and the run continues with the new version), `untilMs?`
+  (when the run stops waiting and fails by itself).
+- **The plugin.** `wait_for_user` returns it as text for Claude: the question, the failed step and error, whether it
+  may change the workflow on its own, where to read (`get_failure`, `get_run`), that the run's tab is in
+  `page_list_pages` (marked with the run id) and can be driven with the `page_*` tools, and to always finish with
+  `resume_run`. A wake that comes while no `wait_for_user` waits is kept like any action.
+- **The answer.** The tool `resume_run` (through `tools.call`): `{ runId, then, answer?, note?, status? }` (`ResumeRunArgs`).
+  `then`: `next` (the step's next step; on a wake, the failed step's), `retry` (the failed step again), `end` (end
+  with `status`: `success` | `failure`, default `failure`), or a step id. `answer`: named values, checked against
+  the step's `answer` shape (types only; a wrong answer is refused with the reason and not written), which become
+  runtime variables. `note`: what Claude found or did, shown in the run view. An older extension answers
+  `unsupported` and the plugin passes that on.
+- **Permission.** `run_workflow` takes `claudeCanChange?: boolean`, the user's answer to "During this run, may Claude
+  change this workflow on its own?"; the workflow remembers it.
+
 Chunk frame (host → extension only):
 ```json
 { "type": "chunk", "cid": "c12", "seq": 0, "last": false, "data": "{\"id\":\"h40\",\"type\":\"call\",…" }
@@ -109,9 +137,11 @@ Chunk frame (host → extension only):
 ## Handshake
 A client's first call is `hello`:
 ```json
-{ "id": 1, "type": "call", "method": "hello", "params": { "plugin": "0.1.0", "protocol": 1 } }
+{ "id": 1, "type": "call", "method": "hello", "params": { "plugin": "0.1.0", "protocol": 1, "features": ["wake"] } }
 { "id": 1, "ok": true, "result": { "extension": "0.1.0", "protocol": 1, "minPlugin": "0.0.0" } }
 ```
+`features` (optional) lists what the plugin understands beyond `protocol`: `wake` (the `user.action` kind `wake`
+and the `resume_run` tool, above). An older plugin sends none; an older extension ignores it.
 A client whose plugin version is below `minPlugin` gets `too_old` on every other call. A client that never sent
 `hello` is treated as the current plugin. When a socket client disconnects, the host may tell the extension
 `{ "type": "client.left", "client": 3 }`, so its `hello` is forgotten. `host_status` is answered by the host itself (process, uptime,
@@ -122,7 +152,7 @@ clients, whether the extension is connected).
 |---|---|---|
 | `status` | | extension version, protocol, the run going, counts |
 | `schema.get` | | the step and workflow JSON Schemas (v1 `get_step_schema`) |
-| `tools.call` | `name`, `args?` | `{ text, payload, isError?, images? }`: one of v1's workflow tools, run by the extension; an unknown name answers `unsupported`; `get_step_schema` takes the plugin's authoring guide in `args.guide` |
+| `tools.call` | `name`, `args?` | `{ text, payload, isError?, images? }`: one of v1's workflow tools, run by the extension; an unknown name answers `unsupported`; `get_step_schema` takes the plugin's authoring guide in `args.guide`; `resume_run` answers a run waiting for Claude (above) |
 | `workflows.list` | | `WorkflowSummary[]` |
 | `workflows.get` | `id`, `version?` | `{ workflow, detail: WorkflowDetail }` |
 | `workflows.history` | `id` | `VersionEntry[]` |
