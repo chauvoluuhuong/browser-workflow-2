@@ -132,9 +132,15 @@ describe('the plugin through the real host', { timeout: 10 * 60_000 }, () => {
   });
 
   it('propose → save & test run fails → get_failure → propose_change → apply → the rerun passes', async () => {
-    const draft = await tool('propose_workflow', { workflow: workflow('//button[@id="missing"]') });
+    // A plain failure (it does not wake Claude), so this flow fixes it with propose_change as before.
+    const draft = await tool('propose_workflow', { workflow: { ...workflow('//button[@id="missing"]'), onError: { wake: false } } });
     assert.match(draft.text, /^Draft "HS search \(plugin e2e\)" \(7 steps\) is shown for review/);
-    const saved = await tool('ui_save_draft', { pendingId: draft.data.pendingId, testRun: true });
+    // Save & test run on a workflow that never ran stops at the question first; the run starts with the answer.
+    const asked = await tool('ui_save_draft', { pendingId: draft.data.pendingId, testRun: true });
+    assert.match(asked.text, /^Not started: this workflow never ran/);
+    assert.equal(asked.data.view, 'runSetup');
+    assert.equal(asked.data.askClaudeCanChange, true);
+    const saved = await tool('run_workflow', { id: 'e2e-plugin-search', claudeCanChange: false });
     assert.match(saved.text, /^Started\. Run run_\S+ of "HS search \(plugin e2e\)" v1/);
     const failed = await runEnd(saved.data.run.runId);
     assert.equal(failed.status, 'failure');
